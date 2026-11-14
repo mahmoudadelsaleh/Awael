@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تكريم العشرة الأوائل - الصف الثاني الإعدادي (٢ / ١)</title>
+    <title>منصة التكريم التفاعلية الذكية - أ. محمود عادل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
-    <!-- مكتبة قراءة ملفات الإكسيل SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
@@ -15,123 +14,200 @@
             padding: 0;
         }
         body {
-            background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%);
+            background: #0b132b;
             color: #f8f9fa;
             font-family: 'Cairo', sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 15px;
+            padding: 10px;
             overflow-x: hidden;
         }
+
+        /* حاوية الهاتف المحمول أو الشاشة */
         .phone-frame {
             width: 100%;
             max-width: 430px;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.92);
             border: 4px solid #d4af37;
             border-radius: 30px;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4), inset 0 0 15px rgba(212, 175, 55, 0.2);
-            padding: 20px;
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.2);
+            padding: 18px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 750px;
         }
-        .ornament-top, .ornament-bottom {
-            font-family: 'Amiri', serif;
+
+        /* خلفية الفيديو المتحركة */
+        #bgVideo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.25; /* شفافية لتظهر العناصر بوضوح فوقها */
+            pointer-events: none;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+
+        /* التبويبات (Tabs) */
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 12px;
+            background: rgba(0,0,0,0.4);
+            padding: 5px;
+            border-radius: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            padding: 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #d4af37, #9a7b0c);
+            color: #000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* شاشة الإعدادات القصصية */
+        .settings-card {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid #334155;
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+        .settings-card h3 {
             color: #ffd700;
-            font-size: 1.2rem;
-            text-align: center;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
+        .input-group {
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        .input-group label {
+            display: block;
+            color: #cbd5e1;
+            margin-bottom: 3px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 6px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+        .row-inputs {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* معاينة الفيديو وقصه */
+        video.preview-vid {
+            width: 100%;
+            max-height: 140px;
+            border-radius: 8px;
+            background: #000;
+            margin-top: 5px;
+        }
+
+        /* شاشة العرض النظيف */
         header {
             text-align: center;
             margin-bottom: 10px;
             width: 100%;
             border-bottom: 2px dashed rgba(212, 175, 55, 0.4);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
-        .edu-admin {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-        .school-name {
-            font-size: 1.1rem;
-            color: #ffd700;
-            font-weight: 700;
-            margin: 2px 0;
-        }
+        .edu-admin { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+        .school-name { font-size: 1rem; color: #ffd700; font-weight: 700; margin: 2px 0; }
         .class-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #38bdf8;
             font-weight: 700;
             background: rgba(56, 189, 248, 0.1);
-            padding: 4px 12px;
-            border-radius: 15px;
+            padding: 3px 10px;
+            border-radius: 12px;
             display: inline-block;
-            margin-top: 4px;
+            margin-top: 3px;
         }
         .month-badge {
             background: linear-gradient(135deg, #d4af37, #9a7b0c);
             color: #000;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 900;
-            padding: 3px 14px;
-            border-radius: 12px;
-            margin-top: 5px;
+            padding: 2px 12px;
+            border-radius: 10px;
+            margin-top: 4px;
             display: inline-block;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
+
         .leadership {
             display: flex;
             justify-content: space-around;
             width: 100%;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: #cbd5e1;
             background: rgba(255, 255, 255, 0.05);
-            padding: 6px;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 8px;
+            margin-bottom: 8px;
             text-align: center;
         }
-        .leadership div span {
-            color: #ffd700;
-            font-weight: 600;
-            display: block;
-        }
-        .upload-section {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px dashed #d4af37;
-            padding: 8px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 0.75rem;
-            color: #cbd5e1;
-            transition: opacity 0.5s ease;
-        }
-        .upload-section input {
-            color: #ffd700;
-            font-size: 0.75rem;
-            margin-top: 4px;
-        }
+        .leadership div span { color: #ffd700; font-weight: 600; display: block; }
+
         .main-title {
             font-family: 'Amiri', serif;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: #fff;
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
         }
+
         .carousel-container {
             width: 100%;
             position: relative;
-            min-height: 330px;
+            min-height: 310px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -139,14 +215,14 @@
         }
         .intro-screen, .outro-screen, .student-card {
             width: 100%;
-            background: linear-gradient(145deg, #1e293b, #0f172a);
+            background: rgba(30, 41, 59, 0.9);
             border: 2px solid #334155;
-            border-radius: 20px;
-            padding: 18px;
+            border-radius: 18px;
+            padding: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             position: absolute;
             opacity: 0;
-            transform: scale(0.9) translateY(20px);
+            transform: scale(0.9) translateY(15px);
             transition: all 0.5s ease-in-out;
             pointer-events: none;
             display: flex;
@@ -154,7 +230,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 310px;
+            min-height: 290px;
         }
         .intro-screen.active, .outro-screen.active, .student-card.active {
             opacity: 1;
@@ -162,27 +238,10 @@
             pointer-events: auto;
             position: relative;
         }
-        .intro-title {
-            font-family: 'Amiri', serif;
-            font-size: 1.7rem;
-            color: #ffd700;
-            margin-bottom: 12px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
-        .intro-subtitle {
-            font-size: 1.05rem;
-            color: #38bdf8;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-        .intro-desc {
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            line-height: 1.5;
-        }
+
         .rank-badge {
-            width: 48px;
-            height: 48px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, #ffd700, #b8860b);
             color: #000;
             border-radius: 50%;
@@ -192,8 +251,8 @@
             font-size: 1.1rem;
             font-weight: 900;
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            margin-bottom: 8px;
-            border: 3px solid #fff;
+            margin-bottom: 6px;
+            border: 2px solid #fff;
         }
         .rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); }
         .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); }
@@ -203,157 +262,166 @@
             font-size: 1.05rem;
             font-weight: 700;
             color: #fff;
-            text-align: center;
-            margin-bottom: 10px;
-            padding: 0 5px;
+            margin-bottom: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             width: 100%;
-            padding-bottom: 5px;
+            padding-bottom: 4px;
         }
         .grades-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            gap: 5px;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .grade-box {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 8px;
-            padding: 5px;
+            border-radius: 6px;
+            padding: 4px;
             text-align: center;
         }
-        .grade-subject {
-            font-size: 0.65rem;
-            color: #94a3b8;
-            margin-bottom: 2px;
-        }
-        .grade-score {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #38bdf8;
-        }
+        .grade-subject { font-size: 0.6rem; color: #94a3b8; }
+        .grade-score { font-size: 0.8rem; font-weight: 700; color: #38bdf8; }
+
         .total-section {
             display: flex;
             justify-content: space-between;
             width: 100%;
             background: rgba(212, 175, 55, 0.15);
             border: 1px solid #d4af37;
-            padding: 6px 12px;
-            border-radius: 10px;
+            padding: 5px 10px;
+            border-radius: 8px;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
         .total-score { color: #ffd700; }
         .percentage { color: #4ade80; }
 
+        /* أزرار التحكم في العرض */
         .controls {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 6px;
+            margin-top: 10px;
             width: 100%;
             justify-content: center;
-            flex-wrap: wrap;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.4s ease;
         }
-        .controls.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        button {
+        .controls.hidden { opacity: 0; pointer-events: none; }
+        
+        button.action-btn {
             background: linear-gradient(135deg, #d4af37, #9a7b0c);
             color: #000;
             border: none;
-            padding: 7px 14px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 15px;
             font-weight: 700;
             cursor: pointer;
             font-family: 'Cairo', sans-serif;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: 0.2s;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
-        button:hover {
-            transform: scale(1.05);
-            background: linear-gradient(135deg, #ffd700, #b8860b);
-        }
-        .action-btn {
-            background: #1e293b;
-            color: #ffd700;
-            border: 1px solid #d4af37;
-        }
-        .action-btn.active-play {
-            background: #16a34a;
-            color: #fff;
-            border-color: #22c55e;
-        }
-        .footer-note {
-            margin-top: 10px;
-            font-size: 0.7rem;
-            color: #64748b;
-            text-align: center;
-            transition: opacity 0.5s ease;
-        }
-        .footer-note.hidden {
-            opacity: 0;
-        }
+        button.action-btn.active-play { background: #16a34a; color: #fff; }
     </style>
 </head>
 <body>
 
+    <!-- فيديو الخلفية -->
+    <video id="bgVideo" loop muted playsinline></video>
+
     <div class="phone-frame">
         <div class="ornament-top">✨ ﷽ ✨</div>
         
-        <header>
-            <div class="edu-admin">إدارة المحمودية التعليمية</div>
-            <div class="school-name">مدرسة الزهور ع بنين</div>
-            <div class="class-title">الصف الثاني الإعدادي (٢ / ١)</div>
-            <div><span class="month-badge" id="monthBadge">⭐ تكريم أوائل شهر أكتوبر ⭐</span></div>
-        </header>
-
-        <div class="leadership">
-            <div>مديرة المدرسة<span>أ. سلوى شلش</span></div>
-            <div>وكيلة المدرسة<span>أ. مروة يونس</span></div>
-            <div>رائد الفصل<span>أ. محمود عادل</span></div>
+        <!-- التبويبات العلوية -->
+        <div class="tabs-header" id="tabsHeader">
+            <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات والقصاص</button>
         </div>
 
-        <!-- خانة رفع ملف الإكسيل (تختفي عند التشغيل) -->
-        <div class="upload-section" id="uploadSection">
-            📁 ارفع ملف الإكسيل الشهري (مثل oct.xlsx): <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
-        </div>
-
-        <div class="main-title">🏆 لوحة شرف الأوائل 🏆</div>
-
-        <div class="carousel-container" id="cardContainer">
-            <div class="intro-screen active" id="slide-0">
-                <div class="intro-title">🌟 لوحة شرف الأوائل 🌟</div>
-                <div class="intro-subtitle" id="introSubtitle">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
-                <div class="intro-desc">نحتفي اليوم بنخبة من طلابنا المتميزين والمتفوقين تقديراً لجهودهم وتفوقهم الدراسي المشرّف.</div>
+        <!-- 1. صفحة الإعدادات والقصاص -->
+        <div class="tab-content" id="tabSettings">
+            <div class="settings-card">
+                <h3>🎬 إعدادات الفيديو الخلفي والقصاص</h3>
+                <div class="input-group">
+                    <label>اختر الفيديو (MP4):</label>
+                    <input type="file" id="videoFile" accept="video/*" onchange="loadVideo(event)">
+                </div>
+                <div class="row-inputs">
+                    <div class="input-group">
+                        <label>بداية القصاص (ثواني):</label>
+                        <input type="number" id="startTime" value="0" min="0" onchange="updateTrim()">
+                    </div>
+                    <div class="input-group">
+                        <label>نهاية القصاص (ثواني):</label>
+                        <input type="number" id="endTime" value="10" min="1" onchange="updateTrim()">
+                    </div>
+                </div>
+                <video id="previewVid" class="preview-vid" controls></video>
             </div>
-            <div class="outro-screen" id="slide-11">
-                <div class="intro-title">🎉 مبروك لكل المتفوقين 🎉</div>
-                <div class="intro-subtitle">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
-                <div class="intro-desc">إشراف رائد الفصل: أ. محمود عادل</div>
+
+            <div class="settings-card">
+                <h3>📁 ملف درجات الإكسيل</h3>
+                <div class="input-group">
+                    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h3>🎵 الموسيقى والصوت البشري</h3>
+                <div class="input-group">
+                    <label>ملف الموسيقى الخلفية (MP3):</label>
+                    <input type="file" id="audioFile" accept="audio/*" onchange="loadAudio(event)">
+                </div>
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="enableSpeech" checked> تفعيل القراءة الصوتية لأسماء الأطلاب (TTS)
+                    </label>
+                </div>
             </div>
         </div>
 
-        <div class="controls" id="controlsPanel">
-            <button class="action-btn" onclick="togglePlayMusic()" id="audioBtn">🎵 تشغيل الموسيقى</button>
-            <button class="action-btn" onclick="toggleAutoPlay()" id="playBtn">▶ تشغيل الفيديو تلقائياً</button>
-            <button onclick="prevSlide()">◀</button>
-            <button onclick="nextSlide()">▶</button>
+        <!-- 2. صفحة العرض النظيف (Display) -->
+        <div class="tab-content active" id="tabDisplay">
+            <header id="mainHeader">
+                <div class="edu-admin">إدارة المحمودية التعليمية</div>
+                <div class="school-name">مدرسة الزهور ع بنين</div>
+                <div class="class-title">الصف الثاني الإعدادي (٢ / ١)</div>
+                <div><span class="month-badge" id="monthBadge">⭐ تكريم أوائل شهر أكتوبر ⭐</span></div>
+            </header>
+
+            <div class="leadership" id="leadershipPanel">
+                <div>مديرة المدرسة<span>أ. سلوى شلش</span></div>
+                <div>وكيلة المدرسة<span>أ. مروة يونس</span></div>
+                <div>رائد الفصل<span>أ. محمود عادل</span></div>
+            </div>
+
+            <div class="main-title">🏆 لوحة شرف الأوائل 🏆</div>
+
+            <div class="carousel-container" id="cardContainer">
+                <div class="intro-screen active" id="slide-0">
+                    <div class="intro-title" style="font-family:'Amiri'; color:#ffd700; font-size:1.5rem;">🌟 لوحة شرف الأوائل 🌟</div>
+                    <div class="intro-subtitle" id="introSubtitle" style="color:#38bdf8; font-size:0.95rem;">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
+                </div>
+                <div class="outro-screen" id="slide-11">
+                    <div style="font-family:'Amiri'; color:#ffd700; font-size:1.4rem; margin-bottom:6px;">🎉 مبروك لكل المتفوقين 🎉</div>
+                    <div style="font-size:0.85rem; color:#cbd5e1;">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
+                </div>
+            </div>
+
+            <div class="controls" id="controlsPanel">
+                <button class="action-btn" onclick="toggleAutoPlay()" id="playBtn">▶ بدء العرض التلقائي والتسجيل</button>
+                <button class="action-btn" onclick="nextSlide()">▶</button>
+            </div>
         </div>
 
-        <div class="footer-note" id="footerNote">إعداد وتصميم: أ. محمود عادل</div>
         <div class="ornament-bottom">❦ ✦ ❦</div>
     </div>
 
-    <audio id="bgMusic" src="music.mp3" loop></audio>
+    <!-- عناصر الصوت وخلفية الفيديو -->
+    <audio id="bgMusic" loop></audio>
+    <audio id="applauseSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
 
     <script>
-        // الداتا الافتراضية لأوائل أكتوبر
         let students = [
             { rank: 1, name: "زياد عاطف إبراهيم محمد أبو الفتوح", arabic: 15, english: 14, math: 12, studies: 13, science: 12.5, religion: 15, total: 81.5, pct: 90.56 },
             { rank: 2, name: "إبراهيم محمد إبراهيم حسن سعد", arabic: 12.5, english: 14, math: 14, studies: 15, science: 13.5, religion: 11, total: 80, pct: 88.89 },
@@ -370,42 +438,90 @@
         let currentSlide = 0;
         let autoPlayTimer = null;
         let isPlaying = false;
+        let trimStart = 0;
+        let trimEnd = 10;
 
-        // دالة قراءة ملف الإكسيل واستخراج الأوائل تلقائياً
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            if (tabName === 'display') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tabDisplay').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tabSettings').classList.add('active');
+            }
+        }
+
+        // معالجة الفيديو وقصه
+        function loadVideo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                const bgVid = document.getElementById('bgVideo');
+                const prevVid = document.getElementById('previewVid');
+                bgVid.src = url;
+                prevVid.src = url;
+            }
+        }
+
+        function updateTrim() {
+            trimStart = parseFloat(document.getElementById('startTime').value) || 0;
+            trimEnd = parseFloat(document.getElementById('endTime').value) || 10;
+            const bgVid = document.getElementById('bgVideo');
+            bgVid.currentTime = trimStart;
+        }
+
+        // مراقبة وقت فيديو الخلفية لجعله يعمل ضمن الأجزاء المقصوصة
+        const bgVid = document.getElementById('bgVideo');
+        bgVid.addEventListener('timeupdate', () => {
+            if (bgVid.currentTime >= trimEnd) {
+                bgVid.currentTime = trimStart;
+            }
+        });
+
+        function loadAudio(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('bgMusic').src = URL.createObjectURL(file);
+            }
+        }
+
+        // قراءة الاسم بصوت اصطناعي طبيعي تشبه جيمناي (Speech Synthesis API)
+        function speakStudent(name, rank) {
+            if (!document.getElementById('enableSpeech').checked) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // إيقاف أي كلام سابق
+                let text = `الطالب ${name}, في المركز ${rank}`;
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ar-SA'; // لغة عربية فصحى نقية
+                utterance.rate = 0.95; // سرعة هادئة وواضحة
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
         function handleExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            // استخراج اسم الشهر من اسم الملف (مثلا oct.xlsx -> أكتوبر)
             let fileName = file.name.toLowerCase();
             let monthName = "أكتوبر";
             if (fileName.includes("nov")) monthName = "نوفمبر";
             else if (fileName.includes("dec")) monthName = "ديسمبر";
-            else if (fileName.includes("jan")) monthName = "يناير";
-            else if (fileName.includes("feb")) monthName = "فبراير";
-            else if (fileName.includes("mar")) monthName = "مارس";
-            else if (fileName.includes("apr")) monthName = "أبريل";
-            else if (fileName.includes("may")) monthName = "مايو";
 
             document.getElementById('monthBadge').innerText = `⭐ تكريم أوائل شهر ${monthName} ⭐`;
-            document.getElementById('introSubtitle').innerText = `تكريم طلاب الصف الثاني الإعدادي (٢ / ١) - شهر ${monthName}`;
-
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, {type: 'array'});
-                
-                // البحث عن شيت الأوائل أو استخدام الشيت الأول
                 let sheetName = workbook.SheetNames.includes("أوائل الطلاب") ? "أوائل الطلاب" : workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
 
                 let parsedStudents = [];
-                // تخطي الهيدر (أول 4 صفوف) والبدء من الصف الخامس
                 for (let i = 4; i < json.length; i++) {
                     let row = json[i];
-                    if (!row || !row[1]) continue; // إذا لم يوجد اسم طالب
-
+                    if (!row || !row[1]) continue;
                     let name = row[1];
                     let arabic = parseFloat(row[2]) || 0;
                     let english = parseFloat(row[3]) || 0;
@@ -413,27 +529,14 @@
                     let studies = parseFloat(row[5]) || 0;
                     let science = parseFloat(row[6]) || 0;
                     let religion = parseFloat(row[7]) || 0;
-                    
                     let total = arabic + english + math + studies + science + religion;
                     let pct = parseFloat(((total / 90) * 100).toFixed(2));
-
                     parsedStudents.push({ name, arabic, english, math, studies, science, religion, total, pct });
                 }
-
-                // فرز الطلاب تنازلياً حسب المجموع واختيار العشرة الأوائل
                 parsedStudents.sort((a, b) => b.total - a.total);
-                let top10 = parsedStudents.slice(0, 10).map((s, idx) => ({
-                    rank: idx + 1,
-                    ...s
-                }));
-
-                if (top10.length > 0) {
-                    students = top10;
-                    buildSlides();
-                    alert(`تم قراءة ملف الإكسيل بنجاح واستخراج أول ${top10.length} طلاب متفوقين!`);
-                } else {
-                    alert("لم يتم العثور على بيانات طلاب صحيحة في الملف.");
-                }
+                students = parsedStudents.slice(0, 10).map((s, idx) => ({ rank: idx + 1, ...s }));
+                buildSlides();
+                alert("تم تحديث بيانات الأوائل بنجاح من ملف الإكسيل!");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -442,26 +545,22 @@
             const container = document.getElementById('cardContainer');
             let introHtml = document.getElementById('slide-0').outerHTML;
             let outroHtml = document.getElementById('slide-11').outerHTML;
-            
             let middleHtml = '';
+
             students.forEach((s, idx) => {
                 let slideNum = idx + 1;
-                let rankClass = '';
-                if (s.rank === 1) rankClass = 'rank-1';
-                else if (s.rank === 2) rankClass = 'rank-2';
-                else if (s.rank === 3) rankClass = 'rank-3';
-
+                let rankClass = s.rank === 1 ? 'rank-1' : s.rank === 2 ? 'rank-2' : s.rank === 3 ? 'rank-3' : '';
                 middleHtml += `
                     <div class="student-card" id="slide-${slideNum}">
                         <div class="rank-badge ${rankClass}">${s.rank}</div>
                         <div class="student-name">${s.name}</div>
                         <div class="grades-grid">
-                            <div class="grade-box"><div class="grade-subject">لغة عربية</div><div class="grade-score">${s.arabic} / 15</div></div>
-                            <div class="grade-box"><div class="grade-subject">لغة إنجليزية</div><div class="grade-score">${s.english} / 15</div></div>
-                            <div class="grade-box"><div class="grade-subject">رياضيات</div><div class="grade-score">${s.math} / 15</div></div>
-                            <div class="grade-box"><div class="grade-subject">دراسات</div><div class="grade-score">${s.studies} / 15</div></div>
-                            <div class="grade-box"><div class="grade-subject">علوم</div><div class="grade-score">${s.science} / 15</div></div>
-                            <div class="grade-box"><div class="grade-subject">دين</div><div class="grade-score">${s.religion} / 15</div></div>
+                            <div class="grade-box"><div class="grade-subject">عربي</div><div class="grade-score">${s.arabic}/15</div></div>
+                            <div class="grade-box"><div class="grade-subject">إنجليزي</div><div class="grade-score">${s.english}/15</div></div>
+                            <div class="grade-box"><div class="grade-subject">رياضيات</div><div class="grade-score">${s.math}/15</div></div>
+                            <div class="grade-box"><div class="grade-subject">دراسات</div><div class="grade-score">${s.studies}/15</div></div>
+                            <div class="grade-box"><div class="grade-subject">علوم</div><div class="grade-score">${s.science}/15</div></div>
+                            <div class="grade-box"><div class="grade-subject">دين</div><div class="grade-score">${s.religion}/15</div></div>
                         </div>
                         <div class="total-section">
                             <span class="total-score">المجموع: ${s.total} / 90</span>
@@ -470,45 +569,22 @@
                     </div>
                 `;
             });
-
             container.innerHTML = introHtml + middleHtml + outroHtml;
         }
 
         function showSlide(index) {
             for (let i = 0; i <= 11; i++) {
                 const el = document.getElementById(`slide-${i}`);
-                if (el) {
-                    if (i === index) {
-                        el.classList.add('active');
-                    } else {
-                        el.classList.remove('active');
-                    }
-                }
+                if (el) el.classList.toggle('active', i === index);
             }
         }
 
-        function triggerConfetti() {
-            confetti({
-                particleCount: 70,
-                spread: 60,
-                origin: { y: 0.6 }
-            });
-        }
-
-        function togglePlayMusic() {
-            const audio = document.getElementById('bgMusic');
-            const btn = document.getElementById('audioBtn');
-            if (audio.paused) {
-                audio.play().then(() => {
-                    btn.textContent = "🎵 الموسيقى تعمل";
-                    btn.classList.add('active-play');
-                }).catch(e => {
-                    alert("تأكد من وجود ملف music.mp3 في المشروع.");
-                });
-            } else {
-                audio.pause();
-                btn.textContent = "🎵 تشغيل الموسيقى";
-                btn.classList.remove('active-play');
+        function triggerCelebration() {
+            confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            const applause = document.getElementById('applauseSound');
+            if (applause) {
+                applause.currentTime = 0;
+                applause.play().catch(e => {});
             }
         }
 
@@ -516,60 +592,37 @@
             if (currentSlide < 11) {
                 currentSlide++;
                 showSlide(currentSlide);
-                if (currentSlide >= 1 && currentSlide <= 10) triggerConfetti();
+                if (currentSlide >= 1 && currentSlide <= 10) {
+                    triggerCelebration();
+                    let student = students[currentSlide - 1];
+                    if (student) speakStudent(student.name, student.rank);
+                }
             } else {
                 stopAutoPlay();
             }
         }
 
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                showSlide(currentSlide);
-            }
+        function getDuration(idx) {
+            if (idx === 0) return 5000;
+            if (idx >= 1 && idx <= 10) return 4500;
+            return 2000;
         }
 
-        function getSlideDuration(slideIdx) {
-            if (slideIdx === 0) return 5000; // مقدمة 5 ثواني
-            if (slideIdx >= 1 && slideIdx <= 10) return 4000; // كل طالب 4 ثواني
-            if (slideIdx === 11) return 2000; // إغلاق ثانيتين
-            return 4000;
-        }
-
-        function runAutoPlayStep() {
+        function runStep() {
             if (currentSlide < 11) {
-                let duration = getSlideDuration(currentSlide);
                 autoPlayTimer = setTimeout(() => {
                     currentSlide++;
                     showSlide(currentSlide);
-                    if (currentSlide >= 1 && currentSlide <= 10) triggerConfetti();
-                    if (currentSlide <= 11) {
-                        runAutoPlayStep();
-                    } else {
-                        fadeOutAudio();
-                        stopAutoPlay();
+                    if (currentSlide >= 1 && currentSlide <= 10) {
+                        triggerCelebration();
+                        let student = students[currentSlide - 1];
+                        if (student) speakStudent(student.name, student.rank);
                     }
-                }, duration);
+                    if (currentSlide <= 11) runStep();
+                    else stopAutoPlay();
+                }, getDuration(currentSlide));
             } else {
-                fadeOutAudio();
                 stopAutoPlay();
-            }
-        }
-
-        function fadeOutAudio() {
-            const audio = document.getElementById('bgMusic');
-            if (!audio.paused) {
-                let fadeInterval = setInterval(() => {
-                    if (audio.volume > 0.1) {
-                        audio.volume -= 0.1;
-                    } else {
-                        audio.pause();
-                        audio.volume = 1.0;
-                        clearInterval(fadeInterval);
-                        document.getElementById('audioBtn').textContent = "🎵 تشغيل الموسيقى";
-                        document.getElementById('audioBtn').classList.remove('active-play');
-                    }
-                }, 200);
             }
         }
 
@@ -577,26 +630,23 @@
             const playBtn = document.getElementById('playBtn');
             isPlaying = !isPlaying;
             if (isPlaying) {
-                // إخفاء الأزرار ومربع رفع الملفات فور بدء الاحتفال لتسجيل الفيديو بنظافة
-                document.getElementById('uploadSection').style.opacity = '0';
-                document.getElementById('uploadSection').style.visibility = 'hidden';
+                // الانتقال التلقائي لتبويب العرض وإخفاء الأزرار أثناء التسجيل
+                switchTab('display');
+                document.getElementById('tabsHeader').style.display = 'none';
                 document.getElementById('controlsPanel').classList.add('hidden');
-                document.getElementById('footerNote').classList.add('hidden');
+                document.getElementById('mainHeader').style.opacity = '0.9';
 
-                playBtn.textContent = "⏹ إيقاف العرض";
-                playBtn.classList.add('active-play');
                 currentSlide = 0;
-                showSlide(currentSlide);
-                triggerConfetti();
-                
-                const audio = document.getElementById('bgMusic');
-                if (audio.paused) {
-                    audio.play().catch(e => {});
-                    document.getElementById('audioBtn').textContent = "🎵 الموسيقى تعمل";
-                    document.getElementById('audioBtn').classList.add('active-play');
-                }
+                showSlide(0);
+                triggerCelebration();
 
-                runAutoPlayStep();
+                // تشغيل فيديو الخلفية والموسيقى
+                bgVid.currentTime = trimStart;
+                bgVid.play().catch(e => {});
+                const music = document.getElementById('bgMusic');
+                if (music.src) music.play().catch(e => {});
+
+                runStep();
             } else {
                 stopAutoPlay();
             }
@@ -605,15 +655,11 @@
         function stopAutoPlay() {
             isPlaying = false;
             clearTimeout(autoPlayTimer);
-            // إظهار الأزرار مرة أخرى عند الإيقاف
-            document.getElementById('uploadSection').style.opacity = '1';
-            document.getElementById('uploadSection').style.visibility = 'visible';
+            bgVid.pause();
+            document.getElementById('bgMusic').pause();
+            document.getElementById('tabsHeader').style.display = 'flex';
             document.getElementById('controlsPanel').classList.remove('hidden');
-            document.getElementById('footerNote').classList.remove('hidden');
-
-            const playBtn = document.getElementById('playBtn');
-            playBtn.textContent = "▶ تشغيل الفيديو تلقائياً";
-            playBtn.classList.remove('active-play');
+            document.getElementById('playBtn').textContent = "▶ بدء العرض التلقائي والتسجيل";
         }
 
         window.onload = () => {
