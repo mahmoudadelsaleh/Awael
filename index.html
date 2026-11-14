@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تكريم العشرة الأوائل - أوائل شهر أكتوبر - الصف الثاني الإعدادي (٢ / ١)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%);
+            color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+        .phone-frame {
+            width: 100%;
+            max-width: 430px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 4px solid #d4af37;
+            border-radius: 30px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4), inset 0 0 15px rgba(212, 175, 55, 0.2);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .ornament-top, .ornament-bottom {
+            font-family: 'Amiri', serif;
+            color: #ffd700;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 12px;
+            width: 100%;
+            border-bottom: 2px dashed rgba(212, 175, 55, 0.4);
+            padding-bottom: 8px;
+        }
+        .edu-admin {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .school-name {
+            font-size: 1.1rem;
+            color: #ffd700;
+            font-weight: 700;
+            margin: 2px 0;
+        }
+        .class-title {
+            font-size: 0.9rem;
+            color: #38bdf8;
+            font-weight: 700;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 4px 12px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .month-badge {
+            background: linear-gradient(135deg, #d4af37, #9a7b0c);
+            color: #000;
+            font-size: 0.85rem;
+            font-weight: 900;
+            padding: 3px 14px;
+            border-radius: 12px;
+            margin-top: 5px;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .leadership {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 0.72rem;
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .leadership div span {
+            color: #ffd700;
+            font-weight: 600;
+            display: block;
+        }
+        .main-title {
+            font-family: 'Amiri', serif;
+            font-size: 1.3rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .carousel-container {
+            width: 100%;
+            position: relative;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .intro-screen, .outro-screen, .student-card {
+            width: 100%;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 2px solid #334155;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.5s ease-in-out;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 330px;
+        }
+        .intro-screen.active, .outro-screen.active, .student-card.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            position: relative;
+        }
+        .intro-title {
+            font-family: 'Amiri', serif;
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        .intro-subtitle {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .intro-desc {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        .rank-badge {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: 900;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            margin-bottom: 8px;
+            border: 3px solid #fff;
+        }
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); }
+        .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+
+        .student-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 0 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            padding-bottom: 5px;
+        }
+        .grades-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .grade-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            padding: 5px;
+            text-align: center;
+        }
+        .grade-subject {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+        .grade-score {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+        .total-section {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid #d4af37;
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .total-score { color: #ffd700; }
+        .percentage { color: #4ade80; }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: linear-gradient(135deg, #d4af37, #9a7b0c);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+        }
+        .action-btn {
+            background: #1e293b;
+            color: #ffd700;
+            border: 1px solid #d4af37;
+        }
+        .action-btn.active-play {
+            background: #16a34a;
+            color: #fff;
+            border-color: #22c55e;
+        }
+        .footer-note {
+            margin-top: 12px;
+            font-size: 0.7rem;
+            color: #64748b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame">
+        <div class="ornament-top">✨ ﷽ ✨</div>
+        
+        <header>
+            <div class="edu-admin">إدارة المحمودية التعليمية</div>
+            <div class="school-name">مدرسة الزهور ع بنين</div>
+            <div class="class-title">الصف الثاني الإعدادي (٢ / ١)</div>
+            <div><span class="month-badge">⭐ تكريم أوائل شهر أكتوبر ⭐</span></div>
+        </header>
+
+        <div class="leadership">
+            <div>مديرة المدرسة<span>أ. سلوى شلش</span></div>
+            <div>وكيلة المدرسة<span>أ. مروة يونس</span></div>
+            <div>رائد الفصل<span>أ. محمود عادل</span></div>
+        </div>
+
+        <div class="carousel-container" id="cardContainer">
+            <!-- Intro Screen (Index 0) - 5 seconds -->
+            <div class="intro-screen active" id="slide-0">
+                <div class="intro-title">🌟 لوحة شرف الأوائل 🌟</div>
+                <div class="intro-subtitle">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
+                <div class="intro-desc">نحتفي اليوم بنخبة من طلابنا المتميزين والمتفوقين في شهر أكتوبر تقديراً لجهودهم وتفوقهم الدراسي المشرّف.</div>
+            </div>
+
+            <!-- Student 1 to 10 (Indices 1 to 10) - 4 seconds each -->
+            <!-- Outro Screen (Index 11) - 2 seconds with fade out -->
+            <div class="outro-screen" id="slide-11">
+                <div class="intro-title">🎉 مبروك لكل المتفوقين 🎉</div>
+                <div class="intro-subtitle">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
+                <div class="intro-desc">إشراف رائد الفصل: أ. محمود عادل</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="action-btn" onclick="togglePlayMusic()" id="audioBtn">🎵 تشغيل الموسيقى</button>
+            <button class="action-btn" onclick="toggleAutoPlay()" id="playBtn">▶ تشغيل الفيديو تلقائياً</button>
+            <button onclick="prevSlide()">◀</button>
+            <button onclick="nextSlide()">▶</button>
+        </div>
+
+        <div class="footer-note">إعداد وتصميم: أ. محمود عادل</div>
+        <div class="ornament-bottom">❦ ✦ ❦</div>
+    </div>
+
+    <!-- Background Audio Element linked directly to music.mp3 in GitHub Repo -->
+    <audio id="bgMusic" src="music.mp3" loop></audio>
+
+    <script>
+        const students = [
+            { rank: 1, name: "زياد عاطف إبراهيم محمد أبو الفتوح", arabic: 15, english: 14, math: 12, studies: 13, science: 12.5, religion: 15, total: 81.5, pct: 90.56 },
+            { rank: 2, name: "إبراهيم محمد إبراهيم حسن سعد", arabic: 12.5, english: 14, math: 14, studies: 15, science: 13.5, religion: 11, total: 80, pct: 88.89 },
+            { rank: 3, name: "أحمد حمدي أحمد محمد شاهين", arabic: 13.5, english: 13, math: 12, studies: 15, science: 13.5, religion: 13, total: 80, pct: 88.89 },
+            { rank: 4, name: "أشرف محمد محمد الششتاوي", arabic: 12, english: 15, math: 15, studies: 15, science: 13.5, religion: 8, total: 78.5, pct: 87.22 },
+            { rank: 5, name: "أحمد محمد أحمد أحمد ناصر", arabic: 10, english: 13, math: 13.5, studies: 15, science: 14.5, religion: 12, total: 78, pct: 86.67 },
+            { rank: 6, name: "أسامه عبدالله علي علي يونس", arabic: 10.5, english: 13, math: 13.5, studies: 13, science: 15, religion: 10, total: 75, pct: 83.33 },
+            { rank: 7, name: "إياد عماد جمال عوض مسعود", arabic: 11, english: 12, math: 12.5, studies: 13, science: 12.5, religion: 14, total: 75, pct: 83.33 },
+            { rank: 8, name: "ريان طارق رفاعي شبل", arabic: 13, english: 7, math: 14, studies: 15, science: 13, religion: 13, total: 75, pct: 83.33 },
+            { rank: 9, name: "مازن جاد الله محمود إمام السيد", arabic: 11.5, english: 12, math: 13.5, studies: 15, science: 11, religion: 10, total: 73, pct: 81.11 },
+            { rank: 10, name: "أحمد سعد محمد سعد محمد أبوليلة", arabic: 10, english: 11, math: 14, studies: 15, science: 11, religion: 11, total: 72, pct: 80.0 }
+        ];
+
+        let currentSlide = 0;
+        let autoPlayTimer = null;
+        let isPlaying = false;
+
+        function buildSlides() {
+            const container = document.getElementById('cardContainer');
+            let introHtml = document.getElementById('slide-0').outerHTML;
+            let outroHtml = document.getElementById('slide-11').outerHTML;
+            
+            let middleHtml = '';
+            students.forEach((s, idx) => {
+                let slideNum = idx + 1;
+                let rankClass = '';
+                if (s.rank === 1) rankClass = 'rank-1';
+                else if (s.rank === 2) rankClass = 'rank-2';
+                else if (s.rank === 3) rankClass = 'rank-3';
+
+                middleHtml += `
+                    <div class="student-card" id="slide-${slideNum}">
+                        <div class="rank-badge ${rankClass}">${s.rank}</div>
+                        <div class="student-name">${s.name}</div>
+                        <div class="grades-grid">
+                            <div class="grade-box"><div class="grade-subject">لغة عربية</div><div class="grade-score">${s.arabic} / 15</div></div>
+                            <div class="grade-box"><div class="grade-subject">لغة إنجليزية</div><div class="grade-score">${s.english} / 15</div></div>
+                            <div class="grade-box"><div class="grade-subject">رياضيات</div><div class="grade-score">${s.math} / 15</div></div>
+                            <div class="grade-box"><div class="grade-subject">دراسات</div><div class="grade-score">${s.studies} / 15</div></div>
+                            <div class="grade-box"><div class="grade-subject">علوم</div><div class="grade-score">${s.science} / 15</div></div>
+                            <div class="grade-box"><div class="grade-subject">دين</div><div class="grade-score">${s.religion} / 15</div></div>
+                        </div>
+                        <div class="total-section">
+                            <span class="total-score">المجموع: ${s.total} / 90</span>
+                            <span class="percentage">النسبة: ${s.pct}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = introHtml + middleHtml + outroHtml;
+        }
+
+        function showSlide(index) {
+            for (let i = 0; i <= 11; i++) {
+                const el = document.getElementById(`slide-${i}`);
+                if (el) {
+                    if (i === index) {
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                }
+            }
+        }
+
+        function triggerConfetti() {
+            confetti({
+                particleCount: 70,
+                spread: 60,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function togglePlayMusic() {
+            const audio = document.getElementById('bgMusic');
+            const btn = document.getElementById('audioBtn');
+            if (audio.paused) {
+                audio.play().then(() => {
+                    btn.textContent = "🎵 الموسيقى تعمل";
+                    btn.classList.add('active-play');
+                }).catch(e => {
+                    alert("تعذر تشغيل الصوت. تأكد من وجود ملف music.mp3 في نفس المستودع على جيت هب.");
+                });
+            } else {
+                audio.pause();
+                btn.textContent = "🎵 تشغيل الموسيقى";
+                btn.classList.remove('active-play');
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < 11) {
+                currentSlide++;
+                showSlide(currentSlide);
+                if (currentSlide >= 1 && currentSlide <= 10) {
+                    triggerConfetti();
+                }
+            } else {
+                stopAutoPlay();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        function getSlideDuration(slideIdx) {
+            if (slideIdx === 0) return 5000;
+            if (slideIdx >= 1 && slideIdx <= 10) return 4000;
+            if (slideIdx === 11) return 2000;
+            return 4000;
+        }
+
+        function runAutoPlayStep() {
+            if (currentSlide < 11) {
+                let duration = getSlideDuration(currentSlide);
+                autoPlayTimer = setTimeout(() => {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                    if (currentSlide >= 1 && currentSlide <= 10) {
+                        triggerConfetti();
+                    }
+                    if (currentSlide <= 11) {
+                        runAutoPlayStep();
+                    } else {
+                        fadeOutAudio();
+                        stopAutoPlay();
+                    }
+                }, duration);
+            } else {
+                fadeOutAudio();
+                stopAutoPlay();
+            }
+        }
+
+        function fadeOutAudio() {
+            const audio = document.getElementById('bgMusic');
+            if (!audio.paused) {
+                let fadeInterval = setInterval(() => {
+                    if (audio.volume > 0.1) {
+                        audio.volume -= 0.1;
+                    } else {
+                        audio.pause();
+                        audio.volume = 1.0;
+                        clearInterval(fadeInterval);
+                        const btn = document.getElementById('audioBtn');
+                        btn.textContent = "🎵 تشغيل الموسيقى";
+                        btn.classList.remove('active-play');
+                    }
+                }, 200);
+            }
+        }
+
+        function toggleAutoPlay() {
+            const playBtn = document.getElementById('playBtn');
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                playBtn.textContent = "⏹ إيقاف العرض";
+                playBtn.classList.add('active-play');
+                currentSlide = 0;
+                showSlide(currentSlide);
+                triggerConfistics = true;
+                triggerConfetti();
+                
+                const audio = document.getElementById('bgMusic');
+                if (audio.paused) {
+                    audio.play().catch(e => {});
+                    document.getElementById('audioBtn').textContent = "🎵 الموسيقى تعمل";
+                    document.getElementById('audioBtn').classList.add('active-play');
+                }
+
+                runAutoPlayStep();
+            } else {
+                stopAutoPlay();
+            }
+        }
+
+        function stopAutoPlay() {
+            isPlaying = false;
+            clearTimeout(autoPlayTimer);
+            const playBtn = document.getElementById('playBtn');
+            playBtn.textContent = "▶ تشغيل الفيديو تلقائياً";
+            playBtn.classList.remove('active-play');
+        }
+
+        window.onload = () => {
+            buildSlides();
+            showSlide(0);
+        };
+    </script>
+</body>
+</html>
