@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التكريم الذكية المتقدمة - أ. محمود عادل</title>
+    <title>منصة التكريم الذكية والتحرير - أ. محمود عادل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -20,20 +20,20 @@
             padding: 10px;
             overflow-x: hidden;
         }
+        /* تم تقليل ارتفاع الإطار وإزالة الفراغات الزائدة من الأسفل */
         .phone-frame {
             width: 100%;
-            max-width: 430px;
-            background: rgba(15, 23, 42, 0.95);
+            max-width: 420px;
+            background: rgba(15, 23, 42, 0.96);
             border: 4px solid #d4af37;
-            border-radius: 30px;
+            border-radius: 25px;
             box-shadow: 0 0 35px rgba(212, 175, 55, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.2);
-            padding: 16px;
+            padding: 12px 14px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 750px;
         }
         #bgVideo {
             position: absolute;
@@ -44,96 +44,109 @@
             position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;
         }
         .tabs-header {
-            display: flex; gap: 6px; width: 100%; margin-bottom: 10px;
-            background: rgba(0,0,0,0.5); padding: 4px; border-radius: 12px;
+            display: flex; gap: 4px; width: 100%; margin-bottom: 8px;
+            background: rgba(0,0,0,0.5); padding: 3px; border-radius: 10px;
         }
         .tab-btn {
-            flex: 1; background: transparent; color: #94a3b8; border: none; padding: 7px;
-            border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
+            flex: 1; background: transparent; color: #94a3b8; border: none; padding: 5px;
+            border-radius: 7px; font-weight: 700; font-size: 0.72rem; cursor: pointer; transition: 0.3s;
         }
         .tab-btn.active {
             background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
         }
         .tab-content { display: none; width: 100%; flex-direction: column; align-items: center; }
         .tab-content.active { display: flex; }
 
         .settings-card {
-            width: 100%; background: rgba(30, 41, 59, 0.92);
-            border: 1px solid #334155; border-radius: 12px; padding: 10px; margin-bottom: 8px; font-size: 0.78rem;
-            max-height: 380px; overflow-y: auto;
+            width: 100%; background: rgba(30, 41, 59, 0.94);
+            border: 1px solid #334155; border-radius: 10px; padding: 8px; margin-bottom: 6px; font-size: 0.75rem;
+            max-height: 340px; overflow-y: auto;
         }
-        .settings-card h3 { color: #ffd700; margin-bottom: 6px; font-size: 0.85rem; }
-        .input-group { margin-bottom: 6px; width: 100%; }
+        .settings-card h3 { color: #ffd700; margin-bottom: 4px; font-size: 0.8rem; }
+        .input-group { margin-bottom: 5px; width: 100%; }
         .input-group label { display: block; color: #cbd5e1; margin-bottom: 2px; }
         .input-group input, .input-group select {
-            width: 100%; padding: 5px; background: #0f172a; border: 1px solid #475569;
-            color: #fff; border-radius: 6px; font-size: 0.78rem;
+            width: 100%; padding: 4px; background: #0f172a; border: 1px solid #475569;
+            color: #fff; border-radius: 5px; font-size: 0.75rem;
         }
-        .row-inputs { display: flex; gap: 6px; }
-        video.preview-vid { width: 100%; max-height: 100px; border-radius: 6px; background: #000; margin-top: 4px; }
+        .row-inputs { display: flex; gap: 4px; }
+        video.preview-vid { width: 100%; max-height: 80px; border-radius: 5px; background: #000; margin-top: 3px; }
 
         button.clip-btn {
             background: #334155; color: #38bdf8; border: 1px solid #38bdf8;
-            padding: 3px 6px; border-radius: 5px; font-size: 0.7rem; cursor: pointer; margin-top: 3px; font-weight: 600;
+            padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; cursor: pointer; margin-top: 2px; font-weight: 600;
         }
         button.clip-btn:hover { background: #38bdf8; color: #000; }
 
-        header { text-align: center; margin-bottom: 8px; width: 100%; border-bottom: 2px dashed rgba(212, 175, 55, 0.4); padding-bottom: 5px; }
-        .edu-admin { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
-        .school-name { font-size: 0.95rem; color: #ffd700; font-weight: 700; margin: 2px 0; }
+        /* جدول تعديل وحذف الأوائل */
+        .students-table {
+            width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 0.7rem; color: #fff;
+        }
+        .students-table th, .students-table td {
+            border: 1px solid #475569; padding: 3px; text-align: center;
+        }
+        .students-table th { background: #1e293b; color: #ffd700; }
+        .students-table input { width: 100%; background: #0f172a; border: none; color: #fff; text-align: center; font-size: 0.7rem; }
+        .table-btn { padding: 2px 5px; border-radius: 4px; border: none; font-size: 0.65rem; cursor: pointer; font-weight: 700; }
+        .btn-del { background: #ef4444; color: #fff; }
+        .btn-add { background: #10b981; color: #fff; width: 100%; margin-top: 5px; padding: 4px; }
+
+        header { text-align: center; margin-bottom: 6px; width: 100%; border-bottom: 2px dashed rgba(212, 175, 55, 0.4); padding-bottom: 4px; }
+        .edu-admin { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
+        .school-name { font-size: 0.9rem; color: #ffd700; font-weight: 700; margin: 1px 0; }
         .class-title {
-            font-size: 0.8rem; color: #38bdf8; font-weight: 700;
-            background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 10px; display: inline-block;
+            font-size: 0.75rem; color: #38bdf8; font-weight: 700;
+            background: rgba(56, 189, 248, 0.1); padding: 2px 6px; border-radius: 8px; display: inline-block;
         }
         .month-badge {
             background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000;
-            font-size: 0.75rem; font-weight: 900; padding: 2px 10px; border-radius: 8px; margin-top: 3px; display: inline-block;
+            font-size: 0.7rem; font-weight: 900; padding: 2px 8px; border-radius: 6px; margin-top: 2px; display: inline-block;
         }
         .leadership {
-            display: flex; justify-content: space-around; width: 100%; font-size: 0.68rem;
-            color: #cbd5e1; background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: 6px; margin-bottom: 6px; text-align: center;
+            display: flex; justify-content: space-around; width: 100%; font-size: 0.65rem;
+            color: #cbd5e1; background: rgba(255, 255, 255, 0.05); padding: 3px; border-radius: 5px; margin-bottom: 5px; text-align: center;
         }
         .leadership div span { color: #ffd700; font-weight: 600; display: block; }
-        .main-title { font-family: 'Amiri', serif; font-size: 1.1rem; color: #fff; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); margin-bottom: 6px; text-align: center; }
+        .main-title { font-family: 'Amiri', serif; font-size: 1rem; color: #fff; text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); margin-bottom: 4px; text-align: center; }
 
-        .carousel-container { width: 100%; position: relative; min-height: 290px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .carousel-container { width: 100%; position: relative; min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .intro-screen, .outro-screen, .student-card {
-            width: 100%; background: rgba(30, 41, 59, 0.94); border: 2px solid #334155; border-radius: 16px;
-            padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: absolute; opacity: 0;
-            transform: scale(0.9) translateY(15px); transition: all 0.5s ease-in-out; pointer-events: none;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 270px;
+            width: 100%; background: rgba(30, 41, 59, 0.95); border: 2px solid #334155; border-radius: 14px;
+            padding: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); position: absolute; opacity: 0;
+            transform: scale(0.9) translateY(10px); transition: all 0.4s ease-in-out; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 245px;
         }
         .intro-screen.active, .outro-screen.active, .student-card.active {
             opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; position: relative;
         }
         .rank-badge {
-            width: 42px; height: 42px; background: linear-gradient(135deg, #ffd700, #b8860b); color: #000;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1rem;
-            font-weight: 900; box-shadow: 0 0 12px rgba(212, 175, 55, 0.6); margin-bottom: 5px; border: 2px solid #fff;
+            width: 38px; height: 38px; background: linear-gradient(135deg, #ffd700, #b8860b); color: #000;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.95rem;
+            font-weight: 900; box-shadow: 0 0 10px rgba(212, 175, 55, 0.6); margin-bottom: 4px; border: 2px solid #fff;
         }
         .rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); }
         .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); }
         .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
 
-        .student-name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%; padding-bottom: 3px; }
-        .grades-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; margin-bottom: 6px; }
-        .grade-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 6px; padding: 3px; text-align: center; }
-        .grade-subject { font-size: 0.58rem; color: #94a3b8; }
-        .grade-score { font-size: 0.75rem; font-weight: 700; color: #38bdf8; }
+        .student-name { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%; padding-bottom: 2px; }
+        .grades-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; width: 100%; margin-bottom: 5px; }
+        .grade-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 5px; padding: 2px; text-align: center; }
+        .grade-subject { font-size: 0.55rem; color: #94a3b8; }
+        .grade-score { font-size: 0.7rem; font-weight: 700; color: #38bdf8; }
         .total-section {
             display: flex; justify-content: space-between; width: 100%; background: rgba(212, 175, 55, 0.15);
-            border: 1px solid #d4af37; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;
+            border: 1px solid #d4af37; padding: 3px 6px; border-radius: 5px; font-weight: 700; font-size: 0.7rem;
         }
         .total-score { color: #ffd700; }
         .percentage { color: #4ade80; }
 
-        .controls { display: flex; gap: 6px; margin-top: 8px; width: 100%; justify-content: center; transition: opacity 0.4s ease; }
+        .controls { display: flex; gap: 5px; margin-top: 6px; width: 100%; justify-content: center; transition: opacity 0.3s ease; }
         .controls.hidden { opacity: 0; pointer-events: none; }
         button.action-btn {
             background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000; border: none;
-            padding: 5px 10px; border-radius: 12px; font-weight: 700; cursor: pointer; font-family: 'Cairo', sans-serif;
-            font-size: 0.72rem; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            padding: 4px 8px; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Cairo', sans-serif;
+            font-size: 0.68rem; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         button.action-btn.active-play { background: #16a34a; color: #fff; }
     </style>
@@ -141,78 +154,18 @@
 <body>
 
     <video id="bgVideo" loop muted playsinline></video>
-    <!-- عنصر صوتي مخصص لتشغيل المقاطع الصوتية المقصوصة بدقة -->
     <audio id="customAudio"></audio>
 
     <div class="phone-frame">
         <div class="ornament-top">✨ ﷽ ✨</div>
         
         <div class="tabs-header" id="tabsHeader">
-            <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم النظيف</button>
-            <button class="tab-btn" onclick="switchTab('settings')">⚙️ إعدادات التوقيتات والأجزاء الصوتية</button>
+            <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم</button>
+            <button class="tab-btn" onclick="switchTab('table')">📊 جدول البيانات</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات والصوت</button>
         </div>
 
-        <!-- تبويب الإعدادات المتقدمة -->
-        <div class="tab-content" id="tabSettings">
-            <div class="settings-card">
-                <h3>🎬 إعدادات الفيديو الخلفي والمدة</h3>
-                <div class="input-group">
-                    <label>اختر الفيديو الكامل:</label>
-                    <input type="file" id="videoFile" accept="video/*" onchange="loadVideo(event)">
-                </div>
-                <div class="input-group">
-                    <label>مدة عرض بطاقة كل طالب (بالثواني):</label>
-                    <input type="number" id="cardDurationInput" value="4.5" min="1" max="20" step="0.5">
-                </div>
-                <video id="previewVid" class="preview-vid" controls></video>
-            </div>
-
-            <div class="settings-card">
-                <h3>🎵 تخصيص الأجزاء الصوتية (من وإلى بالثواني)</h3>
-                
-                <!-- 1. صوت المقدمة -->
-                <div class="input-group">
-                    <label><b>1. صوت المقدمة (Intro Audio):</b></label>
-                    <div class="row-inputs">
-                        <div><label style="font-size:0.65rem">من (ثانية)</label><input type="number" id="intro_start" value="0" min="0"></div>
-                        <div><label style="font-size:0.65rem">إلى (ثانية)</label><input type="number" id="intro_end" value="5" min="1"></div>
-                    </div>
-                    <button class="clip-btn" onclick="previewAudioPart('intro')">▶ معاينة صوت المقدمة</button>
-                </div>
-
-                <!-- 2. صوت عرض الطلاب -->
-                <div class="input-group" style="margin-top:6px;">
-                    <label><b>2. صوت خلفية عرض الطلاب (Presentation Audio):</b></label>
-                    <div class="row-inputs">
-                        <div><label style="font-size:0.65rem">من (ثانية)</label><input type="number" id="students_start" value="6" min="0"></div>
-                        <div><label style="font-size:0.65rem">إلى (ثانية)</label><input type="number" id="students_end" value="50" min="1"></div>
-                    </div>
-                    <button class="clip-btn" onclick="previewAudioPart('students')">▶ معاينة صوت الطلاب</button>
-                </div>
-
-                <!-- 3. صوت الإنهاء -->
-                <div class="input-group" style="margin-top:6px;">
-                    <label><b>3. صوت الإنهاء والخاتمة (Outro Audio):</b></label>
-                    <div class="row-inputs">
-                        <div><label style="font-size:0.65rem">من (ثانية)</label><input type="number" id="outro_start" value="51" min="0"></div>
-                        <div><label style="font-size:0.65rem">إلى (ثانية)</label><input type="number" id="outro_end" value="60" min="1"></div>
-                    </div>
-                    <button class="clip-btn" onclick="previewAudioPart('outro')">▶ معاينة صوت الإنهاء</button>
-                </div>
-            </div>
-
-            <div class="settings-card">
-                <h3>📁 ملف درجات الإكسيل والمحرك الصوتي</h3>
-                <div class="input-group">
-                    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
-                </div>
-                <div class="input-group">
-                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب آلياً أثناء ظهوره</label>
-                </div>
-            </div>
-        </div>
-
-        <!-- تبويب العرض النظيف -->
+        <!-- 1. تبويب عرض التكريم -->
         <div class="tab-content active" id="tabDisplay">
             <header id="mainHeader">
                 <div class="edu-admin">إدارة المحمودية التعليمية</div>
@@ -231,18 +184,77 @@
 
             <div class="carousel-container" id="cardContainer">
                 <div class="intro-screen active" id="slide-0">
-                    <div class="intro-title" style="font-family:'Amiri'; color:#ffd700; font-size:1.4rem;">🌟 لوحة شرف الأوائل 🌟</div>
-                    <div class="intro-subtitle" id="introSubtitle" style="color:#38bdf8; font-size:0.9rem;">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
+                    <div class="intro-title" style="font-family:'Amiri'; color:#ffd700; font-size:1.3rem;">🌟 لوحة شرف الأوائل 🌟</div>
+                    <div class="intro-subtitle" id="introSubtitle" style="color:#38bdf8; font-size:0.85rem;">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
                 </div>
                 <div class="outro-screen" id="slide-11">
-                    <div style="font-family:'Amiri'; color:#ffd700; font-size:1.3rem; margin-bottom:5px;">🎉 مبروك لكل المتفوقين 🎉</div>
-                    <div style="font-size:0.8rem; color:#cbd5e1;">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
+                    <div style="font-family:'Amiri'; color:#ffd700; font-size:1.2rem; margin-bottom:4px;">🎉 مبروك لكل المتفوقين 🎉</div>
+                    <div style="font-size:0.75rem; color:#cbd5e1;">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
                 </div>
             </div>
 
             <div class="controls" id="controlsPanel">
                 <button class="action-btn" onclick="toggleAutoPlay()" id="playBtn">▶ بدء العرض التلقائي والتسجيل</button>
                 <button class="action-btn" onclick="nextSlide()">▶</button>
+            </div>
+        </div>
+
+        <!-- 2. تبويب جدول البيانات (التحرير والإضافة والحذف تماماً مثل شيت إكسل) -->
+        <div class="tab-content" id="tabTable">
+            <div class="settings-card">
+                <h3>📊 تحرير بيانات الأوائل (تعديل، حذف، إضافة)</h3>
+                <div class="input-group">
+                    <label>رفع ملف الإكسيل الجديد:</label>
+                    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
+                </div>
+                <div style="max-height: 200px; overflow-y: auto; margin-top: 5px;">
+                    <table class="students-table" id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>المركز</th>
+                                <th>اسم الطالب</th>
+                                <th>المجموع</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </tbody>
+                    </table>
+                </div>
+                <button class="table-btn btn-add" onclick="addNewStudent()">+ إضافة طالب جديد</button>
+            </div>
+        </div>
+
+        <!-- 3. تبويب الإعدادات والصوتيات -->
+        <div class="tab-content" id="tabSettings">
+            <div class="settings-card">
+                <h3>🎬 إعدادات الفيديو والمدة الافتراضية</h3>
+                <div class="input-group">
+                    <label>اختر الفيديو الخلفي:</label>
+                    <input type="file" id="videoFile" accept="video/*" onchange="loadVideo(event)">
+                </div>
+                <div class="input-group">
+                    <label>مدة عرض بطاقة كل طالب (افتراضياً 10 ثوانٍ):</label>
+                    <input type="number" id="cardDurationInput" value="10" min="1" max="30" step="0.5">
+                </div>
+                <video id="previewVid" class="preview-vid" controls></video>
+            </div>
+
+            <div class="settings-card">
+                <h3>🎵 تخصيص الأجزاء الصوتية (بالثواني)</h3>
+                <div class="input-group">
+                    <label><b>1. المقدمة:</b> من <input type="number" id="intro_start" value="0" style="width:50px; display:inline;"> إلى <input type="number" id="intro_end" value="5" style="width:50px; display:inline;"></label>
+                </div>
+                <div class="input-group">
+                    <label><b>2. خلفية الطلاب:</b> من <input type="number" id="students_start" value="6" style="width:50px; display:inline;"> إلى <input type="number" id="students_end" value="50" style="width:50px; display:inline;"></label>
+                </div>
+                <div class="input-group">
+                    <label><b>3. الخاتمة:</b> من <input type="number" id="outro_start" value="51" style="width:50px; display:inline;"> إلى <input type="number" id="outro_end" value="60" style="width:50px; display:inline;"></label>
+                </div>
+                <div class="input-group">
+                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب آلياً</label>
+                </div>
             </div>
         </div>
 
@@ -277,10 +289,57 @@
             if (tabName === 'display') {
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
                 document.getElementById('tabDisplay').classList.add('active');
-            } else {
+            } else if (tabName === 'table') {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tabTable').classList.add('active');
+                renderTable();
+            } else {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
                 document.getElementById('tabSettings').classList.add('active');
             }
+        }
+
+        // تحديث جدول التحرير في التاب الثاني
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            students.forEach((s, idx) => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td><input type="text" value="${s.name}" onchange="updateStudent(${idx}, 'name', this.value)"></td>
+                    <td><input type="number" value="${s.total}" onchange="updateStudent(${idx}, 'total', this.value)"></td>
+                    <td><button class="table-btn btn-del" onclick="deleteStudent(${idx})">حذف</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStudent(idx, field, value) {
+            students[idx][field] = field === 'total' ? parseFloat(value) || 0 : value;
+            if (field === 'total') {
+                students[idx].pct = parseFloat(((students[idx].total / 90) * 100).toFixed(2));
+            }
+            buildSlides();
+        }
+
+        function deleteStudent(idx) {
+            students.splice(idx, 1);
+            // إعادة ترتيب المراكز
+            students.forEach((s, i) => s.rank = i + 1);
+            renderTable();
+            buildSlides();
+        }
+
+        function addNewStudent() {
+            students.push({
+                rank: students.length + 1,
+                name: "طالب جديد",
+                arabic: 15, english: 15, math: 15, studies: 15, science: 15, religion: 15,
+                total: 90, pct: 100.0
+            });
+            renderTable();
+            buildSlides();
         }
 
         function loadVideo(event) {
@@ -292,28 +351,6 @@
             }
         }
 
-        // معاينة الجزء الصوتي المحدد
-        function previewAudioPart(partName) {
-            const vid = document.getElementById('previewVid');
-            const start = parseFloat(document.getElementById(`${partName}_start`).value) || 0;
-            const end = parseFloat(document.getElementById(`${partName}_end`).value) || 5;
-
-            if (globalMediaSourceURL) {
-                vid.currentTime = start;
-                vid.muted = false;
-                vid.play();
-
-                clearTimeout(audioTimeout);
-                let duration = (end - start) * 1000;
-                audioTimeout = setTimeout(() => {
-                    vid.pause();
-                }, duration);
-            } else {
-                alert("الرجاء اختيار ملف الفيديو في الأعلى أولاً.");
-            }
-        }
-
-        // تشغيل مقطع صوتي مخصص من الفيديو الأساسي في العرض التلقائي
         function playCustomAudioPart(partName, loop=false) {
             const audioEl = document.getElementById('customAudio');
             const start = parseFloat(document.getElementById(`${partName}_start`).value) || 0;
@@ -327,18 +364,14 @@
 
                 clearTimeout(audioTimeout);
                 let duration = (end - start) * 1000;
-                
                 if (loop) {
-                    // إذا كان مقطع الطلاب يحتاج تكرار حتى ينتهي عرض جميع الطلاب
                     audioTimeout = setTimeout(() => {
                         if (isPlaying && currentSlide >= 1 && currentSlide <= 10) {
                             playCustomAudioPart('students', true);
                         }
                     }, duration);
                 } else {
-                    audioTimeout = setTimeout(() => {
-                        audioEl.pause();
-                    }, duration);
+                    audioTimeout = setTimeout(() => { audioEl.pause(); }, duration);
                 }
             }
         }
@@ -390,8 +423,9 @@
                 }
                 parsedStudents.sort((a, b) => b.total - a.total);
                 students = parsedStudents.slice(0, 10).map((s, idx) => ({ rank: idx + 1, ...s }));
+                renderTable();
                 buildSlides();
-                alert("تم تحديث بيانات الأوائل من ملف الإكسيل بنجاح!");
+                alert("تم تحديث وعرض بيانات الأوائل من ملف الإكسيل بنجاح!");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -457,19 +491,12 @@
             }
         }
 
-        // حساب مدة كل شريحة بناء على الإعدادات التي تحكم مدة عرض بطاقة كل طالب
         function getDuration(idx) {
-            let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 4.5;
-            if (idx === 0) {
-                // مدة المقدمة تتناسب مع مدة صوت المقدمة أو افتراضياً 5 ثوان
-                let introStart = parseFloat(document.getElementById('intro_start').value) || 0;
-                let introEnd = parseFloat(document.getElementById('intro_end').value) || 5;
-                return Math.max(3000, (introEnd - introStart) * 1000);
-            }
-            if (idx >= 1 && idx <= 10) {
-                return customCardDuration * 1000; // مدة البطاقة المخصصة لكل طالب
-            }
-            return 3000; // الختام
+            // افتراضياً مدة بطاقة كل طالب 10 ثوانٍ (أو القيمة المحددة في الإعدادات)
+            let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 10;
+            if (idx === 0) return 5000;
+            if (idx >= 1 && idx <= 10) return customCardDuration * 1000;
+            return 3000;
         }
 
         function runStep() {
@@ -480,7 +507,6 @@
                     showSlide(currentSlide);
 
                     if (currentSlide === 1) {
-                        // الانتقال لصوت عرض الطلاب عند بدء الطالب الأول
                         playCustomAudioPart('students', true);
                     }
 
@@ -489,7 +515,6 @@
                         let student = students[currentSlide - 1];
                         if (student) speakStudent(student.name, student.rank);
                     } else if (currentSlide === 11) {
-                        // الانتقال لصوت الإنهاء والخاتمة
                         clearTimeout(audioTimeout);
                         playCustomAudioPart('outro', false);
                     }
@@ -517,15 +542,12 @@
                 showSlide(0);
                 triggerCelebration();
 
-                // تشغيل فيديو الخلفية صامتاً (لأن الصوت مخصص للمقاطع الصوتية الثلاثة)
                 const bgVid = document.getElementById('bgVideo');
                 bgVid.muted = true;
                 bgVid.currentTime = parseFloat(document.getElementById('intro_start').value) || 0;
                 bgVid.play().catch(e => {});
 
-                // تشغيل الجزء الصوتي الأول (المقدمة)
                 playCustomAudioPart('intro', false);
-
                 runStep();
             } else {
                 stopAutoPlay();
