@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التكريم الذكية - محاكاة وقصاصات الفيديو والصوت</title>
+    <title>منصة التكريم الذكية المتقدمة - أ. محمود عادل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -23,7 +23,7 @@
         .phone-frame {
             width: 100%;
             max-width: 430px;
-            background: rgba(15, 23, 42, 0.94);
+            background: rgba(15, 23, 42, 0.95);
             border: 4px solid #d4af37;
             border-radius: 30px;
             box-shadow: 0 0 35px rgba(212, 175, 55, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.2);
@@ -33,12 +33,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 720px;
+            min-height: 750px;
         }
         #bgVideo {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 0; opacity: 0.3; pointer-events: none;
+            object-fit: cover; z-index: 0; opacity: 0.25; pointer-events: none;
         }
         .content-layer {
             position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;
@@ -59,8 +59,9 @@
         .tab-content.active { display: flex; }
 
         .settings-card {
-            width: 100%; background: rgba(30, 41, 59, 0.9);
+            width: 100%; background: rgba(30, 41, 59, 0.92);
             border: 1px solid #334155; border-radius: 12px; padding: 10px; margin-bottom: 8px; font-size: 0.78rem;
+            max-height: 380px; overflow-y: auto;
         }
         .settings-card h3 { color: #ffd700; margin-bottom: 6px; font-size: 0.85rem; }
         .input-group { margin-bottom: 6px; width: 100%; }
@@ -70,11 +71,11 @@
             color: #fff; border-radius: 6px; font-size: 0.78rem;
         }
         .row-inputs { display: flex; gap: 6px; }
-        video.preview-vid { width: 100%; max-height: 110px; border-radius: 6px; background: #000; margin-top: 4px; }
+        video.preview-vid { width: 100%; max-height: 100px; border-radius: 6px; background: #000; margin-top: 4px; }
 
         button.clip-btn {
             background: #334155; color: #38bdf8; border: 1px solid #38bdf8;
-            padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; margin-top: 3px; font-weight: 600;
+            padding: 3px 6px; border-radius: 5px; font-size: 0.7rem; cursor: pointer; margin-top: 3px; font-weight: 600;
         }
         button.clip-btn:hover { background: #38bdf8; color: #000; }
 
@@ -98,7 +99,7 @@
 
         .carousel-container { width: 100%; position: relative; min-height: 290px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .intro-screen, .outro-screen, .student-card {
-            width: 100%; background: rgba(30, 41, 59, 0.92); border: 2px solid #334155; border-radius: 16px;
+            width: 100%; background: rgba(30, 41, 59, 0.94); border: 2px solid #334155; border-radius: 16px;
             padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: absolute; opacity: 0;
             transform: scale(0.9) translateY(15px); transition: all 0.5s ease-in-out; pointer-events: none;
             display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 270px;
@@ -140,66 +141,63 @@
 <body>
 
     <video id="bgVideo" loop muted playsinline></video>
+    <!-- عنصر صوتي مخصص لتشغيل المقاطع الصوتية المقصوصة بدقة -->
+    <audio id="customAudio"></audio>
 
     <div class="phone-frame">
         <div class="ornament-top">✨ ﷽ ✨</div>
         
         <div class="tabs-header" id="tabsHeader">
             <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم النظيف</button>
-            <button class="tab-btn" onclick="switchTab('settings')">⚙️ إعدادات وقصاص الفيديو</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ إعدادات التوقيتات والأجزاء الصوتية</button>
         </div>
 
-        <!-- تبويب الإعدادات والقصاص -->
+        <!-- تبويب الإعدادات المتقدمة -->
         <div class="tab-content" id="tabSettings">
             <div class="settings-card">
-                <h3>🎬 رفع الفيديو والتحكم في الأجزاء (القصاص)</h3>
+                <h3>🎬 إعدادات الفيديو الخلفي والمدة</h3>
                 <div class="input-group">
-                    <label>اختر الفيديو الكامل (6 دقائق أو أكثر):</label>
+                    <label>اختر الفيديو الكامل:</label>
                     <input type="file" id="videoFile" accept="video/*" onchange="loadVideo(event)">
+                </div>
+                <div class="input-group">
+                    <label>مدة عرض بطاقة كل طالب (بالثواني):</label>
+                    <input type="number" id="cardDurationInput" value="4.5" min="1" max="20" step="0.5">
                 </div>
                 <video id="previewVid" class="preview-vid" controls></video>
             </div>
 
             <div class="settings-card">
-                <h3>✂️ تحديد أجزاء الاستماع (القصاصات)</h3>
+                <h3>🎵 تخصيص الأجزاء الصوتية (من وإلى بالثواني)</h3>
                 
-                <!-- الجزء الأول -->
+                <!-- 1. صوت المقدمة -->
                 <div class="input-group">
-                    <label><b>الجزء الأول (Part 1):</b></label>
+                    <label><b>1. صوت المقدمة (Intro Audio):</b></label>
                     <div class="row-inputs">
-                        <div><label style="font-size:0.68rem">من (ثانية)</label><input type="number" id="p1_start" value="0" min="0"></div>
-                        <div><label style="font-size:0.68rem">إلى (ثانية)</label><input type="number" id="p1_end" value="10" min="1"></div>
+                        <div><label style="font-size:0.65rem">من (ثانية)</label><input type="number" id="intro_start" value="0" min="0"></div>
+                        <div><label style="font-size:0.65rem">إلى (ثانية)</label><input type="number" id="intro_end" value="5" min="1"></div>
                     </div>
-                    <button class="clip-btn" onclick="previewClip(1)">▶ معاينة الجزء الأول</button>
+                    <button class="clip-btn" onclick="previewAudioPart('intro')">▶ معاينة صوت المقدمة</button>
                 </div>
 
-                <!-- الجزء الثاني -->
+                <!-- 2. صوت عرض الطلاب -->
                 <div class="input-group" style="margin-top:6px;">
-                    <label><b>الجزء الثاني (Part 2):</b></label>
+                    <label><b>2. صوت خلفية عرض الطلاب (Presentation Audio):</b></label>
                     <div class="row-inputs">
-                        <div><label style="font-size:0.68rem">من (ثانية)</label><input type="number" id="p2_start" value="15" min="0"></div>
-                        <div><label style="font-size:0.68rem">إلى (ثانية)</label><input type="number" id="p2_end" value="25" min="1"></div>
+                        <div><label style="font-size:0.65rem">من (ثانية)</label><input type="number" id="students_start" value="6" min="0"></div>
+                        <div><label style="font-size:0.65rem">إلى (ثانية)</label><input type="number" id="students_end" value="50" min="1"></div>
                     </div>
-                    <button class="clip-btn" onclick="previewClip(2)">▶ معاينة الجزء الثاني</button>
+                    <button class="clip-btn" onclick="previewAudioPart('students')">▶ معاينة صوت الطلاب</button>
                 </div>
 
-                <!-- الجزء الثالث -->
+                <!-- 3. صوت الإنهاء -->
                 <div class="input-group" style="margin-top:6px;">
-                    <label><b>الجزء الثالث (Part 3 - إن احتجت):</b></label>
+                    <label><b>3. صوت الإنهاء والخاتمة (Outro Audio):</b></label>
                     <div class="row-inputs">
-                        <div><label style="font-size:0.68rem">من (ثانية)</label><input type="number" id="p3_start" value="30" min="0"></div>
-                        <div><label style="font-size:0.68rem">إلى (ثانية)</label><input type="number" id="p3_end" value="40" min="1"></div>
+                        <div><label style="font-size:0.65rem">من (ثانية)</label><input type="number" id="outro_start" value="51" min="0"></div>
+                        <div><label style="font-size:0.65rem">إلى (ثانية)</label><input type="number" id="outro_end" value="60" min="1"></div>
                     </div>
-                    <button class="clip-btn" onclick="previewClip(3)">▶ معاينة الجزء الثالث</button>
-                </div>
-
-                <div class="input-group" style="margin-top:8px;">
-                    <label>اختر الجزء الافتراضي لتشغيله في الخلفية:</label>
-                    <select id="activePartSelect">
-                        <option value="1">الجزء الأول (Part 1)</option>
-                        <option value="2">الجزء الثاني (Part 2)</option>
-                        <option value="3">الجزء الثالث (Part 3)</option>
-                    </select>
+                    <button class="clip-btn" onclick="previewAudioPart('outro')">▶ معاينة صوت الإنهاء</button>
                 </div>
             </div>
 
@@ -209,7 +207,7 @@
                     <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
                 </div>
                 <div class="input-group">
-                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب آلياً (مثل محادثة Gemini)</label>
+                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب آلياً أثناء ظهوره</label>
                 </div>
             </div>
         </div>
@@ -270,7 +268,8 @@
         let currentSlide = 0;
         let autoPlayTimer = null;
         let isPlaying = false;
-        let clipTimeout = null;
+        let audioTimeout = null;
+        let globalMediaSourceURL = "";
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -287,45 +286,62 @@
         function loadVideo(event) {
             const file = event.target.files[0];
             if (file) {
-                const url = URL.createObjectURL(file);
-                document.getElementById('bgVideo').src = url;
-                document.getElementById('previewVid').src = url;
+                globalMediaSourceURL = URL.createObjectURL(file);
+                document.getElementById('bgVideo').src = globalMediaSourceURL;
+                document.getElementById('previewVid').src = globalMediaSourceURL;
             }
         }
 
-        // معاينة الجزء المحدد (من إلى) في المعاينة
-        function previewClip(partNum) {
+        // معاينة الجزء الصوتي المحدد
+        function previewAudioPart(partName) {
             const vid = document.getElementById('previewVid');
-            const start = parseFloat(document.getElementById(`p${partNum}_start`).value) || 0;
-            const end = parseFloat(document.getElementById(`p${partNum}_end`).value) || 10;
-            
-            if (vid.src) {
+            const start = parseFloat(document.getElementById(`${partName}_start`).value) || 0;
+            const end = parseFloat(document.getElementById(`${partName}_end`).value) || 5;
+
+            if (globalMediaSourceURL) {
                 vid.currentTime = start;
-                vid.muted = false; // تشغيل الصوت أثناء المعاينة
+                vid.muted = false;
                 vid.play();
-                
-                clearTimeout(clipTimeout);
+
+                clearTimeout(audioTimeout);
                 let duration = (end - start) * 1000;
-                clipTimeout = setTimeout(() => {
+                audioTimeout = setTimeout(() => {
                     vid.pause();
                 }, duration);
             } else {
-                alert("الرجاء اختيار ملف فيديو أولاً في الأعلى.");
+                alert("الرجاء اختيار ملف الفيديو في الأعلى أولاً.");
             }
         }
 
-        // مراقبة خلفية الفيديو أثناء العرض التلقائي وفق الجزء النشط
-        const bgVid = document.getElementById('bgVideo');
-        bgVid.addEventListener('timeupdate', () => {
-            if (!isPlaying) return;
-            const activePart = document.getElementById('activePartSelect').value;
-            const start = parseFloat(document.getElementById(`p${activePart}_start`).value) || 0;
-            const end = parseFloat(document.getElementById(`p${activePart}_end`).value) || 10;
+        // تشغيل مقطع صوتي مخصص من الفيديو الأساسي في العرض التلقائي
+        function playCustomAudioPart(partName, loop=false) {
+            const audioEl = document.getElementById('customAudio');
+            const start = parseFloat(document.getElementById(`${partName}_start`).value) || 0;
+            const end = parseFloat(document.getElementById(`${partName}_end`).value) || 5;
 
-            if (bgVid.currentTime >= end) {
-                bgVid.currentTime = start;
+            if (globalMediaSourceURL) {
+                audioEl.src = globalMediaSourceURL;
+                audioEl.currentTime = start;
+                audioEl.muted = false;
+                audioEl.play().catch(e => {});
+
+                clearTimeout(audioTimeout);
+                let duration = (end - start) * 1000;
+                
+                if (loop) {
+                    // إذا كان مقطع الطلاب يحتاج تكرار حتى ينتهي عرض جميع الطلاب
+                    audioTimeout = setTimeout(() => {
+                        if (isPlaying && currentSlide >= 1 && currentSlide <= 10) {
+                            playCustomAudioPart('students', true);
+                        }
+                    }, duration);
+                } else {
+                    audioTimeout = setTimeout(() => {
+                        audioEl.pause();
+                    }, duration);
+                }
             }
-        });
+        }
 
         function speakStudent(name, rank) {
             if (!document.getElementById('enableSpeech').checked) return;
@@ -441,25 +457,49 @@
             }
         }
 
+        // حساب مدة كل شريحة بناء على الإعدادات التي تحكم مدة عرض بطاقة كل طالب
         function getDuration(idx) {
-            if (idx === 0) return 5000;
-            if (idx >= 1 && idx <= 10) return 4500;
-            return 2000;
+            let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 4.5;
+            if (idx === 0) {
+                // مدة المقدمة تتناسب مع مدة صوت المقدمة أو افتراضياً 5 ثوان
+                let introStart = parseFloat(document.getElementById('intro_start').value) || 0;
+                let introEnd = parseFloat(document.getElementById('intro_end').value) || 5;
+                return Math.max(3000, (introEnd - introStart) * 1000);
+            }
+            if (idx >= 1 && idx <= 10) {
+                return customCardDuration * 1000; // مدة البطاقة المخصصة لكل طالب
+            }
+            return 3000; // الختام
         }
 
         function runStep() {
             if (currentSlide < 11) {
+                let duration = getDuration(currentSlide);
                 autoPlayTimer = setTimeout(() => {
                     currentSlide++;
                     showSlide(currentSlide);
+
+                    if (currentSlide === 1) {
+                        // الانتقال لصوت عرض الطلاب عند بدء الطالب الأول
+                        playCustomAudioPart('students', true);
+                    }
+
                     if (currentSlide >= 1 && currentSlide <= 10) {
                         triggerCelebration();
                         let student = students[currentSlide - 1];
                         if (student) speakStudent(student.name, student.rank);
+                    } else if (currentSlide === 11) {
+                        // الانتقال لصوت الإنهاء والخاتمة
+                        clearTimeout(audioTimeout);
+                        playCustomAudioPart('outro', false);
                     }
-                    if (currentSlide <= 11) runStep();
-                    else stopAutoPlay();
-                }, getDuration(currentSlide));
+
+                    if (currentSlide <= 11) {
+                        runStep();
+                    } else {
+                        stopAutoPlay();
+                    }
+                }, duration);
             } else {
                 stopAutoPlay();
             }
@@ -477,12 +517,14 @@
                 showSlide(0);
                 triggerCelebration();
 
-                // تشغيل فيديو الخلفية من بداية الجزء النشط المحدد
-                const activePart = document.getElementById('activePartSelect').value;
-                const start = parseFloat(document.getElementById(`p${activePart}_start`).value) || 0;
-                bgVid.muted = false; // تشغيل صوت الفيديو المقصوص حسب الرغبة
-                bgVid.currentTime = start;
+                // تشغيل فيديو الخلفية صامتاً (لأن الصوت مخصص للمقاطع الصوتية الثلاثة)
+                const bgVid = document.getElementById('bgVideo');
+                bgVid.muted = true;
+                bgVid.currentTime = parseFloat(document.getElementById('intro_start').value) || 0;
                 bgVid.play().catch(e => {});
+
+                // تشغيل الجزء الصوتي الأول (المقدمة)
+                playCustomAudioPart('intro', false);
 
                 runStep();
             } else {
@@ -493,7 +535,10 @@
         function stopAutoPlay() {
             isPlaying = false;
             clearTimeout(autoPlayTimer);
-            bgVid.pause();
+            clearTimeout(audioTimeout);
+            document.getElementById('bgVideo').pause();
+            document.getElementById('customAudio').pause();
+            window.speechSynthesis.cancel();
             document.getElementById('tabsHeader').style.display = 'flex';
             document.getElementById('controlsPanel').classList.remove('hidden');
             document.getElementById('playBtn').textContent = "▶ بدء العرض التلقائي والتسجيل";
