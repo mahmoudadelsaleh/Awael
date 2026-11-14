@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التكريم التفاعلية الذكية - أ. محمود عادل</title>
+    <title>منصة التكريم الذكية - محاكاة وقصاصات الفيديو والصوت</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background: #0b132b;
             color: #f8f9fa;
@@ -24,363 +20,201 @@
             padding: 10px;
             overflow-x: hidden;
         }
-
-        /* حاوية الهاتف المحمول أو الشاشة */
         .phone-frame {
             width: 100%;
             max-width: 430px;
-            background: rgba(15, 23, 42, 0.92);
+            background: rgba(15, 23, 42, 0.94);
             border: 4px solid #d4af37;
             border-radius: 30px;
             box-shadow: 0 0 35px rgba(212, 175, 55, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.2);
-            padding: 18px;
+            padding: 16px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 750px;
+            min-height: 720px;
         }
-
-        /* خلفية الفيديو المتحركة */
         #bgVideo {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0;
-            opacity: 0.25; /* شفافية لتظهر العناصر بوضوح فوقها */
-            pointer-events: none;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 0; opacity: 0.3; pointer-events: none;
         }
-
         .content-layer {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100%;
+            position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;
         }
-
-        /* التبويبات (Tabs) */
         .tabs-header {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-            margin-bottom: 12px;
-            background: rgba(0,0,0,0.4);
-            padding: 5px;
-            border-radius: 15px;
+            display: flex; gap: 6px; width: 100%; margin-bottom: 10px;
+            background: rgba(0,0,0,0.5); padding: 4px; border-radius: 12px;
         }
         .tab-btn {
-            flex: 1;
-            background: transparent;
-            color: #94a3b8;
-            border: none;
-            padding: 8px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.3s;
+            flex: 1; background: transparent; color: #94a3b8; border: none; padding: 7px;
+            border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
         }
         .tab-btn.active {
-            background: linear-gradient(135deg, #d4af37, #9a7b0c);
-            color: #000;
+            background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
+        .tab-content { display: none; width: 100%; flex-direction: column; align-items: center; }
+        .tab-content.active { display: flex; }
 
-        .tab-content {
-            display: none;
-            width: 100%;
-            flex-direction: column;
-            align-items: center;
-        }
-        .tab-content.active {
-            display: flex;
-        }
-
-        /* شاشة الإعدادات القصصية */
         .settings-card {
-            width: 100%;
-            background: rgba(30, 41, 59, 0.85);
-            border: 1px solid #334155;
-            border-radius: 15px;
-            padding: 12px;
-            margin-bottom: 10px;
-            font-size: 0.8rem;
+            width: 100%; background: rgba(30, 41, 59, 0.9);
+            border: 1px solid #334155; border-radius: 12px; padding: 10px; margin-bottom: 8px; font-size: 0.78rem;
         }
-        .settings-card h3 {
-            color: #ffd700;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-        .input-group {
-            margin-bottom: 8px;
-            width: 100%;
-        }
-        .input-group label {
-            display: block;
-            color: #cbd5e1;
-            margin-bottom: 3px;
-        }
+        .settings-card h3 { color: #ffd700; margin-bottom: 6px; font-size: 0.85rem; }
+        .input-group { margin-bottom: 6px; width: 100%; }
+        .input-group label { display: block; color: #cbd5e1; margin-bottom: 2px; }
         .input-group input, .input-group select {
-            width: 100%;
-            padding: 6px;
-            background: #0f172a;
-            border: 1px solid #475569;
-            color: #fff;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            width: 100%; padding: 5px; background: #0f172a; border: 1px solid #475569;
+            color: #fff; border-radius: 6px; font-size: 0.78rem;
         }
-        .row-inputs {
-            display: flex;
-            gap: 6px;
-        }
+        .row-inputs { display: flex; gap: 6px; }
+        video.preview-vid { width: 100%; max-height: 110px; border-radius: 6px; background: #000; margin-top: 4px; }
 
-        /* معاينة الفيديو وقصه */
-        video.preview-vid {
-            width: 100%;
-            max-height: 140px;
-            border-radius: 8px;
-            background: #000;
-            margin-top: 5px;
+        button.clip-btn {
+            background: #334155; color: #38bdf8; border: 1px solid #38bdf8;
+            padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; margin-top: 3px; font-weight: 600;
         }
+        button.clip-btn:hover { background: #38bdf8; color: #000; }
 
-        /* شاشة العرض النظيف */
-        header {
-            text-align: center;
-            margin-bottom: 10px;
-            width: 100%;
-            border-bottom: 2px dashed rgba(212, 175, 55, 0.4);
-            padding-bottom: 6px;
-        }
-        .edu-admin { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
-        .school-name { font-size: 1rem; color: #ffd700; font-weight: 700; margin: 2px 0; }
+        header { text-align: center; margin-bottom: 8px; width: 100%; border-bottom: 2px dashed rgba(212, 175, 55, 0.4); padding-bottom: 5px; }
+        .edu-admin { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+        .school-name { font-size: 0.95rem; color: #ffd700; font-weight: 700; margin: 2px 0; }
         .class-title {
-            font-size: 0.85rem;
-            color: #38bdf8;
-            font-weight: 700;
-            background: rgba(56, 189, 248, 0.1);
-            padding: 3px 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 3px;
+            font-size: 0.8rem; color: #38bdf8; font-weight: 700;
+            background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 10px; display: inline-block;
         }
         .month-badge {
-            background: linear-gradient(135deg, #d4af37, #9a7b0c);
-            color: #000;
-            font-size: 0.8rem;
-            font-weight: 900;
-            padding: 2px 12px;
-            border-radius: 10px;
-            margin-top: 4px;
-            display: inline-block;
+            background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000;
+            font-size: 0.75rem; font-weight: 900; padding: 2px 10px; border-radius: 8px; margin-top: 3px; display: inline-block;
         }
-
         .leadership {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            font-size: 0.7rem;
-            color: #cbd5e1;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            text-align: center;
+            display: flex; justify-content: space-around; width: 100%; font-size: 0.68rem;
+            color: #cbd5e1; background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: 6px; margin-bottom: 6px; text-align: center;
         }
         .leadership div span { color: #ffd700; font-weight: 600; display: block; }
+        .main-title { font-family: 'Amiri', serif; font-size: 1.1rem; color: #fff; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); margin-bottom: 6px; text-align: center; }
 
-        .main-title {
-            font-family: 'Amiri', serif;
-            font-size: 1.2rem;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .carousel-container {
-            width: 100%;
-            position: relative;
-            min-height: 310px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+        .carousel-container { width: 100%; position: relative; min-height: 290px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .intro-screen, .outro-screen, .student-card {
-            width: 100%;
-            background: rgba(30, 41, 59, 0.9);
-            border: 2px solid #334155;
-            border-radius: 18px;
-            padding: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            position: absolute;
-            opacity: 0;
-            transform: scale(0.9) translateY(15px);
-            transition: all 0.5s ease-in-out;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            min-height: 290px;
+            width: 100%; background: rgba(30, 41, 59, 0.92); border: 2px solid #334155; border-radius: 16px;
+            padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: absolute; opacity: 0;
+            transform: scale(0.9) translateY(15px); transition: all 0.5s ease-in-out; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 270px;
         }
         .intro-screen.active, .outro-screen.active, .student-card.active {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-            position: relative;
+            opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; position: relative;
         }
-
         .rank-badge {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #ffd700, #b8860b);
-            color: #000;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.1rem;
-            font-weight: 900;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            margin-bottom: 6px;
-            border: 2px solid #fff;
+            width: 42px; height: 42px; background: linear-gradient(135deg, #ffd700, #b8860b); color: #000;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1rem;
+            font-weight: 900; box-shadow: 0 0 12px rgba(212, 175, 55, 0.6); margin-bottom: 5px; border: 2px solid #fff;
         }
         .rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); }
         .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); }
         .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
 
-        .student-name {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            width: 100%;
-            padding-bottom: 4px;
-        }
-        .grades-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            width: 100%;
-            margin-bottom: 8px;
-        }
-        .grade-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 6px;
-            padding: 4px;
-            text-align: center;
-        }
-        .grade-subject { font-size: 0.6rem; color: #94a3b8; }
-        .grade-score { font-size: 0.8rem; font-weight: 700; color: #38bdf8; }
-
+        .student-name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%; padding-bottom: 3px; }
+        .grades-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; margin-bottom: 6px; }
+        .grade-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 6px; padding: 3px; text-align: center; }
+        .grade-subject { font-size: 0.58rem; color: #94a3b8; }
+        .grade-score { font-size: 0.75rem; font-weight: 700; color: #38bdf8; }
         .total-section {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            background: rgba(212, 175, 55, 0.15);
-            border: 1px solid #d4af37;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.8rem;
+            display: flex; justify-content: space-between; width: 100%; background: rgba(212, 175, 55, 0.15);
+            border: 1px solid #d4af37; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;
         }
         .total-score { color: #ffd700; }
         .percentage { color: #4ade80; }
 
-        /* أزرار التحكم في العرض */
-        .controls {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-            width: 100%;
-            justify-content: center;
-            transition: opacity 0.4s ease;
-        }
+        .controls { display: flex; gap: 6px; margin-top: 8px; width: 100%; justify-content: center; transition: opacity 0.4s ease; }
         .controls.hidden { opacity: 0; pointer-events: none; }
-        
         button.action-btn {
-            background: linear-gradient(135deg, #d4af37, #9a7b0c);
-            color: #000;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Cairo', sans-serif;
-            font-size: 0.75rem;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000; border: none;
+            padding: 5px 10px; border-radius: 12px; font-weight: 700; cursor: pointer; font-family: 'Cairo', sans-serif;
+            font-size: 0.72rem; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         button.action-btn.active-play { background: #16a34a; color: #fff; }
     </style>
 </head>
 <body>
 
-    <!-- فيديو الخلفية -->
     <video id="bgVideo" loop muted playsinline></video>
 
     <div class="phone-frame">
         <div class="ornament-top">✨ ﷽ ✨</div>
         
-        <!-- التبويبات العلوية -->
         <div class="tabs-header" id="tabsHeader">
-            <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم</button>
-            <button class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات والقصاص</button>
+            <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم النظيف</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ إعدادات وقصاص الفيديو</button>
         </div>
 
-        <!-- 1. صفحة الإعدادات والقصاص -->
+        <!-- تبويب الإعدادات والقصاص -->
         <div class="tab-content" id="tabSettings">
             <div class="settings-card">
-                <h3>🎬 إعدادات الفيديو الخلفي والقصاص</h3>
+                <h3>🎬 رفع الفيديو والتحكم في الأجزاء (القصاص)</h3>
                 <div class="input-group">
-                    <label>اختر الفيديو (MP4):</label>
+                    <label>اختر الفيديو الكامل (6 دقائق أو أكثر):</label>
                     <input type="file" id="videoFile" accept="video/*" onchange="loadVideo(event)">
-                </div>
-                <div class="row-inputs">
-                    <div class="input-group">
-                        <label>بداية القصاص (ثواني):</label>
-                        <input type="number" id="startTime" value="0" min="0" onchange="updateTrim()">
-                    </div>
-                    <div class="input-group">
-                        <label>نهاية القصاص (ثواني):</label>
-                        <input type="number" id="endTime" value="10" min="1" onchange="updateTrim()">
-                    </div>
                 </div>
                 <video id="previewVid" class="preview-vid" controls></video>
             </div>
 
             <div class="settings-card">
-                <h3>📁 ملف درجات الإكسيل</h3>
+                <h3>✂️ تحديد أجزاء الاستماع (القصاصات)</h3>
+                
+                <!-- الجزء الأول -->
                 <div class="input-group">
-                    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
+                    <label><b>الجزء الأول (Part 1):</b></label>
+                    <div class="row-inputs">
+                        <div><label style="font-size:0.68rem">من (ثانية)</label><input type="number" id="p1_start" value="0" min="0"></div>
+                        <div><label style="font-size:0.68rem">إلى (ثانية)</label><input type="number" id="p1_end" value="10" min="1"></div>
+                    </div>
+                    <button class="clip-btn" onclick="previewClip(1)">▶ معاينة الجزء الأول</button>
+                </div>
+
+                <!-- الجزء الثاني -->
+                <div class="input-group" style="margin-top:6px;">
+                    <label><b>الجزء الثاني (Part 2):</b></label>
+                    <div class="row-inputs">
+                        <div><label style="font-size:0.68rem">من (ثانية)</label><input type="number" id="p2_start" value="15" min="0"></div>
+                        <div><label style="font-size:0.68rem">إلى (ثانية)</label><input type="number" id="p2_end" value="25" min="1"></div>
+                    </div>
+                    <button class="clip-btn" onclick="previewClip(2)">▶ معاينة الجزء الثاني</button>
+                </div>
+
+                <!-- الجزء الثالث -->
+                <div class="input-group" style="margin-top:6px;">
+                    <label><b>الجزء الثالث (Part 3 - إن احتجت):</b></label>
+                    <div class="row-inputs">
+                        <div><label style="font-size:0.68rem">من (ثانية)</label><input type="number" id="p3_start" value="30" min="0"></div>
+                        <div><label style="font-size:0.68rem">إلى (ثانية)</label><input type="number" id="p3_end" value="40" min="1"></div>
+                    </div>
+                    <button class="clip-btn" onclick="previewClip(3)">▶ معاينة الجزء الثالث</button>
+                </div>
+
+                <div class="input-group" style="margin-top:8px;">
+                    <label>اختر الجزء الافتراضي لتشغيله في الخلفية:</label>
+                    <select id="activePartSelect">
+                        <option value="1">الجزء الأول (Part 1)</option>
+                        <option value="2">الجزء الثاني (Part 2)</option>
+                        <option value="3">الجزء الثالث (Part 3)</option>
+                    </select>
                 </div>
             </div>
 
             <div class="settings-card">
-                <h3>🎵 الموسيقى والصوت البشري</h3>
+                <h3>📁 ملف درجات الإكسيل والمحرك الصوتي</h3>
                 <div class="input-group">
-                    <label>ملف الموسيقى الخلفية (MP3):</label>
-                    <input type="file" id="audioFile" accept="audio/*" onchange="loadAudio(event)">
+                    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
                 </div>
                 <div class="input-group">
-                    <label>
-                        <input type="checkbox" id="enableSpeech" checked> تفعيل القراءة الصوتية لأسماء الأطلاب (TTS)
-                    </label>
+                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب آلياً (مثل محادثة Gemini)</label>
                 </div>
             </div>
         </div>
 
-        <!-- 2. صفحة العرض النظيف (Display) -->
+        <!-- تبويب العرض النظيف -->
         <div class="tab-content active" id="tabDisplay">
             <header id="mainHeader">
                 <div class="edu-admin">إدارة المحمودية التعليمية</div>
@@ -399,12 +233,12 @@
 
             <div class="carousel-container" id="cardContainer">
                 <div class="intro-screen active" id="slide-0">
-                    <div class="intro-title" style="font-family:'Amiri'; color:#ffd700; font-size:1.5rem;">🌟 لوحة شرف الأوائل 🌟</div>
-                    <div class="intro-subtitle" id="introSubtitle" style="color:#38bdf8; font-size:0.95rem;">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
+                    <div class="intro-title" style="font-family:'Amiri'; color:#ffd700; font-size:1.4rem;">🌟 لوحة شرف الأوائل 🌟</div>
+                    <div class="intro-subtitle" id="introSubtitle" style="color:#38bdf8; font-size:0.9rem;">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
                 </div>
                 <div class="outro-screen" id="slide-11">
-                    <div style="font-family:'Amiri'; color:#ffd700; font-size:1.4rem; margin-bottom:6px;">🎉 مبروك لكل المتفوقين 🎉</div>
-                    <div style="font-size:0.85rem; color:#cbd5e1;">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
+                    <div style="font-family:'Amiri'; color:#ffd700; font-size:1.3rem; margin-bottom:5px;">🎉 مبروك لكل المتفوقين 🎉</div>
+                    <div style="font-size:0.8rem; color:#cbd5e1;">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
                 </div>
             </div>
 
@@ -417,8 +251,6 @@
         <div class="ornament-bottom">❦ ✦ ❦</div>
     </div>
 
-    <!-- عناصر الصوت وخلفية الفيديو -->
-    <audio id="bgMusic" loop></audio>
     <audio id="applauseSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
 
     <script>
@@ -438,8 +270,7 @@
         let currentSlide = 0;
         let autoPlayTimer = null;
         let isPlaying = false;
-        let trimStart = 0;
-        let trimEnd = 10;
+        let clipTimeout = null;
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -453,49 +284,57 @@
             }
         }
 
-        // معالجة الفيديو وقصه
         function loadVideo(event) {
             const file = event.target.files[0];
             if (file) {
                 const url = URL.createObjectURL(file);
-                const bgVid = document.getElementById('bgVideo');
-                const prevVid = document.getElementById('previewVid');
-                bgVid.src = url;
-                prevVid.src = url;
+                document.getElementById('bgVideo').src = url;
+                document.getElementById('previewVid').src = url;
             }
         }
 
-        function updateTrim() {
-            trimStart = parseFloat(document.getElementById('startTime').value) || 0;
-            trimEnd = parseFloat(document.getElementById('endTime').value) || 10;
-            const bgVid = document.getElementById('bgVideo');
-            bgVid.currentTime = trimStart;
+        // معاينة الجزء المحدد (من إلى) في المعاينة
+        function previewClip(partNum) {
+            const vid = document.getElementById('previewVid');
+            const start = parseFloat(document.getElementById(`p${partNum}_start`).value) || 0;
+            const end = parseFloat(document.getElementById(`p${partNum}_end`).value) || 10;
+            
+            if (vid.src) {
+                vid.currentTime = start;
+                vid.muted = false; // تشغيل الصوت أثناء المعاينة
+                vid.play();
+                
+                clearTimeout(clipTimeout);
+                let duration = (end - start) * 1000;
+                clipTimeout = setTimeout(() => {
+                    vid.pause();
+                }, duration);
+            } else {
+                alert("الرجاء اختيار ملف فيديو أولاً في الأعلى.");
+            }
         }
 
-        // مراقبة وقت فيديو الخلفية لجعله يعمل ضمن الأجزاء المقصوصة
+        // مراقبة خلفية الفيديو أثناء العرض التلقائي وفق الجزء النشط
         const bgVid = document.getElementById('bgVideo');
         bgVid.addEventListener('timeupdate', () => {
-            if (bgVid.currentTime >= trimEnd) {
-                bgVid.currentTime = trimStart;
+            if (!isPlaying) return;
+            const activePart = document.getElementById('activePartSelect').value;
+            const start = parseFloat(document.getElementById(`p${activePart}_start`).value) || 0;
+            const end = parseFloat(document.getElementById(`p${activePart}_end`).value) || 10;
+
+            if (bgVid.currentTime >= end) {
+                bgVid.currentTime = start;
             }
         });
 
-        function loadAudio(event) {
-            const file = event.target.files[0];
-            if (file) {
-                document.getElementById('bgMusic').src = URL.createObjectURL(file);
-            }
-        }
-
-        // قراءة الاسم بصوت اصطناعي طبيعي تشبه جيمناي (Speech Synthesis API)
         function speakStudent(name, rank) {
             if (!document.getElementById('enableSpeech').checked) return;
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // إيقاف أي كلام سابق
+                window.speechSynthesis.cancel();
                 let text = `الطالب ${name}, في المركز ${rank}`;
                 let utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ar-SA'; // لغة عربية فصحى نقية
-                utterance.rate = 0.95; // سرعة هادئة وواضحة
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.92;
                 utterance.pitch = 1.0;
                 window.speechSynthesis.speak(utterance);
             }
@@ -536,7 +375,7 @@
                 parsedStudents.sort((a, b) => b.total - a.total);
                 students = parsedStudents.slice(0, 10).map((s, idx) => ({ rank: idx + 1, ...s }));
                 buildSlides();
-                alert("تم تحديث بيانات الأوائل بنجاح من ملف الإكسيل!");
+                alert("تم تحديث بيانات الأوائل من ملف الإكسيل بنجاح!");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -580,7 +419,7 @@
         }
 
         function triggerCelebration() {
-            confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
             const applause = document.getElementById('applauseSound');
             if (applause) {
                 applause.currentTime = 0;
@@ -630,21 +469,20 @@
             const playBtn = document.getElementById('playBtn');
             isPlaying = !isPlaying;
             if (isPlaying) {
-                // الانتقال التلقائي لتبويب العرض وإخفاء الأزرار أثناء التسجيل
                 switchTab('display');
                 document.getElementById('tabsHeader').style.display = 'none';
                 document.getElementById('controlsPanel').classList.add('hidden');
-                document.getElementById('mainHeader').style.opacity = '0.9';
 
                 currentSlide = 0;
                 showSlide(0);
                 triggerCelebration();
 
-                // تشغيل فيديو الخلفية والموسيقى
-                bgVid.currentTime = trimStart;
+                // تشغيل فيديو الخلفية من بداية الجزء النشط المحدد
+                const activePart = document.getElementById('activePartSelect').value;
+                const start = parseFloat(document.getElementById(`p${activePart}_start`).value) || 0;
+                bgVid.muted = false; // تشغيل صوت الفيديو المقصوص حسب الرغبة
+                bgVid.currentTime = start;
                 bgVid.play().catch(e => {});
-                const music = document.getElementById('bgMusic');
-                if (music.src) music.play().catch(e => {});
 
                 runStep();
             } else {
@@ -656,7 +494,6 @@
             isPlaying = false;
             clearTimeout(autoPlayTimer);
             bgVid.pause();
-            document.getElementById('bgMusic').pause();
             document.getElementById('tabsHeader').style.display = 'flex';
             document.getElementById('controlsPanel').classList.remove('hidden');
             document.getElementById('playBtn').textContent = "▶ بدء العرض التلقائي والتسجيل";
