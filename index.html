@@ -224,7 +224,7 @@
             <div class="settings-card">
                 <h3>🎵 تخصيص الأجزاء الصوتية الافتراضية (بالثواني)</h3>
                 <div class="input-group">
-                    <label><b>1. المقدمة:</b> من <input type="number" id="intro_start" value="0" style="width:50px; display:inline;"> إلى <input type="number" id="intro_end" value="20" style="width:50px; display:inline;"></label>
+                    <label><b>1. المقدمة (ضبطت على 20 ثانية):</b> من <input type="number" id="intro_start" value="0" style="width:50px; display:inline;"> إلى <input type="number" id="intro_end" value="20" style="width:50px; display:inline;"></label>
                 </div>
                 <div class="input-group">
                     <label><b>2. البطاقات:</b> من <input type="number" id="students_start" value="240" style="width:50px; display:inline;"> إلى <input type="number" id="students_end" value="255" style="width:50px; display:inline;"></label>
@@ -251,15 +251,12 @@
         let isPlaying = false;
         let audioTimeout = null;
         
-        // المسارات المباشرة للملفات بجوار الـ index مباشرة بلا مجلدات
         const VIDEO_URL = "awael.mp4";
         const EXCEL_URL = "awael.xlsx";
 
         window.onload = () => {
-            // ربط الفيديو تلقائياً
             document.getElementById('bgVideo').src = VIDEO_URL;
             
-            // قراءة ملف الإكسيل مباشرة من نفس المسار
             fetch(EXCEL_URL)
                 .then(res => res.arrayBuffer())
                 .then(buffer => {
@@ -289,7 +286,6 @@
                     }
                 })
                 .catch(err => {
-                    console.log("جارٍ تحميل البيانات الاحتياطية...", err);
                     loadFallbackData();
                 });
 
@@ -484,7 +480,12 @@
 
         function getDuration(idx) {
             let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 15;
-            if (idx === 0) return 5000;
+            if (idx === 0) {
+                // مدة المقدمة تتطابق مع مدة صوت المقدمة (20 ثانية بالضبط)
+                let introStart = parseFloat(document.getElementById('intro_start').value) || 0;
+                let introEnd = parseFloat(document.getElementById('intro_end').value) || 20;
+                return (introEnd - introStart) * 1000; // 20000 مللي ثانية (20 ثانية)
+            }
             let studentsList = getTop10Students();
             if (idx >= 1 && idx <= studentsList.length) return customCardDuration * 1000;
             return 3000;
@@ -534,15 +535,15 @@
 
                 currentSlide = 0;
                 showSlide(0);
-                triggerCelebration();
-
+                
+                // تشغيل موسيقى المقدمة من 0 إلى 20 ثانية بالتحديد
                 const bgVid = document.getElementById('bgVideo');
                 bgVid.muted = true;
                 bgVid.currentTime = parseFloat(document.getElementById('intro_start').value) || 0;
                 bgVid.play().catch(e => {});
 
                 playCustomAudioPart('intro', false);
-                runStep();
+                runStep(); // ستبقى شاشة المقدمة ظاهرة لمدة 20 ثانية كاملة قبل الانتقال للطالب الأول
             } else {
                 stopAutoPlay();
             }
