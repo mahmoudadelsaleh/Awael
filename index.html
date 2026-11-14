@@ -20,7 +20,6 @@
             padding: 10px;
             overflow-x: hidden;
         }
-        /* تم تقليل ارتفاع الإطار وإزالة الفراغات الزائدة من الأسفل */
         .phone-frame {
             width: 100%;
             max-width: 420px;
@@ -73,12 +72,6 @@
         .row-inputs { display: flex; gap: 4px; }
         video.preview-vid { width: 100%; max-height: 80px; border-radius: 5px; background: #000; margin-top: 3px; }
 
-        button.clip-btn {
-            background: #334155; color: #38bdf8; border: 1px solid #38bdf8;
-            padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; cursor: pointer; margin-top: 2px; font-weight: 600;
-        }
-        button.clip-btn:hover { background: #38bdf8; color: #000; }
-
         /* جدول تعديل وحذف الأوائل */
         .students-table {
             width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 0.7rem; color: #fff;
@@ -90,7 +83,6 @@
         .students-table input { width: 100%; background: #0f172a; border: none; color: #fff; text-align: center; font-size: 0.7rem; }
         .table-btn { padding: 2px 5px; border-radius: 4px; border: none; font-size: 0.65rem; cursor: pointer; font-weight: 700; }
         .btn-del { background: #ef4444; color: #fff; }
-        .btn-add { background: #10b981; color: #fff; width: 100%; margin-top: 5px; padding: 4px; }
 
         header { text-align: center; margin-bottom: 6px; width: 100%; border-bottom: 2px dashed rgba(212, 175, 55, 0.4); padding-bottom: 4px; }
         .edu-admin { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
@@ -161,7 +153,7 @@
         
         <div class="tabs-header" id="tabsHeader">
             <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم</button>
-            <button class="tab-btn" onclick="switchTab('table')">📊 جدول البيانات</button>
+            <button class="tab-btn" onclick="switchTab('table')">📊 جدول البيانات والأوائل</button>
             <button class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات والصوت</button>
         </div>
 
@@ -199,12 +191,12 @@
             </div>
         </div>
 
-        <!-- 2. تبويب جدول البيانات (التحرير والإضافة والحذف تماماً مثل شيت إكسل) -->
+        <!-- 2. تبويب جدول البيانات (التحرير والبدائل التلقائية) -->
         <div class="tab-content" id="tabTable">
             <div class="settings-card">
-                <h3>📊 تحرير بيانات الأوائل (تعديل، حذف، إضافة)</h3>
+                <h3>📊 إدارة بيانات الطلاب والأوائل (مع جلب البدائل تلقائياً)</h3>
                 <div class="input-group">
-                    <label>رفع ملف الإكسيل الجديد:</label>
+                    <label>رفع ملف الإكسيل الكامل:</label>
                     <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
                 </div>
                 <div style="max-height: 200px; overflow-y: auto; margin-top: 5px;">
@@ -218,11 +210,10 @@
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <!-- سيتم ملؤها ديناميكياً -->
+                            <!-- سيتم ملؤها ديناميكياً بأعلى 10 طلاب -->
                         </tbody>
                     </table>
                 </div>
-                <button class="table-btn btn-add" onclick="addNewStudent()">+ إضافة طالب جديد</button>
             </div>
         </div>
 
@@ -264,19 +255,23 @@
     <audio id="applauseSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
 
     <script>
-        let students = [
-            { rank: 1, name: "زياد عاطف إبراهيم محمد أبو الفتوح", arabic: 15, english: 14, math: 12, studies: 13, science: 12.5, religion: 15, total: 81.5, pct: 90.56 },
-            { rank: 2, name: "إبراهيم محمد إبراهيم حسن سعد", arabic: 12.5, english: 14, math: 14, studies: 15, science: 13.5, religion: 11, total: 80, pct: 88.89 },
-            { rank: 3, name: "أحمد حمدي أحمد محمد شاهين", arabic: 13.5, english: 13, math: 12, studies: 15, science: 13.5, religion: 13, total: 80, pct: 88.89 },
-            { rank: 4, name: "أشرف محمد محمد الششتاوي", arabic: 12, english: 15, math: 15, studies: 15, science: 13.5, religion: 8, total: 78.5, pct: 87.22 },
-            { rank: 5, name: "أحمد محمد أحمد أحمد ناصر", arabic: 10, english: 13, math: 13.5, studies: 15, science: 14.5, religion: 12, total: 78, pct: 86.67 },
-            { rank: 6, name: "أسامه عبدالله علي علي يونس", arabic: 10.5, english: 13, math: 13.5, studies: 13, science: 15, religion: 10, total: 75, pct: 83.33 },
-            { rank: 7, name: "إياد عماد جمال عوض مسعود", arabic: 11, english: 12, math: 12.5, studies: 13, science: 12.5, religion: 14, total: 75, pct: 83.33 },
-            { rank: 8, name: "ريان طارق رفاعي شبل", arabic: 13, english: 7, math: 14, studies: 15, science: 13, religion: 13, total: 75, pct: 83.33 },
-            { rank: 9, name: "مازن جاد الله محمود إمام السيد", arabic: 11.5, english: 12, math: 13.5, studies: 15, science: 11, religion: 10, total: 73, pct: 81.11 },
-            { rank: 10, name: "أحمد سعد محمد سعد محمد أبوليلة", arabic: 10, english: 11, math: 14, studies: 15, science: 11, religion: 11, total: 72, pct: 80.0 }
+        // قاعدة البيانات الكاملة لجميع الطلاب المستخرجة أو الافتراضية
+        let allStudentsMaster = [
+            { name: "زياد عاطف إبراهيم محمد أبو الفتوح", arabic: 15, english: 14, math: 12, studies: 13, science: 12.5, religion: 15, total: 81.5, pct: 90.56 },
+            { name: "إبراهيم محمد إبراهيم حسن سعد", arabic: 12.5, english: 14, math: 14, studies: 15, science: 13.5, religion: 11, total: 80, pct: 88.89 },
+            { name: "أحمد حمدي أحمد محمد شاهين", arabic: 13.5, english: 13, math: 12, studies: 15, science: 13.5, religion: 13, total: 80, pct: 88.89 },
+            { name: "أشرف محمد محمد الششتاوي", arabic: 12, english: 15, math: 15, studies: 15, science: 13.5, religion: 8, total: 78.5, pct: 87.22 },
+            { name: "أحمد محمد أحمد أحمد ناصر", arabic: 10, english: 13, math: 13.5, studies: 15, science: 14.5, religion: 12, total: 78, pct: 86.67 },
+            { name: "أسامه عبدالله علي علي يونس", arabic: 10.5, english: 13, math: 13.5, studies: 13, science: 15, religion: 10, total: 75, pct: 83.33 },
+            { name: "إياد عماد جمال عوض مسعود", arabic: 11, english: 12, math: 12.5, studies: 13, science: 12.5, religion: 14, total: 75, pct: 83.33 },
+            { name: "ريان طارق رفاعي شبل", arabic: 13, english: 7, math: 14, studies: 15, science: 13, religion: 13, total: 75, pct: 83.33 },
+            { name: "مازن جاد الله محمود إمام السيد", arabic: 11.5, english: 12, math: 13.5, studies: 15, science: 11, religion: 10, total: 73, pct: 81.11 },
+            { name: "أحمد سعد محمد سعد محمد أبوليلة", arabic: 10, english: 11, math: 14, studies: 15, science: 11, religion: 11, total: 72, pct: 80.0 },
+            { name: "ريان محمد علي حسن خضر الطويل", arabic: 13.5, english: 12, math: 8, studies: 12, science: 13, religion: 13, total: 71.5, pct: 79.44 },
+            { name: "زياد عصام إبراهيم رمضان خضر", arabic: 11.5, english: 9, math: 9, studies: 13, science: 10, religion: 10, total: 62.5, pct: 69.44 }
         ];
 
+        let excludedNames = []; // قائمة الأسماء المحذوفة يدوياً
         let currentSlide = 0;
         let autoPlayTimer = null;
         let isPlaying = false;
@@ -299,47 +294,44 @@
             }
         }
 
-        // تحديث جدول التحرير في التاب الثاني
+        // استخراج أفضل 10 طلاب غير محذوفين (لضمان جلب البدائل تلقائياً)
+        function getTop10Students() {
+            // فرز الباقي تنازلياً حسب المجموع
+            let available = allStudentsMaster.filter(s => !excludedNames.includes(s.name));
+            available.sort((a, b) => b.total - a.total);
+            let top10 = available.slice(0, 10);
+            return top10.map((s, idx) => ({ rank: idx + 1, ...s }));
+        }
+
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-            students.forEach((s, idx) => {
+            let currentTop10 = getTop10Students();
+
+            currentTop10.forEach((s, idx) => {
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${idx + 1}</td>
-                    <td><input type="text" value="${s.name}" onchange="updateStudent(${idx}, 'name', this.value)"></td>
-                    <td><input type="number" value="${s.total}" onchange="updateStudent(${idx}, 'total', this.value)"></td>
-                    <td><button class="table-btn btn-del" onclick="deleteStudent(${idx})">حذف</button></td>
+                    <td><input type="text" value="${s.name}" onchange="updateStudentName('${s.name}', this.value)"></td>
+                    <td>${s.total}</td>
+                    <td><button class="table-btn btn-del" onclick="deleteStudent('${s.name}')">حذف</button></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function updateStudent(idx, field, value) {
-            students[idx][field] = field === 'total' ? parseFloat(value) || 0 : value;
-            if (field === 'total') {
-                students[idx].pct = parseFloat(((students[idx].total / 90) * 100).toFixed(2));
-            }
+        function updateStudentName(oldName, newName) {
+            let item = allStudentsMaster.find(s => s.name === oldName);
+            if (item) item.name = newName;
             buildSlides();
         }
 
-        function deleteStudent(idx) {
-            students.splice(idx, 1);
-            // إعادة ترتيب المراكز
-            students.forEach((s, i) => s.rank = i + 1);
+        // عند حذف طالب، يتم إضافته لقائمة الاستبعاد، فيقوم النظام تلقائياً بجلب البديل التالي من البيانات!
+        function deleteStudent(name) {
+            excludedNames.push(name);
             renderTable();
             buildSlides();
-        }
-
-        function addNewStudent() {
-            students.push({
-                rank: students.length + 1,
-                name: "طالب جديد",
-                arabic: 15, english: 15, math: 15, studies: 15, science: 15, religion: 15,
-                total: 90, pct: 100.0
-            });
-            renderTable();
-            buildSlides();
+            alert(`تم حذف الطالب، وجلب البديل تلقائياً من قاعدة بيانات الطلاب!`);
         }
 
         function loadVideo(event) {
@@ -366,7 +358,8 @@
                 let duration = (end - start) * 1000;
                 if (loop) {
                     audioTimeout = setTimeout(() => {
-                        if (isPlaying && currentSlide >= 1 && currentSlide <= 10) {
+                        let studentsList = getTop10Students();
+                        if (isPlaying && currentSlide >= 1 && currentSlide <= studentsList.length) {
                             playCustomAudioPart('students', true);
                         }
                     }, duration);
@@ -421,11 +414,13 @@
                     let pct = parseFloat(((total / 90) * 100).toFixed(2));
                     parsedStudents.push({ name, arabic, english, math, studies, science, religion, total, pct });
                 }
-                parsedStudents.sort((a, b) => b.total - a.total);
-                students = parsedStudents.slice(0, 10).map((s, idx) => ({ rank: idx + 1, ...s }));
-                renderTable();
-                buildSlides();
-                alert("تم تحديث وعرض بيانات الأوائل من ملف الإكسيل بنجاح!");
+                if (parsedStudents.length > 0) {
+                    allStudentsMaster = parsedStudents;
+                    excludedNames = []; // إعادة تعيين الحذف عند رفع ملف جديد
+                    renderTable();
+                    buildSlides();
+                    alert("تم تحميل بيانات الإكسيل الكاملة وتحديث جدول الأوائل بنجاح!");
+                }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -436,7 +431,9 @@
             let outroHtml = document.getElementById('slide-11').outerHTML;
             let middleHtml = '';
 
-            students.forEach((s, idx) => {
+            let currentTop10 = getTop10Students();
+
+            currentTop10.forEach((s, idx) => {
                 let slideNum = idx + 1;
                 let rankClass = s.rank === 1 ? 'rank-1' : s.rank === 2 ? 'rank-2' : s.rank === 3 ? 'rank-3' : '';
                 middleHtml += `
@@ -462,9 +459,19 @@
         }
 
         function showSlide(index) {
+            let studentsList = getTop10Students();
+            let maxSlide = studentsList.length + 1;
+            if (index > maxSlide) index = maxSlide;
+
             for (let i = 0; i <= 11; i++) {
                 const el = document.getElementById(`slide-${i}`);
-                if (el) el.classList.toggle('active', i === index);
+                if (el) {
+                    if (i === index || (i === 11 && index === maxSlide)) {
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                }
             }
         }
 
@@ -478,12 +485,14 @@
         }
 
         function nextSlide() {
-            if (currentSlide < 11) {
+            let studentsList = getTop10Students();
+            let maxSlide = studentsList.length + 1;
+            if (currentSlide < maxSlide) {
                 currentSlide++;
                 showSlide(currentSlide);
-                if (currentSlide >= 1 && currentSlide <= 10) {
+                if (currentSlide >= 1 && currentSlide <= studentsList.length) {
                     triggerCelebration();
-                    let student = students[currentSlide - 1];
+                    let student = studentsList[currentSlide - 1];
                     if (student) speakStudent(student.name, student.rank);
                 }
             } else {
@@ -492,15 +501,18 @@
         }
 
         function getDuration(idx) {
-            // افتراضياً مدة بطاقة كل طالب 10 ثوانٍ (أو القيمة المحددة في الإعدادات)
             let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 10;
             if (idx === 0) return 5000;
-            if (idx >= 1 && idx <= 10) return customCardDuration * 1000;
+            let studentsList = getTop10Students();
+            if (idx >= 1 && idx <= studentsList.length) return customCardDuration * 1000;
             return 3000;
         }
 
         function runStep() {
-            if (currentSlide < 11) {
+            let studentsList = getTop10Students();
+            let maxSlide = studentsList.length + 1;
+
+            if (currentSlide < maxSlide) {
                 let duration = getDuration(currentSlide);
                 autoPlayTimer = setTimeout(() => {
                     currentSlide++;
@@ -510,16 +522,16 @@
                         playCustomAudioPart('students', true);
                     }
 
-                    if (currentSlide >= 1 && currentSlide <= 10) {
+                    if (currentSlide >= 1 && currentSlide <= studentsList.length) {
                         triggerCelebration();
-                        let student = students[currentSlide - 1];
+                        let student = studentsList[currentSlide - 1];
                         if (student) speakStudent(student.name, student.rank);
-                    } else if (currentSlide === 11) {
+                    } else if (currentSlide === maxSlide) {
                         clearTimeout(audioTimeout);
                         playCustomAudioPart('outro', false);
                     }
 
-                    if (currentSlide <= 11) {
+                    if (currentSlide <= maxSlide) {
                         runStep();
                     } else {
                         stopAutoPlay();
