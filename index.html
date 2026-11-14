@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التكريم الذكية والتحرير - أ. محمود عادل</title>
+    <title>منصة التكريم الذكية - أ. محمود عادل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -70,9 +70,7 @@
             color: #fff; border-radius: 5px; font-size: 0.75rem;
         }
         .row-inputs { display: flex; gap: 4px; }
-        video.preview-vid { width: 100%; max-height: 80px; border-radius: 5px; background: #000; margin-top: 3px; }
 
-        /* جدول تعديل وحذف الأوائل */
         .students-table {
             width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 0.7rem; color: #fff;
         }
@@ -191,14 +189,10 @@
             </div>
         </div>
 
-        <!-- 2. تبويب جدول البيانات (التحرير والبدائل التلقائية) -->
+        <!-- 2. تبويب جدول البيانات -->
         <div class="tab-content" id="tabTable">
             <div class="settings-card">
                 <h3>📊 إدارة بيانات الطلاب والأوائل (مع جلب البدائل تلقائياً)</h3>
-                <div class="input-group">
-                    <label>رفع ملف الإكسيل الكامل:</label>
-                    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleExcelUpload(event)">
-                </div>
                 <div style="max-height: 200px; overflow-y: auto; margin-top: 5px;">
                     <table class="students-table" id="studentsTable">
                         <thead>
@@ -210,7 +204,7 @@
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <!-- سيتم ملؤها ديناميكياً بأعلى 10 طلاب -->
+                            <!-- سيتم ملؤها ديناميكياً -->
                         </tbody>
                     </table>
                 </div>
@@ -222,29 +216,24 @@
             <div class="settings-card">
                 <h3>🎬 إعدادات الفيديو والمدة الافتراضية</h3>
                 <div class="input-group">
-                    <label>اختر الفيديو الخلفي:</label>
-                    <input type="file" id="videoFile" accept="video/*" onchange="loadVideo(event)">
+                    <label>مدة عرض بطاقة كل طالب (15 ثانية):</label>
+                    <input type="number" id="cardDurationInput" value="15" min="1" max="30" step="0.5">
                 </div>
-                <div class="input-group">
-                    <label>مدة عرض بطاقة كل طالب (افتراضياً 10 ثوانٍ):</label>
-                    <input type="number" id="cardDurationInput" value="10" min="1" max="30" step="0.5">
-                </div>
-                <video id="previewVid" class="preview-vid" controls></video>
             </div>
 
             <div class="settings-card">
-                <h3>🎵 تخصيص الأجزاء الصوتية (بالثواني)</h3>
+                <h3>🎵 تخصيص الأجزاء الصوتية الافتراضية (بالثواني)</h3>
                 <div class="input-group">
-                    <label><b>1. المقدمة:</b> من <input type="number" id="intro_start" value="0" style="width:50px; display:inline;"> إلى <input type="number" id="intro_end" value="5" style="width:50px; display:inline;"></label>
+                    <label><b>1. المقدمة:</b> من <input type="number" id="intro_start" value="0" style="width:50px; display:inline;"> إلى <input type="number" id="intro_end" value="20" style="width:50px; display:inline;"></label>
                 </div>
                 <div class="input-group">
-                    <label><b>2. خلفية الطلاب:</b> من <input type="number" id="students_start" value="6" style="width:50px; display:inline;"> إلى <input type="number" id="students_end" value="50" style="width:50px; display:inline;"></label>
+                    <label><b>2. البطاقات:</b> من <input type="number" id="students_start" value="240" style="width:50px; display:inline;"> إلى <input type="number" id="students_end" value="255" style="width:50px; display:inline;"></label>
                 </div>
                 <div class="input-group">
-                    <label><b>3. الخاتمة:</b> من <input type="number" id="outro_start" value="51" style="width:50px; display:inline;"> إلى <input type="number" id="outro_end" value="60" style="width:50px; display:inline;"></label>
+                    <label><b>3. الخروج:</b> من <input type="number" id="outro_start" value="340" style="width:50px; display:inline;"> إلى <input type="number" id="outro_end" value="355" style="width:50px; display:inline;"></label>
                 </div>
                 <div class="input-group">
-                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب آلياً</label>
+                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب ومرتبه آلياً بصوت واضح</label>
                 </div>
             </div>
         </div>
@@ -255,28 +244,74 @@
     <audio id="applauseSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
 
     <script>
-        // قاعدة البيانات الكاملة لجميع الطلاب المستخرجة أو الافتراضية
-        let allStudentsMaster = [
-            { name: "زياد عاطف إبراهيم محمد أبو الفتوح", arabic: 15, english: 14, math: 12, studies: 13, science: 12.5, religion: 15, total: 81.5, pct: 90.56 },
-            { name: "إبراهيم محمد إبراهيم حسن سعد", arabic: 12.5, english: 14, math: 14, studies: 15, science: 13.5, religion: 11, total: 80, pct: 88.89 },
-            { name: "أحمد حمدي أحمد محمد شاهين", arabic: 13.5, english: 13, math: 12, studies: 15, science: 13.5, religion: 13, total: 80, pct: 88.89 },
-            { name: "أشرف محمد محمد الششتاوي", arabic: 12, english: 15, math: 15, studies: 15, science: 13.5, religion: 8, total: 78.5, pct: 87.22 },
-            { name: "أحمد محمد أحمد أحمد ناصر", arabic: 10, english: 13, math: 13.5, studies: 15, science: 14.5, religion: 12, total: 78, pct: 86.67 },
-            { name: "أسامه عبدالله علي علي يونس", arabic: 10.5, english: 13, math: 13.5, studies: 13, science: 15, religion: 10, total: 75, pct: 83.33 },
-            { name: "إياد عماد جمال عوض مسعود", arabic: 11, english: 12, math: 12.5, studies: 13, science: 12.5, religion: 14, total: 75, pct: 83.33 },
-            { name: "ريان طارق رفاعي شبل", arabic: 13, english: 7, math: 14, studies: 15, science: 13, religion: 13, total: 75, pct: 83.33 },
-            { name: "مازن جاد الله محمود إمام السيد", arabic: 11.5, english: 12, math: 13.5, studies: 15, science: 11, religion: 10, total: 73, pct: 81.11 },
-            { name: "أحمد سعد محمد سعد محمد أبوليلة", arabic: 10, english: 11, math: 14, studies: 15, science: 11, religion: 11, total: 72, pct: 80.0 },
-            { name: "ريان محمد علي حسن خضر الطويل", arabic: 13.5, english: 12, math: 8, studies: 12, science: 13, religion: 13, total: 71.5, pct: 79.44 },
-            { name: "زياد عصام إبراهيم رمضان خضر", arabic: 11.5, english: 9, math: 9, studies: 13, science: 10, religion: 10, total: 62.5, pct: 69.44 }
-        ];
-
-        let excludedNames = []; // قائمة الأسماء المحذوفة يدوياً
+        let allStudentsMaster = [];
+        let excludedNames = [];
         let currentSlide = 0;
         let autoPlayTimer = null;
         let isPlaying = false;
         let audioTimeout = null;
-        let globalMediaSourceURL = "";
+        
+        // المسارات المباشرة للملفات بجوار الـ index مباشرة بلا مجلدات
+        const VIDEO_URL = "awael.mp4";
+        const EXCEL_URL = "awael.xlsx";
+
+        window.onload = () => {
+            // ربط الفيديو تلقائياً
+            document.getElementById('bgVideo').src = VIDEO_URL;
+            
+            // قراءة ملف الإكسيل مباشرة من نفس المسار
+            fetch(EXCEL_URL)
+                .then(res => res.arrayBuffer())
+                .then(buffer => {
+                    const workbook = XLSX.read(new Uint8Array(buffer), {type: 'array'});
+                    let sheetName = workbook.SheetNames.includes("أوائل الطلاب") ? "أوائل الطلاب" : workbook.SheetNames[0];
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+
+                    let parsedStudents = [];
+                    for (let i = 4; i < json.length; i++) {
+                        let row = json[i];
+                        if (!row || !row[1]) continue;
+                        let name = row[1];
+                        let arabic = parseFloat(row[2]) || 0;
+                        let english = parseFloat(row[3]) || 0;
+                        let math = parseFloat(row[4]) || 0;
+                        let studies = parseFloat(row[5]) || 0;
+                        let science = parseFloat(row[6]) || 0;
+                        let religion = parseFloat(row[7]) || 0;
+                        let total = arabic + english + math + studies + science + religion;
+                        let pct = parseFloat(((total / 90) * 100).toFixed(2));
+                        parsedStudents.push({ name, arabic, english, math, studies, science, religion, total, pct });
+                    }
+                    if (parsedStudents.length > 0) {
+                        allStudentsMaster = parsedStudents;
+                        renderTable();
+                        buildSlides();
+                    }
+                })
+                .catch(err => {
+                    console.log("جارٍ تحميل البيانات الاحتياطية...", err);
+                    loadFallbackData();
+                });
+
+            showSlide(0);
+        };
+
+        function loadFallbackData() {
+            allStudentsMaster = [
+                { name: "زياد عاطف إبراهيم محمد أبو الفتوح", arabic: 15, english: 14, math: 12, studies: 13, science: 12.5, religion: 15, total: 81.5, pct: 90.56 },
+                { name: "إبراهيم محمد إبراهيم حسن سعد", arabic: 12.5, english: 14, math: 14, studies: 15, science: 13.5, religion: 11, total: 80, pct: 88.89 },
+                { name: "أحمد حمدي أحمد محمد شاهين", arabic: 13.5, english: 13, math: 12, studies: 15, science: 13.5, religion: 13, total: 80, pct: 88.89 },
+                { name: "أشرف محمد محمد الششتاوي", arabic: 12, english: 15, math: 15, studies: 15, science: 13.5, religion: 8, total: 78.5, pct: 87.22 },
+                { name: "أحمد محمد أحمد أحمد ناصر", arabic: 10, english: 13, math: 13.5, studies: 15, science: 14.5, religion: 12, total: 78, pct: 86.67 },
+                { name: "أسامه عبدالله علي علي يونس", arabic: 10.5, english: 13, math: 13.5, studies: 13, science: 15, religion: 10, total: 75, pct: 83.33 },
+                { name: "إياد عماد جمال عوض مسعود", arabic: 11, english: 12, math: 12.5, studies: 13, science: 12.5, religion: 14, total: 75, pct: 83.33 },
+                { name: "ريان طارق رفاعي شبل", arabic: 13, english: 7, math: 14, studies: 15, science: 13, religion: 13, total: 75, pct: 83.33 },
+                { name: "مازن جاد الله محمود إمام السيد", arabic: 11.5, english: 12, math: 13.5, studies: 15, science: 11, religion: 10, total: 73, pct: 81.11 },
+                { name: "أحمد سعد محمد سعد محمد أبوليلة", arabic: 10, english: 11, math: 14, studies: 15, science: 11, religion: 11, total: 72, pct: 80.0 }
+            ];
+            renderTable();
+            buildSlides();
+        }
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -294,9 +329,7 @@
             }
         }
 
-        // استخراج أفضل 10 طلاب غير محذوفين (لضمان جلب البدائل تلقائياً)
         function getTop10Students() {
-            // فرز الباقي تنازلياً حسب المجموع
             let available = allStudentsMaster.filter(s => !excludedNames.includes(s.name));
             available.sort((a, b) => b.total - a.total);
             let top10 = available.slice(0, 10);
@@ -326,21 +359,10 @@
             buildSlides();
         }
 
-        // عند حذف طالب، يتم إضافته لقائمة الاستبعاد، فيقوم النظام تلقائياً بجلب البديل التالي من البيانات!
         function deleteStudent(name) {
             excludedNames.push(name);
             renderTable();
             buildSlides();
-            alert(`تم حذف الطالب، وجلب البديل تلقائياً من قاعدة بيانات الطلاب!`);
-        }
-
-        function loadVideo(event) {
-            const file = event.target.files[0];
-            if (file) {
-                globalMediaSourceURL = URL.createObjectURL(file);
-                document.getElementById('bgVideo').src = globalMediaSourceURL;
-                document.getElementById('previewVid').src = globalMediaSourceURL;
-            }
         }
 
         function playCustomAudioPart(partName, loop=false) {
@@ -348,8 +370,9 @@
             const start = parseFloat(document.getElementById(`${partName}_start`).value) || 0;
             const end = parseFloat(document.getElementById(`${partName}_end`).value) || 5;
 
-            if (globalMediaSourceURL) {
-                audioEl.src = globalMediaSourceURL;
+            const bgVid = document.getElementById('bgVideo');
+            if (bgVid.src) {
+                audioEl.src = bgVid.src;
                 audioEl.currentTime = start;
                 audioEl.muted = false;
                 audioEl.play().catch(e => {});
@@ -373,56 +396,15 @@
             if (!document.getElementById('enableSpeech').checked) return;
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                let text = `الطالب ${name}, في المركز ${rank}`;
+                let rankWords = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن", "التاسع", "العاشر"];
+                let rankText = rankWords[rank - 1] || rank;
+                let text = `الطالب ${name}, في المركز ${rankText}`;
                 let utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ar-SA';
-                utterance.rate = 0.92;
+                utterance.rate = 0.90;
                 utterance.pitch = 1.0;
                 window.speechSynthesis.speak(utterance);
             }
-        }
-
-        function handleExcelUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            let fileName = file.name.toLowerCase();
-            let monthName = "أكتوبر";
-            if (fileName.includes("nov")) monthName = "نوفمبر";
-            else if (fileName.includes("dec")) monthName = "ديسمبر";
-
-            document.getElementById('monthBadge').innerText = `⭐ تكريم أوائل شهر ${monthName} ⭐`;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                let sheetName = workbook.SheetNames.includes("أوائل الطلاب") ? "أوائل الطلاب" : workbook.SheetNames[0];
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
-
-                let parsedStudents = [];
-                for (let i = 4; i < json.length; i++) {
-                    let row = json[i];
-                    if (!row || !row[1]) continue;
-                    let name = row[1];
-                    let arabic = parseFloat(row[2]) || 0;
-                    let english = parseFloat(row[3]) || 0;
-                    let math = parseFloat(row[4]) || 0;
-                    let studies = parseFloat(row[5]) || 0;
-                    let science = parseFloat(row[6]) || 0;
-                    let religion = parseFloat(row[7]) || 0;
-                    let total = arabic + english + math + studies + science + religion;
-                    let pct = parseFloat(((total / 90) * 100).toFixed(2));
-                    parsedStudents.push({ name, arabic, english, math, studies, science, religion, total, pct });
-                }
-                if (parsedStudents.length > 0) {
-                    allStudentsMaster = parsedStudents;
-                    excludedNames = []; // إعادة تعيين الحذف عند رفع ملف جديد
-                    renderTable();
-                    buildSlides();
-                    alert("تم تحميل بيانات الإكسيل الكاملة وتحديث جدول الأوائل بنجاح!");
-                }
-            };
-            reader.readAsArrayBuffer(file);
         }
 
         function buildSlides() {
@@ -501,7 +483,7 @@
         }
 
         function getDuration(idx) {
-            let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 10;
+            let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 15;
             if (idx === 0) return 5000;
             let studentsList = getTop10Students();
             if (idx >= 1 && idx <= studentsList.length) return customCardDuration * 1000;
@@ -577,11 +559,6 @@
             document.getElementById('controlsPanel').classList.remove('hidden');
             document.getElementById('playBtn').textContent = "▶ بدء العرض التلقائي والتسجيل";
         }
-
-        window.onload = () => {
-            buildSlides();
-            showSlide(0);
-        };
     </script>
 </body>
 </html>
