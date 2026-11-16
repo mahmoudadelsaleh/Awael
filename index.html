@@ -1,565 +1,1650 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التكريم الذكية - أ. محمود عادل</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: #0b132b;
-            color: #f8f9fa;
-            font-family: 'Cairo', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            overflow-x: hidden;
-        }
-        .phone-frame {
-            width: 100%;
-            max-width: 420px;
-            background: rgba(15, 23, 42, 0.96);
-            border: 4px solid #d4af37;
-            border-radius: 25px;
-            box-shadow: 0 0 35px rgba(212, 175, 55, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.2);
-            padding: 12px 14px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #bgVideo {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 0; opacity: 0.25; pointer-events: none;
-        }
-        .content-layer {
-            position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;
-        }
-        .tabs-header {
-            display: flex; gap: 4px; width: 100%; margin-bottom: 8px;
-            background: rgba(0,0,0,0.5); padding: 3px; border-radius: 10px;
-        }
-        .tab-btn {
-            flex: 1; background: transparent; color: #94a3b8; border: none; padding: 5px;
-            border-radius: 7px; font-weight: 700; font-size: 0.72rem; cursor: pointer; transition: 0.3s;
-        }
-        .tab-btn.active {
-            background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-        }
-        .tab-content { display: none; width: 100%; flex-direction: column; align-items: center; }
-        .tab-content.active { display: flex; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>احتفالية أوائل مدرسة الزهور الإعدادية بنين - شهر أكتوبر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  :root {
+    --gold: #ffd700;
+    --gold-light: #fff3b0;
+    --gold-dark: #b8860b;
+    --silver: #e2e8f0;
+    --bg-deep: #040710;
+    --card-bg: rgba(11, 18, 34, 0.90);
+    --card-inner: rgba(20, 30, 52, 0.85);
+    --cyan: #38bdf8;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: radial-gradient(circle at 50% 15%, #172554 0%, #060a17 65%, #02040a 100%);
+    color: #fff;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  #bg-video {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    opacity: 0.30;
+    z-index: -1;
+    pointer-events: none;
+  }
 
-        .settings-card {
-            width: 100%; background: rgba(30, 41, 59, 0.94);
-            border: 1px solid #334155; border-radius: 10px; padding: 8px; margin-bottom: 6px; font-size: 0.75rem;
-            max-height: 340px; overflow-y: auto;
-        }
-        .settings-card h3 { color: #ffd700; margin-bottom: 4px; font-size: 0.8rem; }
-        .input-group { margin-bottom: 5px; width: 100%; }
-        .input-group label { display: block; color: #cbd5e1; margin-bottom: 2px; }
-        .input-group input, .input-group select {
-            width: 100%; padding: 4px; background: #0f172a; border: 1px solid #475569;
-            color: #fff; border-radius: 5px; font-size: 0.75rem;
-        }
-        .row-inputs { display: flex; gap: 4px; }
+  /* Micro Floating Settings Gear (Top-Left) */
+  .floating-gear {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 500;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(11, 18, 34, 0.65);
+    border: 1px solid rgba(255, 215, 0, 0.45);
+    color: var(--gold);
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    transition: 0.25s;
+    backdrop-filter: blur(6px);
+    opacity: 0.55;
+  }
+  .floating-gear:hover {
+    opacity: 1;
+    transform: rotate(45deg) scale(1.08);
+    border-color: var(--gold);
+  }
 
-        .students-table {
-            width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 0.7rem; color: #fff;
-        }
-        .students-table th, .students-table td {
-            border: 1px solid #475569; padding: 3px; text-align: center;
-        }
-        .students-table th { background: #1e293b; color: #ffd700; }
-        .students-table input { width: 100%; background: #0f172a; border: none; color: #fff; text-align: center; font-size: 0.7rem; }
-        .table-btn { padding: 2px 5px; border-radius: 4px; border: none; font-size: 0.65rem; cursor: pointer; font-weight: 700; }
-        .btn-del { background: #ef4444; color: #fff; }
+  /* Micro Floating Playback Bar (Bottom-Right) */
+  .ceremony-QuickBar {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 400;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    background: rgba(7, 11, 20, 0.65);
+    border: 1px solid rgba(255, 215, 0, 0.30);
+    padding: 4px 8px;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    transition: opacity 0.25s;
+    opacity: 0.42;
+  }
+  .ceremony-QuickBar:hover { opacity: 1; }
+  .clean-mode .ceremony-QuickBar,
+  .clean-mode .floating-gear { opacity: 0.04; }
+  .clean-mode .floating-gear:hover,
+  .clean-mode .ceremony-QuickBar:hover { opacity: 0.85; }
 
-        header { text-align: center; margin-bottom: 6px; width: 100%; border-bottom: 2px dashed rgba(212, 175, 55, 0.4); padding-bottom: 4px; }
-        .edu-admin { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
-        .school-name { font-size: 0.9rem; color: #ffd700; font-weight: 700; margin: 1px 0; }
-        .class-title {
-            font-size: 0.75rem; color: #38bdf8; font-weight: 700;
-            background: rgba(56, 189, 248, 0.1); padding: 2px 6px; border-radius: 8px; display: inline-block;
-        }
-        .month-badge {
-            background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000;
-            font-size: 0.7rem; font-weight: 900; padding: 2px 8px; border-radius: 6px; margin-top: 2px; display: inline-block;
-        }
-        .leadership {
-            display: flex; justify-content: space-around; width: 100%; font-size: 0.65rem;
-            color: #cbd5e1; background: rgba(255, 255, 255, 0.05); padding: 3px; border-radius: 5px; margin-bottom: 5px; text-align: center;
-        }
-        .leadership div span { color: #ffd700; font-weight: 600; display: block; }
-        .main-title { font-family: 'Amiri', serif; font-size: 1rem; color: #fff; text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); margin-bottom: 4px; text-align: center; }
+  .q-btn {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid rgba(255,215,0,0.35);
+    padding: 3px 8px;
+    border-radius: 99px;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 700;
+    transition: 0.18s;
+  }
+  .q-btn.primary {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: #000;
+    border: none;
+  }
+  .q-btn:hover { transform: scale(1.04); }
 
-        .carousel-container { width: 100%; position: relative; min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .intro-screen, .outro-screen, .student-card {
-            width: 100%; background: rgba(30, 41, 59, 0.95); border: 2px solid #334155; border-radius: 14px;
-            padding: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); position: absolute; opacity: 0;
-            transform: scale(0.9) translateY(10px); transition: all 0.4s ease-in-out; pointer-events: none;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 245px;
-        }
-        .intro-screen.active, .outro-screen.active, .student-card.active {
-            opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; position: relative;
-        }
-        .rank-badge {
-            width: 38px; height: 38px; background: linear-gradient(135deg, #ffd700, #b8860b); color: #000;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.95rem;
-            font-weight: 900; box-shadow: 0 0 10px rgba(212, 175, 55, 0.6); margin-bottom: 4px; border: 2px solid #fff;
-        }
-        .rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); }
-        .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); }
-        .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+  /* Compact Jewel-Like Stage */
+  .stage {
+    width: 94%;
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+  }
 
-        .student-name { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%; padding-bottom: 2px; }
-        .grades-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; width: 100%; margin-bottom: 5px; }
-        .grade-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 5px; padding: 2px; text-align: center; }
-        .grade-subject { font-size: 0.55rem; color: #94a3b8; }
-        .grade-score { font-size: 0.7rem; font-weight: 700; color: #38bdf8; }
-        .total-section {
-            display: flex; justify-content: space-between; width: 100%; background: rgba(212, 175, 55, 0.15);
-            border: 1px solid #d4af37; padding: 3px 6px; border-radius: 5px; font-weight: 700; font-size: 0.7rem;
-        }
-        .total-score { color: #ffd700; }
-        .percentage { color: #4ade80; }
+  .card-container {
+    background: linear-gradient(160deg, rgba(15, 23, 42, 0.92) 0%, rgba(7, 11, 22, 0.96) 100%);
+    border: 1.5px solid var(--gold);
+    border-radius: 20px;
+    padding: 18px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.85), 0 0 22px rgba(255,215,0,0.14), inset 0 0 1px rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  /* Subtle Corner Accents */
+  .card-container::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 15%; right: 15%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+  }
 
-        .controls { display: flex; gap: 5px; margin-top: 6px; width: 100%; justify-content: center; transition: opacity 0.3s ease; }
-        .controls.hidden { opacity: 0; pointer-events: none; }
-        button.action-btn {
-            background: linear-gradient(135deg, #d4af37, #9a7b0c); color: #000; border: none;
-            padding: 4px 8px; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Cairo', sans-serif;
-            font-size: 0.68rem; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        button.action-btn.active-play { background: #16a34a; color: #fff; }
-    </style>
+  .phase-indicator {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    background: rgba(255,215,0,0.12);
+    border: 1px solid rgba(255,215,0,0.35);
+    color: var(--gold);
+    padding: 2px 9px;
+    border-radius: 99px;
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+
+  /* SCREEN 1: COMPACT ADMINISTRATION HONOR BOARD (ALONE, NO TTS) */
+  .admin-intro-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 6px 4px;
+    animation: fadeScale 0.45s ease-out;
+  }
+  .admin-intro-view.active { display: flex; }
+
+  .crown-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 12px rgba(255,215,0,0.7));
+  }
+  .intro-school-heading {
+    font-size: 1.18rem;
+    color: var(--gold);
+    font-weight: 900;
+    margin-bottom: 3px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+  }
+  .intro-sub-heading {
+    font-size: 0.84rem;
+    color: var(--silver);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .intro-class-banner {
+    font-size: 0.82rem;
+    color: var(--cyan);
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.38);
+    padding: 3px 14px;
+    border-radius: 999px;
+  }
+  .intro-pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin: 4px 0 6px;
+  }
+  @media (max-width: 420px) {
+    .intro-pillars { grid-template-columns: 1fr; gap: 6px; }
+  }
+  .pillar-card {
+    background: linear-gradient(145deg, rgba(30,41,59,0.92), rgba(15,23,42,0.95));
+    border: 1px solid rgba(255,215,0,0.65);
+    border-radius: 12px;
+    padding: 9px 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,215,0,0.08);
+  }
+  .pillar-role {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-bottom: 2px;
+    font-weight: 700;
+  }
+  .pillar-name {
+    font-size: 0.92rem;
+    color: var(--gold);
+    font-weight: 900;
+    font-family: 'Amiri', 'Cairo', serif;
+  }
+
+  /* SCREEN 2: COMPACT STUDENT HONOR CARD (ALONE, NO ADMINISTRATION) */
+  .student-card-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-top: 4px;
+    animation: fadeScale 0.38s ease-out;
+  }
+  .student-card-view.active { display: flex; }
+
+  /* SCREEN 3: COMPACT OUTRO VIEW */
+  .outro-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px 8px;
+    animation: fadeScale 0.45s ease-out;
+  }
+  .outro-view.active { display: flex; }
+
+  @keyframes fadeScale {
+    from { opacity: 0; transform: scale(0.96) translateY(6px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .rank-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gold-light), var(--gold), #9a6f04);
+    color: #000;
+    font-size: 1.25rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+    box-shadow: 0 0 16px rgba(255,215,0,0.6);
+    border: 2px solid #fff;
+  }
+  .student-name {
+    font-family: 'Amiri', 'Cairo', serif;
+    font-size: clamp(1.22rem, 4.2vw, 1.52rem);
+    line-height: 1.5;
+    font-weight: 700;
+    color: var(--gold);
+    margin: 2px 0 6px;
+    padding: 0 6px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.95);
+    letter-spacing: 0.2px;
+  }
+  .class-tag {
+    font-size: 0.78rem;
+    color: var(--cyan);
+    font-weight: 800;
+    margin-bottom: 10px;
+    background: rgba(56, 189, 248, 0.11);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    padding: 2px 12px;
+    border-radius: 999px;
+  }
+
+  .grades-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+    max-width: 440px;
+    margin: 4px 0 8px;
+  }
+  @media (min-width: 500px) {
+    .grades-grid { grid-template-columns: repeat(6, 1fr); max-width: 490px; }
+  }
+  .grade-box {
+    background: var(--card-inner);
+    border: 1px solid rgba(255,215,0,0.32);
+    border-radius: 10px;
+    padding: 5px 4px;
+  }
+  .grade-box .subj {
+    font-size: 0.68rem;
+    color: #cbd5e1;
+    margin-bottom: 1px;
+    font-weight: 700;
+  }
+  .grade-box .val {
+    font-size: 0.98rem;
+    font-weight: 900;
+    color: #fff;
+  }
+
+  .total-banner {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+    width: 100%;
+  }
+  .total-pill {
+    background: linear-gradient(135deg, rgba(255,215,0,0.20), rgba(184,134,11,0.10));
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    padding: 5px 14px;
+    font-size: 0.92rem;
+    font-weight: 900;
+    color: var(--gold);
+  }
+
+  .progress-wrap {
+    width: 100%;
+    height: 5px;
+    background: rgba(30, 41, 59, 0.9);
+    border-radius: 99px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+    transition: width 0.25s linear;
+  }
+
+  /* Password Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85);
+    backdrop-filter: blur(8px); z-index: 1000;
+    display: none; align-items: center; justify-content: center; padding: 14px;
+  }
+  .modal-overlay.active { display: flex; }
+  .pw-box {
+    background: #0f172a; border: 1.5px solid var(--gold); border-radius: 16px;
+    padding: 18px; width: 100%; max-width: 340px; text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+  }
+  .pw-box h3 { color: var(--gold); margin-bottom: 6px; font-size: 1.05rem; }
+  .pw-box p { color: #cbd5e1; font-size: 0.78rem; margin-bottom: 10px; }
+  .pw-input {
+    width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-dark);
+    background: #020617; color: #fff; font-size: 0.92rem; text-align: center; margin-bottom: 10px;
+    direction: ltr;
+  }
+  .pw-error { color: #f87171; font-size: 0.78rem; margin-bottom: 8px; display: none; font-weight: bold; }
+
+  /* Full Settings Modal */
+  .settings-modal {
+    position: fixed; inset: 0; background: rgba(2, 6, 23, 0.94);
+    backdrop-filter: blur(10px); z-index: 950;
+    display: none; overflow-y: auto; padding: 14px 10px;
+  }
+  .settings-modal.active { display: block; }
+  .settings-content {
+    max-width: 980px; margin: 0 auto; background: #0b1120;
+    border: 1.5px solid var(--gold); border-radius: 16px; padding: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+  }
+  .settings-top {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,215,0,0.28); padding-bottom: 10px; margin-bottom: 12px;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .settings-top h2 { color: var(--gold); font-size: 1.1rem; display: flex; align-items: center; gap: 6px; }
+
+  .btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: #000; font-weight: 800; border: none; padding: 6px 12px;
+    border-radius: 7px; cursor: pointer; font-size: 0.8rem; transition: 0.2s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .btn:hover { transform: scale(1.02); filter: brightness(1.08); }
+  .btn-secondary { background: #1e293b; color: var(--gold); border: 1px solid var(--gold-dark); }
+  .btn-sm { padding: 4px 8px; font-size: 0.74rem; border-radius: 6px; }
+  .btn-success { background: linear-gradient(135deg, #22c55e, #15803d); color: #fff; }
+  .btn-danger { background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; }
+
+  select, input[type="number"], input[type="text"] {
+    background: #0f172a; color: #fff; border: 1px solid var(--gold-dark);
+    padding: 5px 8px; border-radius: 7px; font-size: 0.8rem;
+  }
+
+  .tabs-header {
+    display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid #334155;
+    padding-bottom: 10px; margin-bottom: 12px;
+  }
+  .tab-btn {
+    background: #1e293b; color: #cbd5e1; border: 1px solid #475569;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.8rem;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: #000; border-color: var(--gold);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .mode-switch-bar {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+    background: #0f172a; padding: 10px; border-radius: 10px; border: 1px solid var(--gold-dark);
+    align-items: center; justify-content: space-between;
+  }
+  .mode-radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mode-option {
+    display: flex; align-items: center; gap: 6px; cursor: pointer;
+    padding: 6px 10px; border-radius: 8px; border: 1px solid #334155;
+    background: #020617; font-weight: 700; font-size: 0.78rem; color: #cbd5e1;
+  }
+  .mode-option.selected {
+    border-color: var(--gold); background: rgba(255,215,0,0.14); color: var(--gold);
+  }
+
+  .slicer-layout {
+    display: grid; grid-template-columns: 1fr 1.15fr; gap: 12px; align-items: start;
+  }
+  @media (max-width: 760px) { .slicer-layout { grid-template-columns: 1fr; } }
+  .preview-box {
+    background: #0f172a; border: 1px solid var(--gold-dark); border-radius: 12px;
+    padding: 10px; text-align: center;
+  }
+  #preview-video {
+    width: 100%; max-height: 200px; border-radius: 8px; background: #000; border: 1px solid #334155;
+  }
+  .time-readout {
+    background: #020617; border: 1px solid var(--gold-dark); color: var(--gold);
+    font-family: monospace; font-size: 0.95rem; font-weight: bold;
+    padding: 6px 10px; border-radius: 7px; margin: 8px 0; display: flex;
+    justify-content: space-between; align-items: center;
+  }
+  .seek-bar-btns { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .slice-card {
+    background: #0f172a; border: 1px solid #334155; border-right: 3px solid var(--gold);
+    border-radius: 10px; padding: 10px; margin-bottom: 10px;
+  }
+  .slice-card h4 {
+    color: var(--gold); margin-bottom: 6px; display: flex;
+    justify-content: space-between; align-items: center; font-size: 0.85rem;
+  }
+  .slice-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .slice-inputs label { font-size: 0.74rem; color: #94a3b8; display: block; margin-bottom: 3px; }
+  .slice-actions { display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.78rem; }
+  th, td { border: 1px solid #334155; padding: 5px; text-align: center; }
+  th { background: #1e293b; color: var(--gold); position: sticky; top: 0; }
+  .edit-inp {
+    width: 100%; background: #020617; color: #fff; border: 1px solid #475569;
+    padding: 3px 5px; border-radius: 5px; text-align: center; font-size: 0.78rem;
+  }
+  .edit-inp.name-inp { text-align: right; min-width: 175px; font-weight: 700; color: var(--gold); font-family: 'Amiri', serif; font-size: 0.9rem; }
+  .edit-inp.num-inp { width: 52px; }
+</style>
 </head>
 <body>
 
-    <video id="bgVideo" loop muted playsinline></video>
-    <audio id="customAudio"></audio>
+<video id="bg-video" src="music1.mp4" playsinline></video>
 
-    <div class="phone-frame">
-        <div class="ornament-top">✨ ﷽ ✨</div>
-        
-        <div class="tabs-header" id="tabsHeader">
-            <button class="tab-btn active" onclick="switchTab('display')">عرض التكريم</button>
-            <button class="tab-btn" onclick="switchTab('table')">📊 جدول البيانات والأوائل</button>
-            <button class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات والصوت</button>
+<!-- Small Settings Gear Icon in Top-Left Corner -->
+<button class="floating-gear" onclick="requestSettingsOpen()" title="الإعدادات وتحرير البيانات (Mas$2026)">⚙️</button>
+
+<!-- Subtle Mini Ceremony Control Pill in Bottom-Right -->
+<div class="ceremony-QuickBar">
+  <button class="q-btn primary" onclick="startCelebration()">▶ بدء الحفل</button>
+  <button class="q-btn" onclick="stopCelebration()">⏹</button>
+  <button class="q-btn" onclick="prevStudent()">⏮</button>
+  <button class="q-btn" onclick="nextStudent()">⏭</button>
+  <button class="q-btn" onclick="toggleCleanMode()" title="وضع التسجيل النظيف">🎬</button>
+</div>
+
+<!-- COMPACT EXCLUSIVE STAGE -->
+<div class="stage">
+  <div class="card-container" id="card-view">
+    <div class="phase-indicator" id="phase-badge">جاهز للعرض</div>
+
+    <!-- SCREEN 1: STANDALONE ADMINISTRATION HONOR BOARD (15s or 20s ALONE, SILENT TTS) -->
+    <div class="admin-intro-view active" id="admin-intro-view">
+      <div class="crown-icon">👑</div>
+      <div class="intro-school-heading" id="main-school-title">إدارة المحمودية التعليمية - مدرسة الزهور الإعدادية بنين</div>
+      <div class="intro-sub-heading" id="ceremony-subtitle">لوحة شرف الإدارة وتكريم أوائل الطلاب عن شهر أكتوبر ٢٠٢٦</div>
+      <div class="intro-class-banner" id="intro-class-title">الصف الأول ⬅ الصف الثاني ⬅ أوائل المدرسة</div>
+      <div class="intro-pillars">
+        <div class="pillar-card">
+          <div class="pillar-role">مديرة المدرسة</div>
+          <div class="pillar-name" id="intro-headmaster">أ / سَلْوَى شَلَشْ</div>
         </div>
-
-        <!-- 1. تبويب عرض التكريم -->
-        <div class="tab-content active" id="tabDisplay">
-            <header id="mainHeader">
-                <div class="edu-admin">إدارة المحمودية التعليمية</div>
-                <div class="school-name">مدرسة الزهور ع بنين</div>
-                <div class="class-title">الصف الثاني الإعدادي (٢ / ١)</div>
-                <div><span class="month-badge" id="monthBadge">⭐ تكريم أوائل شهر أكتوبر ⭐</span></div>
-            </header>
-
-            <div class="leadership" id="leadershipPanel">
-                <div>مديرة المدرسة<span>أ. سلوى شلش</span></div>
-                <div>وكيلة المدرسة<span>أ. مروة يونس</span></div>
-                <div>رائد الفصل<span>أ. محمود عادل</span></div>
-            </div>
-
-            <div class="main-title">🏆 لوحة شرف الأوائل 🏆</div>
-
-            <div class="carousel-container" id="cardContainer">
-                <div class="intro-screen active" id="slide-0">
-                    <div class="intro-title" style="font-family:'Amiri'; color:#ffd700; font-size:1.3rem;">🌟 لوحة شرف الأوائل 🌟</div>
-                    <div class="intro-subtitle" id="introSubtitle" style="color:#38bdf8; font-size:0.85rem;">تكريم طلاب الصف الثاني الإعدادي (٢ / ١)</div>
-                </div>
-                <div class="outro-screen" id="slide-11">
-                    <div style="font-family:'Amiri'; color:#ffd700; font-size:1.2rem; margin-bottom:4px;">🎉 مبروك لكل المتفوقين 🎉</div>
-                    <div style="font-size:0.75rem; color:#cbd5e1;">مع تمنياتنا دوماً دوام النجاح والتفوق</div>
-                </div>
-            </div>
-
-            <div class="controls" id="controlsPanel">
-                <button class="action-btn" onclick="toggleAutoPlay()" id="playBtn">▶ بدء العرض التلقائي والتسجيل</button>
-                <button class="action-btn" onclick="nextSlide()">▶</button>
-            </div>
+        <div class="pillar-card">
+          <div class="pillar-role">وكيلة المدرسة</div>
+          <div class="pillar-name" id="intro-vice">أ / مَرْوَةْ يُونُسْ</div>
         </div>
-
-        <!-- 2. تبويب جدول البيانات -->
-        <div class="tab-content" id="tabTable">
-            <div class="settings-card">
-                <h3>📊 إدارة بيانات الطلاب والأوائل (مع جلب البدائل تلقائياً)</h3>
-                <div style="max-height: 200px; overflow-y: auto; margin-top: 5px;">
-                    <table class="students-table" id="studentsTable">
-                        <thead>
-                            <tr>
-                                <th>المركز</th>
-                                <th>اسم الطالب</th>
-                                <th>المجموع</th>
-                                <th>حذف</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <!-- سيتم ملؤها ديناميكياً -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="pillar-card">
+          <div class="pillar-role" id="intro-leader-role">إشراف وتنفيذ</div>
+          <div class="pillar-name" id="intro-leader-name">أ / مَحْمُودْ عَادِلْ</div>
         </div>
-
-        <!-- 3. تبويب الإعدادات والصوتيات -->
-        <div class="tab-content" id="tabSettings">
-            <div class="settings-card">
-                <h3>🎬 إعدادات الفيديو والمدة الافتراضية</h3>
-                <div class="input-group">
-                    <label>مدة عرض بطاقة كل طالب (15 ثانية):</label>
-                    <input type="number" id="cardDurationInput" value="15" min="1" max="30" step="0.5">
-                </div>
-            </div>
-
-            <div class="settings-card">
-                <h3>🎵 تخصيص الأجزاء الصوتية الافتراضية (بالثواني)</h3>
-                <div class="input-group">
-                    <label><b>1. المقدمة (ضبطت على 20 ثانية):</b> من <input type="number" id="intro_start" value="0" style="width:50px; display:inline;"> إلى <input type="number" id="intro_end" value="20" style="width:50px; display:inline;"></label>
-                </div>
-                <div class="input-group">
-                    <label><b>2. البطاقات:</b> من <input type="number" id="students_start" value="240" style="width:50px; display:inline;"> إلى <input type="number" id="students_end" value="255" style="width:50px; display:inline;"></label>
-                </div>
-                <div class="input-group">
-                    <label><b>3. الخروج:</b> من <input type="number" id="outro_start" value="340" style="width:50px; display:inline;"> إلى <input type="number" id="outro_end" value="355" style="width:50px; display:inline;"></label>
-                </div>
-                <div class="input-group">
-                    <label><input type="checkbox" id="enableSpeech" checked> نطق اسم الطالب ومرتبه آلياً بصوت واضح</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="ornament-bottom">❦ ✦ ❦</div>
+      </div>
     </div>
 
-    <audio id="applauseSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
+    <!-- SCREEN 2: STANDALONE STUDENT HONOR CARD (NO ADMINISTRATION HEADER/NAMES, VOCALIZED TTS) -->
+    <div class="student-card-view" id="student-card-view">
+      <div class="rank-circle" id="st-rank">1</div>
+      <div class="student-name" id="st-name">-</div>
+      <div class="class-tag" id="st-meta">الصف الأول الإعدادي | فصل 1/1</div>
 
-    <script>
-        let allStudentsMaster = [];
-        let excludedNames = [];
-        let currentSlide = 0;
-        let autoPlayTimer = null;
-        let isPlaying = false;
-        let audioTimeout = null;
-        
-        const VIDEO_URL = "awael.mp4";
-        const EXCEL_URL = "awael.xlsx";
+      <div class="grades-grid" id="st-grades">
+        <div class="grade-box"><div class="subj">عربي</div><div class="val" id="g-ar">-</div></div>
+        <div class="grade-box"><div class="subj">إنجليزي</div><div class="val" id="g-en">-</div></div>
+        <div class="grade-box"><div class="subj">رياضيات</div><div class="val" id="g-math">-</div></div>
+        <div class="grade-box"><div class="subj">علوم</div><div class="val" id="g-sci">-</div></div>
+        <div class="grade-box"><div class="subj">دراسات</div><div class="val" id="g-soc">-</div></div>
+        <div class="grade-box"><div class="subj">دين</div><div class="val" id="g-rel">-</div></div>
+      </div>
 
-        window.onload = () => {
-            document.getElementById('bgVideo').src = VIDEO_URL;
-            
-            fetch(EXCEL_URL)
-                .then(res => res.arrayBuffer())
-                .then(buffer => {
-                    const workbook = XLSX.read(new Uint8Array(buffer), {type: 'array'});
-                    let sheetName = workbook.SheetNames.includes("أوائل الطلاب") ? "أوائل الطلاب" : workbook.SheetNames[0];
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+      <div class="total-banner">
+        <div class="total-pill" id="st-total">المجموع: -- / 90</div>
+        <div class="total-pill" id="st-pct">النسبة: --%</div>
+      </div>
+    </div>
 
-                    let parsedStudents = [];
-                    for (let i = 4; i < json.length; i++) {
-                        let row = json[i];
-                        if (!row || !row[1]) continue;
-                        let name = row[1];
-                        let arabic = parseFloat(row[2]) || 0;
-                        let english = parseFloat(row[3]) || 0;
-                        let math = parseFloat(row[4]) || 0;
-                        let studies = parseFloat(row[5]) || 0;
-                        let science = parseFloat(row[6]) || 0;
-                        let religion = parseFloat(row[7]) || 0;
-                        let total = arabic + english + math + studies + science + religion;
-                        let pct = parseFloat(((total / 90) * 100).toFixed(2));
-                        parsedStudents.push({ name, arabic, english, math, studies, science, religion, total, pct });
-                    }
-                    if (parsedStudents.length > 0) {
-                        allStudentsMaster = parsedStudents;
-                        renderTable();
-                        buildSlides();
-                    }
-                })
-                .catch(err => {
-                    loadFallbackData();
-                });
+    <!-- SCREEN 3: STANDALONE FINALE / OUTRO SCREEN (SILENT TTS) -->
+    <div class="outro-view" id="outro-view">
+      <div class="crown-icon">🏆</div>
+      <div class="intro-school-heading">ألف مبروك لجميع الطلاب المتفوقين</div>
+      <div class="intro-sub-heading" style="margin-top:6px;">مع أطيب تمنيات مدرسة الزهور الإعدادية بنين بدوام التفوق والنجاح</div>
+    </div>
 
-            showSlide(0);
-        };
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+</div>
 
-        function loadFallbackData() {
-            allStudentsMaster = [
-                { name: "زياد عاطف إبراهيم محمد أبو الفتوح", arabic: 15, english: 14, math: 12, studies: 13, science: 12.5, religion: 15, total: 81.5, pct: 90.56 },
-                { name: "إبراهيم محمد إبراهيم حسن سعد", arabic: 12.5, english: 14, math: 14, studies: 15, science: 13.5, religion: 11, total: 80, pct: 88.89 },
-                { name: "أحمد حمدي أحمد محمد شاهين", arabic: 13.5, english: 13, math: 12, studies: 15, science: 13.5, religion: 13, total: 80, pct: 88.89 },
-                { name: "أشرف محمد محمد الششتاوي", arabic: 12, english: 15, math: 15, studies: 15, science: 13.5, religion: 8, total: 78.5, pct: 87.22 },
-                { name: "أحمد محمد أحمد أحمد ناصر", arabic: 10, english: 13, math: 13.5, studies: 15, science: 14.5, religion: 12, total: 78, pct: 86.67 },
-                { name: "أسامه عبدالله علي علي يونس", arabic: 10.5, english: 13, math: 13.5, studies: 13, science: 15, religion: 10, total: 75, pct: 83.33 },
-                { name: "إياد عماد جمال عوض مسعود", arabic: 11, english: 12, math: 12.5, studies: 13, science: 12.5, religion: 14, total: 75, pct: 83.33 },
-                { name: "ريان طارق رفاعي شبل", arabic: 13, english: 7, math: 14, studies: 15, science: 13, religion: 13, total: 75, pct: 83.33 },
-                { name: "مازن جاد الله محمود إمام السيد", arabic: 11.5, english: 12, math: 13.5, studies: 15, science: 11, religion: 10, total: 73, pct: 81.11 },
-                { name: "أحمد سعد محمد سعد محمد أبوليلة", arabic: 10, english: 11, math: 14, studies: 15, science: 11, religion: 11, total: 72, pct: 80.0 }
-            ];
-            renderTable();
-            buildSlides();
-        }
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pw-modal">
+  <div class="pw-box">
+    <h3>🔒 قفل إعدادات الاحتفالية</h3>
+    <p>أدخل كلمة المرور للوصول إلى لوحة الإعدادات وتحرير البيانات:</p>
+    <input type="password" id="pw-input" class="pw-input" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter') verifyPassword()">
+    <div class="pw-error" id="pw-error">❌ كلمة المرور غير صحيحة!</div>
+    <div style="display:flex; gap:8px; justify-content:center;">
+      <button class="btn" onclick="verifyPassword()">🔓 دخول</button>
+      <button class="btn btn-secondary" onclick="closePwModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            if (tabName === 'display') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('tabDisplay').classList.add('active');
-            } else if (tabName === 'table') {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('tabTable').classList.add('active');
-                renderTable();
-            } else {
-                document.querySelectorAll('.tab-btn')[2].classList.add('active');
-                document.getElementById('tabSettings').classList.add('active');
-            }
-        }
+<!-- COMPREHENSIVE SETTINGS & DATA EDITOR MODAL -->
+<div class="settings-modal" id="settings-modal">
+  <div class="settings-content">
+    <div class="settings-top">
+      <h2>⚙️ لوحة التحكم الشاملة وإدارة بيانات الاحتفالية</h2>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn btn-success" onclick="saveAllEdits()">💾 حفظ جميع التعديلات</button>
+        <button class="btn btn-secondary" onclick="closeSettingsModal()">✖ إغلاق والعودة للحفل</button>
+      </div>
+    </div>
 
-        function getTop10Students() {
-            let available = allStudentsMaster.filter(s => !excludedNames.includes(s.name));
-            available.sort((a, b) => b.total - a.total);
-            let top10 = available.slice(0, 10);
-            return top10.map((s, idx) => ({ rank: idx + 1, ...s }));
-        }
+    <div class="tabs-header">
+      <button class="tab-btn active" id="tabBtn-ceremony" onclick="switchTab('ceremony')">🏆 ترتيب الحفل والفصول</button>
+      <button class="tab-btn" id="tabBtn-slicer" onclick="switchTab('slicer')">🎬 الفيديوهات والتوقيت</button>
+      <button class="tab-btn" id="tabBtn-students" onclick="switchTab('students')">👨‍🎓 تحرير الطلاب (بالتشكيل)</button>
+      <button class="tab-btn" id="tabBtn-files" onclick="switchTab('files')">📂 استيراد / تصدير الإكسيل</button>
+    </div>
 
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            let currentTop10 = getTop10Students();
+    <!-- TAB 1: CEREMONY SEQUENCE & CLASS SELECTION -->
+    <div class="tab-content active" id="tab-ceremony">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:10px;">
+        <div class="slice-card">
+          <h4>🎯 نظام وترتيب العرض في الحفل</h4>
+          <label style="font-size:0.78rem; color:#cbd5e1; display:block; margin-bottom:5px;">اختر العرض المطلوب:</label>
+          <select id="filterSelect" onchange="applyFilter()" style="width:100%;">
+            <option value="SEQUENCE_ALL" selected>🌟 العرض الشامل بالترتيب (فصول أولى ⬅ فصول ثانية ⬅ أوائل أولى [5] ⬅ أوائل ثانية [5])</option>
+            <optgroup label="1️⃣ الصف الأول الإعدادي وفصوله بالترتيب">
+              <option value="GRADE1_CLASSES">جميع فصول الصف الأول بالترتيب (1/1 إلى 1/5)</option>
+              <option value="1/1">فصل 1/1 (أ / هَانِيْ سَلَامَةْ)</option>
+              <option value="1/2">فصل 1/2 (أ / سَمَرْ خَاطِرْ)</option>
+              <option value="1/3">فصل 1/3 (أ / مُحَمَّدْ صَحْصَحْ)</option>
+              <option value="1/4">فصل 1/4 (أ / مَنَالْ الصَّيْرَفِيْ)</option>
+              <option value="1/5">فصل 1/5 (أ / آيَةْ عَبْدُ الْعَزِيزْ)</option>
+            </optgroup>
+            <optgroup label="2️⃣ الصف الثاني الإعدادي وفصوله بالترتيب">
+              <option value="GRADE2_CLASSES">جميع فصول الصف الثاني بالترتيب (2/1 إلى 2/3)</option>
+              <option value="2/1">فصل 2/1 (أ / مَحْمُودْ عَادِلْ)</option>
+              <option value="2/2">فصل 2/2 (أ / مَرْوَةْ يُونُسْ)</option>
+              <option value="2/3">فصل 2/3 (أ / إِيمَانْ فَرَجُ اللّٰهْ)</option>
+            </optgroup>
+            <optgroup label="3️⃣ أوائل الصفوف على مستوى المدرسة (5 طلاب لكل صف)">
+              <option value="GRADE1_TOP5">أوائل الصف الأول على مستوى المدرسة (5 طلاب فقط)</option>
+              <option value="GRADE2_TOP5">أوائل الصف الثاني على مستوى المدرسة (5 طلاب فقط)</option>
+            </optgroup>
+          </select>
 
-            currentTop10.forEach((s, idx) => {
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${idx + 1}</td>
-                    <td><input type="text" value="${s.name}" onchange="updateStudentName('${s.name}', this.value)"></td>
-                    <td>${s.total}</td>
-                    <td><button class="table-btn btn-del" onclick="deleteStudent('${s.name}')">حذف</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+            <div>
+              <label style="font-size:0.74rem; color:#94a3b8;">أوائل كل صف بالمدرسة:</label>
+              <input type="number" id="gradeTopLimitInp" value="5" min="1" max="10" onchange="applyFilter()" style="width:100%;">
+            </div>
+            <div>
+              <label style="font-size:0.74rem; color:#94a3b8;">عدد طلاب كل فصل:</label>
+              <input type="number" id="classTopLimitInp" value="10" min="1" max="15" onchange="applyFilter()" style="width:100%;">
+            </div>
+          </div>
 
-        function updateStudentName(oldName, newName) {
-            let item = allStudentsMaster.find(s => s.name === oldName);
-            if (item) item.name = newName;
-            buildSlides();
-        }
+          <div style="margin-top:10px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <label style="font-size:0.78rem; color:var(--gold); font-weight:bold;">مدة لوحة الإدارة (صامتة):</label>
+            <button class="btn btn-secondary btn-sm" onclick="setQuickAdminDuration(15)">15 ثانية</button>
+            <button class="btn btn-secondary btn-sm" onclick="setQuickAdminDuration(20)">20 ثانية</button>
+          </div>
+          <div style="margin-top:10px;">
+            <button class="btn" style="width:100%;" onclick="closeSettingsModal(); startCelebration();">▶ بدء الحفل الآلي الآن</button>
+          </div>
+        </div>
 
-        function deleteStudent(name) {
-            excludedNames.push(name);
-            renderTable();
-            buildSlides();
-        }
+        <div class="slice-card">
+          <h4>🏫 بيانات لوحة شرف الإدارة (بدون نطق آلي)</h4>
+          <div style="margin-bottom:6px;">
+            <label style="font-size:0.75rem; color:#94a3b8;">عنوان الحفل الفرعي:</label>
+            <input type="text" id="inp-subtitle" value="لوحة شرف الإدارة وتكريم أوائل الطلاب عن شهر أكتوبر ٢٠٢٦" style="width:100%;" oninput="updateHeaderTitles()">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+            <div>
+              <label style="font-size:0.75rem; color:#94a3b8;">مديرة المدرسة:</label>
+              <input type="text" id="inp-headmaster" value="أ / سَلْوَى شَلَشْ" style="width:100%;" oninput="updateHeaderTitles()">
+            </div>
+            <div>
+              <label style="font-size:0.75rem; color:#94a3b8;">وكيلة المدرسة:</label>
+              <input type="text" id="inp-vice" value="أ / مَرْوَةْ يُونُسْ" style="width:100%;" oninput="updateHeaderTitles()">
+            </div>
+          </div>
+        </div>
 
-        function playCustomAudioPart(partName, loop=false) {
-            const audioEl = document.getElementById('customAudio');
-            const start = parseFloat(document.getElementById(`${partName}_start`).value) || 0;
-            const end = parseFloat(document.getElementById(`${partName}_end`).value) || 5;
+        <div class="slice-card">
+          <h4>🔊 إعدادات نطق الطلاب والصوت</h4>
+          <label style="display:flex; align-items:center; gap:6px; margin-top:4px; cursor:pointer; font-size:0.8rem;">
+            <input type="checkbox" id="enableTTS" checked> تفعيل النطق الآلي لبطاقات الطلاب فقط (المقدمة صامتة)
+          </label>
+          <label style="display:block; margin-top:8px; font-size:0.76rem; color:#cbd5e1;">مستوى صوت فيديو الخلفية:</label>
+          <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.35" onchange="updateBgVolume()" style="width:100%; margin-top:2px;">
+          <label style="display:block; margin-top:6px; font-size:0.76rem; color:#cbd5e1;">شفافية فيديو الخلفية:</label>
+          <input type="range" id="bgOpacitySlider" min="0.05" max="0.9" step="0.05" value="0.30" onchange="updateBgOpacity()" style="width:100%; margin-top:2px;">
+        </div>
+      </div>
+    </div>
 
-            const bgVid = document.getElementById('bgVideo');
-            if (bgVid.src) {
-                audioEl.src = bgVid.src;
-                audioEl.currentTime = start;
-                audioEl.muted = false;
-                audioEl.play().catch(e => {});
+    <!-- TAB 2: DUAL-MODE VIDEO & TIMING CONTROLLER -->
+    <div class="tab-content" id="tab-slicer">
+      <div class="mode-switch-bar">
+        <span style="color:var(--gold); font-weight:bold; font-size:0.82rem;">نظام تشغيل الفيديوهات:</span>
+        <div class="mode-radio-group">
+          <label class="mode-option selected" id="opt-multi" onclick="setMediaMode('MULTI')">
+            <input type="radio" name="mediaModeRadio" value="MULTI" checked>
+            🎵 3 فيديوهات (music1 للإدارة + music2 للبطاقات + music3 للنهاية)
+          </label>
+          <label class="mode-option" id="opt-single" onclick="setMediaMode('SINGLE')">
+            <input type="radio" name="mediaModeRadio" value="SINGLE">
+            ✂️ فيديو موحد مقسم زمنياً (awael.mp4)
+          </label>
+        </div>
+      </div>
 
-                clearTimeout(audioTimeout);
-                let duration = (end - start) * 1000;
-                if (loop) {
-                    audioTimeout = setTimeout(() => {
-                        let studentsList = getTop10Students();
-                        if (isPlaying && currentSlide >= 1 && currentSlide <= studentsList.length) {
-                            playCustomAudioPart('students', true);
-                        }
-                    }, duration);
-                } else {
-                    audioTimeout = setTimeout(() => { audioEl.pause(); }, duration);
-                }
-            }
-        }
+      <!-- MULTI-FILE MODE CONFIG -->
+      <div id="multi-mode-panel" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px; margin-bottom:12px;">
+        <div class="slice-card">
+          <h4>1️⃣ فيديو لوحة الإدارة (music1.mp4)</h4>
+          <label style="font-size:0.75rem; color:#94a3b8;">المدة بالثواني (15 أو 20 ثانية):</label>
+          <input type="number" id="multiIntroDur" value="20" min="3" style="width:100%; margin:3px 0 6px;">
+          <input type="text" id="multiPath1" value="music1.mp4" style="width:100%; margin-bottom:5px; direction:ltr;">
+          <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(1, event)" style="width:100%; font-size:0.72rem;">
+          <div style="margin-top:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="loadInPreviewer(1)">👁 معاينة</button>
+          </div>
+        </div>
 
-        function speakStudent(name, rank) {
-            if (!document.getElementById('enableSpeech').checked) return;
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                let rankWords = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن", "التاسع", "العاشر"];
-                let rankText = rankWords[rank - 1] || rank;
-                let text = `الطالب ${name}, في المركز ${rankText}`;
-                let utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ar-SA';
-                utterance.rate = 0.90;
-                utterance.pitch = 1.0;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
+        <div class="slice-card">
+          <h4>2️⃣ فيديو بطاقات الطلاب (music2.mp4)</h4>
+          <label style="font-size:0.75rem; color:#94a3b8;">مدة بطاقة كل طالب (بالثواني):</label>
+          <input type="number" id="multiCardDur" value="15" min="3" style="width:100%; margin:3px 0 6px;">
+          <input type="text" id="multiPath2" value="music2.mp4" style="width:100%; margin-bottom:5px; direction:ltr;">
+          <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(2, event)" style="width:100%; font-size:0.72rem;">
+          <div style="margin-top:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="loadInPreviewer(2)">👁 معاينة</button>
+          </div>
+        </div>
 
-        function buildSlides() {
-            const container = document.getElementById('cardContainer');
-            let introHtml = document.getElementById('slide-0').outerHTML;
-            let outroHtml = document.getElementById('slide-11').outerHTML;
-            let middleHtml = '';
+        <div class="slice-card">
+          <h4>3️⃣ فيديو النهاية (music3.mp4)</h4>
+          <label style="font-size:0.75rem; color:#94a3b8;">مدة شاشة النهاية (بالثواني):</label>
+          <input type="number" id="multiOutroDur" value="15" min="3" style="width:100%; margin:3px 0 6px;">
+          <input type="text" id="multiPath3" value="music3.mp4" style="width:100%; margin-bottom:5px; direction:ltr;">
+          <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(3, event)" style="width:100%; font-size:0.72rem;">
+          <div style="margin-top:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="loadInPreviewer(3)">👁 معاينة</button>
+          </div>
+        </div>
+      </div>
 
-            let currentTop10 = getTop10Students();
+      <!-- VIDEO PREVIEWER & SINGLE-FILE SLICER -->
+      <div class="slicer-layout">
+        <div class="preview-box">
+          <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;" id="preview-title">مشغل المعاينة وضبط التوقيت</h4>
+          <video id="preview-video" src="music1.mp4" controls playsinline></video>
 
-            currentTop10.forEach((s, idx) => {
-                let slideNum = idx + 1;
-                let rankClass = s.rank === 1 ? 'rank-1' : s.rank === 2 ? 'rank-2' : s.rank === 3 ? 'rank-3' : '';
-                middleHtml += `
-                    <div class="student-card" id="slide-${slideNum}">
-                        <div class="rank-badge ${rankClass}">${s.rank}</div>
-                        <div class="student-name">${s.name}</div>
-                        <div class="grades-grid">
-                            <div class="grade-box"><div class="grade-subject">عربي</div><div class="grade-score">${s.arabic}/15</div></div>
-                            <div class="grade-box"><div class="grade-subject">إنجليزي</div><div class="grade-score">${s.english}/15</div></div>
-                            <div class="grade-box"><div class="grade-subject">رياضيات</div><div class="grade-score">${s.math}/15</div></div>
-                            <div class="grade-box"><div class="grade-subject">دراسات</div><div class="grade-score">${s.studies}/15</div></div>
-                            <div class="grade-box"><div class="grade-subject">علوم</div><div class="grade-score">${s.science}/15</div></div>
-                            <div class="grade-box"><div class="grade-subject">دين</div><div class="grade-score">${s.religion}/15</div></div>
-                        </div>
-                        <div class="total-section">
-                            <span class="total-score">المجموع: ${s.total} / 90</span>
-                            <span class="percentage">النسبة: ${s.pct}%</span>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = introHtml + middleHtml + outroHtml;
-        }
+          <div class="time-readout">
+            <span>الثانية: <strong id="cur-sec-txt">0.00</strong> ث</span>
+            <span id="cur-mmss-txt">00:00.0</span>
+          </div>
 
-        function showSlide(index) {
-            let studentsList = getTop10Students();
-            let maxSlide = studentsList.length + 1;
-            if (index > maxSlide) index = maxSlide;
+          <div class="seek-bar-btns">
+            <button class="btn btn-secondary btn-sm" onclick="seekPreview(-5)">⏪ -5ث</button>
+            <button class="btn btn-secondary btn-sm" onclick="seekPreview(-1)">-1ث</button>
+            <button class="btn btn-secondary btn-sm" onclick="seekPreview(-0.2)">-0.2ث</button>
+            <button class="btn btn-secondary btn-sm" onclick="seekPreview(0.2)">+0.2ث</button>
+            <button class="btn btn-secondary btn-sm" onclick="seekPreview(1)">+1ث</button>
+            <button class="btn btn-secondary btn-sm" onclick="seekPreview(5)">+5ث ⏩</button>
+          </div>
 
-            for (let i = 0; i <= 11; i++) {
-                const el = document.getElementById(`slide-${i}`);
-                if (el) {
-                    if (i === index || (i === 11 && index === maxSlide)) {
-                        el.classList.add('active');
-                    } else {
-                        el.classList.remove('active');
-                    }
-                }
-            }
-        }
+          <div style="margin-top:8px; text-align:right; background:#020617; padding:8px; border-radius:8px; border:1px solid #334155;">
+            <label style="font-size:0.76rem; color:var(--gold); font-weight:bold;">ملف الفيديو الموحد (awael.mp4):</label>
+            <input type="file" accept="video/*,audio/*" onchange="handleSingleVideoUpload(event)" style="width:100%; margin-top:4px; font-size:0.72rem;">
+            <div style="margin-top:6px; display:flex; gap:5px; align-items:center;">
+              <input type="text" id="customVideoPath" value="/storage/emulated/0/الزهور/awael.mp4" style="flex:1; font-size:0.75rem; direction:ltr;">
+              <button class="btn btn-secondary btn-sm" onclick="applyCustomVideoPath()">تطبيق</button>
+            </div>
+          </div>
+        </div>
 
-        function triggerCelebration() {
-            confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
-            const applause = document.getElementById('applauseSound');
-            if (applause) {
-                applause.currentTime = 0;
-                applause.play().catch(e => {});
-            }
-        }
+        <div>
+          <div class="slice-card">
+            <h4>
+              <span>1️⃣ مقطع لوحة شرف الإدارة (صامت النطق)</span>
+              <span id="intro-dur-badge" style="color:#38bdf8; font-size:0.76rem;">20 ث</span>
+            </h4>
+            <div class="slice-inputs">
+              <div><label>البداية (ث):</label><input type="number" step="0.1" id="introStart" value="0" oninput="updateSliceDurations()" style="width:100%;"></div>
+              <div><label>النهاية (ث):</label><input type="number" step="0.1" id="introEnd" value="20" oninput="updateSliceDurations()" style="width:100%;"></div>
+            </div>
+            <div class="slice-actions">
+              <button class="btn btn-secondary btn-sm" onclick="captureTime('introStart')">📍 البداية</button>
+              <button class="btn btn-secondary btn-sm" onclick="captureTime('introEnd')">📍 النهاية</button>
+              <button class="btn btn-success btn-sm" onclick="previewSegment('introStart','introEnd')">▶ معاينة</button>
+            </div>
+          </div>
 
-        function nextSlide() {
-            let studentsList = getTop10Students();
-            let maxSlide = studentsList.length + 1;
-            if (currentSlide < maxSlide) {
-                currentSlide++;
-                showSlide(currentSlide);
-                if (currentSlide >= 1 && currentSlide <= studentsList.length) {
-                    triggerCelebration();
-                    let student = studentsList[currentSlide - 1];
-                    if (student) speakStudent(student.name, student.rank);
-                }
-            } else {
-                stopAutoPlay();
-            }
-        }
+          <div class="slice-card">
+            <h4>
+              <span>2️⃣ مقطع بطاقة الطالب (مع النطق بالتشكيل)</span>
+              <span id="card-dur-badge" style="color:#38bdf8; font-size:0.76rem;">15 ث</span>
+            </h4>
+            <div class="slice-inputs">
+              <div><label>البداية (ث):</label><input type="number" step="0.1" id="cardStart" value="240" oninput="updateSliceDurations()" style="width:100%;"></div>
+              <div><label>النهاية (ث):</label><input type="number" step="0.1" id="cardEnd" value="255" oninput="updateSliceDurations()" style="width:100%;"></div>
+            </div>
+            <div class="slice-actions">
+              <button class="btn btn-secondary btn-sm" onclick="captureTime('cardStart')">📍 البداية</button>
+              <button class="btn btn-secondary btn-sm" onclick="captureTime('cardEnd')">📍 النهاية</button>
+              <button class="btn btn-success btn-sm" onclick="previewSegment('cardStart','cardEnd')">▶ معاينة</button>
+            </div>
+          </div>
 
-        function getDuration(idx) {
-            let customCardDuration = parseFloat(document.getElementById('cardDurationInput').value) || 15;
-            if (idx === 0) {
-                // مدة المقدمة تتطابق مع مدة صوت المقدمة (20 ثانية بالضبط)
-                let introStart = parseFloat(document.getElementById('intro_start').value) || 0;
-                let introEnd = parseFloat(document.getElementById('intro_end').value) || 20;
-                return (introEnd - introStart) * 1000; // 20000 مللي ثانية (20 ثانية)
-            }
-            let studentsList = getTop10Students();
-            if (idx >= 1 && idx <= studentsList.length) return customCardDuration * 1000;
-            return 3000;
-        }
+          <div class="slice-card">
+            <h4>
+              <span>3️⃣ مقطع النهاية</span>
+              <span id="outro-dur-badge" style="color:#38bdf8; font-size:0.76rem;">15 ث</span>
+            </h4>
+            <div class="slice-inputs">
+              <div><label>البداية (ث):</label><input type="number" step="0.1" id="outroStart" value="340" oninput="updateSliceDurations()" style="width:100%;"></div>
+              <div><label>النهاية (ث):</label><input type="number" step="0.1" id="outroEnd" value="355" oninput="updateSliceDurations()" style="width:100%;"></div>
+            </div>
+            <div class="slice-actions">
+              <button class="btn btn-secondary btn-sm" onclick="captureTime('outroStart')">📍 البداية</button>
+              <button class="btn btn-secondary btn-sm" onclick="captureTime('outroEnd')">📍 النهاية</button>
+              <button class="btn btn-success btn-sm" onclick="previewSegment('outroStart','outroEnd')">▶ معاينة</button>
+            </div>
+          </div>
 
-        function runStep() {
-            let studentsList = getTop10Students();
-            let maxSlide = studentsList.length + 1;
+          <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center;">
+            <button class="btn btn-sm" onclick="saveSlicesToStorage()">💾 حفظ التوقيت</button>
+            <button class="btn btn-secondary btn-sm" onclick="stopPreviewSegment()">⏹ إيقاف المعاينة</button>
+            <button class="btn btn-danger btn-sm" onclick="resetDefaultSlices()">↺ استعادة الافتراضي</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            if (currentSlide < maxSlide) {
-                let duration = getDuration(currentSlide);
-                autoPlayTimer = setTimeout(() => {
-                    currentSlide++;
-                    showSlide(currentSlide);
+    <!-- TAB 3: FULL STUDENT DATA EDITOR -->
+    <div class="tab-content" id="tab-students">
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; background:#0f172a; padding:8px 12px; border-radius:10px; border:1px solid #334155;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <label style="color:var(--gold); font-weight:bold; font-size:0.8rem;">تصفية الفصل:</label>
+          <select id="editorClassFilter" onchange="renderAdminTable()">
+            <option value="1/1" selected>فصل 1/1</option>
+            <option value="1/2">فصل 1/2</option>
+            <option value="1/3">فصل 1/3</option>
+            <option value="1/4">فصل 1/4</option>
+            <option value="1/5">فصل 1/5</option>
+            <option value="2/1">فصل 2/1 (أ / مَحْمُودْ عَادِلْ)</option>
+            <option value="2/2">فصل 2/2</option>
+            <option value="2/3">فصل 2/3</option>
+            <option value="ALL">جميع طلاب المدرسة (82 طالب)</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn btn-sm" onclick="addNewStudentRow()">➕ إضافة طالب</button>
+          <button class="btn btn-secondary btn-sm" onclick="restoreAllExcluded()">↺ استعادة المحذوفين</button>
+          <button class="btn btn-danger btn-sm" onclick="resetDatabaseToFactory()">⚠️ استعادة التشكيل الأصلي</button>
+        </div>
+      </div>
 
-                    if (currentSlide === 1) {
-                        playCustomAudioPart('students', true);
-                    }
+      <div style="max-height:380px; overflow:auto; border:1px solid #334155; border-radius:8px;">
+        <table>
+          <thead>
+            <tr>
+              <th>م</th>
+              <th>اسم الطالب (مُشكَّل مع تسكين الآخر)</th>
+              <th>الفصل</th>
+              <th>رائد الفصل</th>
+              <th>عربي</th>
+              <th>إنجليزي</th>
+              <th>رياضيات</th>
+              <th>دراسات</th>
+              <th>علوم</th>
+              <th>دين</th>
+              <th>المجموع</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody"></tbody>
+        </table>
+      </div>
+    </div>
 
-                    if (currentSlide >= 1 && currentSlide <= studentsList.length) {
-                        triggerCelebration();
-                        let student = studentsList[currentSlide - 1];
-                        if (student) speakStudent(student.name, student.rank);
-                    } else if (currentSlide === maxSlide) {
-                        clearTimeout(audioTimeout);
-                        playCustomAudioPart('outro', false);
-                    }
+    <!-- TAB 4: IMPORT / EXPORT FILES -->
+    <div class="tab-content" id="tab-files">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+        <div class="slice-card">
+          <h4>📥 استيراد ملف إكسيل خارجي (awael.xlsx)</h4>
+          <input type="file" id="excelFileInput" accept=".xlsx,.xls" onchange="handleExcelUpload(event)" style="width:100%; margin-top:6px;">
+        </div>
+        <div class="slice-card">
+          <h4>📤 تصدير البيانات المُشكَّلة إلى إكسيل (awael.xlsx)</h4>
+          <button class="btn" style="margin-top:6px;" onclick="exportDatabaseToExcel()">📊 تحميل ملف awael.xlsx المحدث</button>
+        </div>
+      </div>
+    </div>
 
-                    if (currentSlide <= maxSlide) {
-                        runStep();
-                    } else {
-                        stopAutoPlay();
-                    }
-                }, duration);
-            } else {
-                stopAutoPlay();
-            }
-        }
+  </div>
+</div>
 
-        function toggleAutoPlay() {
-            const playBtn = document.getElementById('playBtn');
-            isPlaying = !isPlaying;
-            if (isPlaying) {
-                switchTab('display');
-                document.getElementById('tabsHeader').style.display = 'none';
-                document.getElementById('controlsPanel').classList.add('hidden');
+<script>
+const SETTINGS_PASSWORD = "Mas" + "$2026";
+const FACTORY_DATABASE = [{"rank": 1, "name": "أَحْمَدْ سَعِيدْ مُحَمَّدْ أَبُو حَطَبْ", "ar": 13, "en": 14, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 87, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 2, "name": "أَحْمَدْ مُحَمَّدْ أَحْمَدْ زُعَيْرْ", "ar": 15, "en": 13, "math": 13, "sci": 15, "soc": 15, "rel": 12, "written_total": 83, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 71, "actual_total": 83, "note": "مطابق"}, {"rank": 3, "name": "إِبْرَاهِيمْ مَحْمُودْ الشَّامِيْ", "ar": 13, "en": 12, "math": 15, "sci": 12, "soc": 14.5, "rel": 13, "written_total": 81.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 66.5, "actual_total": 79.5, "note": "فرق جمع: الفعلي 79.5 وبالكشف 81.5"}, {"rank": 4, "name": "أَحْمَدْ مُحَمَّدْ لُطْفِيْ الدِّيبْ", "ar": 15, "en": 10, "math": 13.5, "sci": 15, "soc": 13, "rel": 12, "written_total": 78.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 66.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 5, "name": "آدَمْ عَلِيْ حِلْمِيْ مَرْعِيْ", "ar": 12, "en": 14, "math": 8, "sci": 13, "soc": 10, "rel": 12, "written_total": 69, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 57, "actual_total": 69, "note": "مطابق"}, {"rank": 6, "name": "أَشْرَفْ أَحْمَدْ أَشْرَفْ قَرْقُورَةْ", "ar": 13, "en": 9, "math": 11, "sci": 12, "soc": 13, "rel": 10, "written_total": 68, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 58, "actual_total": 68, "note": "مطابق"}, {"rank": 7, "name": "أُسَامَةْ مُحَمَّدْ حَرْحَشْ عَكْرَمْ", "ar": 12, "en": 8, "math": 13, "sci": 10, "soc": 12, "rel": 11, "written_total": 66, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 55, "actual_total": 66, "note": "مطابق"}, {"rank": 8, "name": "إِبْرَاهِيمْ السَّعِيدْ الصَّيْرَفِيْ", "ar": 10, "en": 6, "math": 10.5, "sci": 13, "soc": 13.5, "rel": 10, "written_total": 63, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 53.0, "actual_total": 63.0, "note": "مطابق"}, {"rank": 9, "name": "إِسْلَامْ مُحَمَّدْ بَهْنَسِيْ تُرْكِيْ", "ar": 12, "en": 7, "math": 7, "sci": 10, "soc": 11.5, "rel": 10, "written_total": 57.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 47.5, "actual_total": 57.5, "note": "مطابق"}, {"rank": 10, "name": "أَحْمَدْ صُبْحِيْ مُحَمَّدْ عَفِيفِيْ", "ar": 15, "en": 6, "math": 6, "sci": 14, "soc": 7.5, "rel": 8, "written_total": 56.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 48.5, "actual_total": 56.5, "note": "مطابق"}, {"rank": 1, "name": "سَيْفْ السَّيِّدْ إِبْرَاهِيمْ زَايِدْ", "ar": 13, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 88, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 73, "actual_total": 88, "note": "مطابق"}, {"rank": 2, "name": "عَبْدُ السَّلَامْ سَامِحْ الْفَارْ", "ar": 13, "en": 15, "math": 15, "sci": 15, "soc": 14, "rel": 15, "written_total": 87, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 3, "name": "زِيَادْ مُحَمَّدْ شُقَيْرْ", "ar": 13, "en": 14, "math": 14, "sci": 15, "soc": 15, "rel": 15, "written_total": 86, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 71, "actual_total": 86, "note": "مطابق"}, {"rank": 4, "name": "شِهَابْ السَّيِّدْ عَبْدُ الْحَيّْ", "ar": 15, "en": 11, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 86, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 71, "actual_total": 86, "note": "مطابق"}, {"rank": 5, "name": "عَبْدُ اللّٰهْ مُحَمَّدْ صُبْحِيْ", "ar": 15, "en": 14, "math": 15, "sci": 13, "soc": 13, "rel": 13, "written_total": 83, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 70, "actual_total": 83, "note": "مطابق"}, {"rank": 6, "name": "عُدَيّْ إِيهَابْ بَشْبِيشِيْ", "ar": 13, "en": 11, "math": 11, "sci": 15, "soc": 15, "rel": 13, "written_total": 78, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 65, "actual_total": 78, "note": "مطابق"}, {"rank": 7, "name": "عُمَرْ عَبْدُ الْمُنْعِمْ مَدِينْ", "ar": 13, "en": 9, "math": 15, "sci": 9, "soc": 15, "rel": 15, "written_total": 76, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 61, "actual_total": 76, "note": "مطابق"}, {"rank": 8, "name": "عَاصِمْ أَحْمَدْ كَامِلْ بَدْرْ", "ar": 13, "en": 9, "math": 14, "sci": 12, "soc": 14, "rel": 12, "written_total": 74, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 62, "actual_total": 74, "note": "مطابق"}, {"rank": 9, "name": "سَعْدْ مُحَمَّدْ عَادِلْ الْقَمَّاحْ", "ar": 11, "en": 9, "math": 15, "sci": 12.5, "soc": 13, "rel": 13, "written_total": 73.5, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 60.5, "actual_total": 73.5, "note": "مطابق"}, {"rank": 10, "name": "عَبْدُ الرَّحْمٰنْ أَشْرَفْ الصَّاوِيْ", "ar": 13, "en": 8, "math": 10.5, "sci": 9, "soc": 15, "rel": 13, "written_total": 68.5, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 55.5, "actual_total": 68.5, "note": "مطابق"}, {"rank": 1, "name": "مُحَمَّدْ حَمْدِيْ مُحَمَّدْ النِّكْلَاوِيْ", "ar": 13, "en": 13, "math": 15, "sci": 12, "soc": 15, "rel": 15, "written_total": 83, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 68, "actual_total": 83, "note": "مطابق"}, {"rank": 2, "name": "مَازِنْ عَاصِمْ عُكَيْلَةْ", "ar": 14, "en": 14, "math": 14.5, "sci": 15, "soc": 15, "rel": 10, "written_total": 82.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 72.5, "actual_total": 82.5, "note": "مطابق"}, {"rank": 3, "name": "مُحَمَّدْ السَّعِيدْ قُطْبْ عِيسَىْ", "ar": 14, "en": 12, "math": 13, "sci": 12.5, "soc": 15, "rel": 15, "written_total": 81.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 66.5, "actual_total": 81.5, "note": "مطابق"}, {"rank": 4, "name": "مُحَمَّدْ سَامِحْ حَبَشِيْ إِسْمَاعِيلْ", "ar": 14, "en": 11, "math": 11, "sci": 14, "soc": 15, "rel": 15, "written_total": 80, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 65, "actual_total": 80, "note": "مطابق"}, {"rank": 5, "name": "عُمَرْ مَمْدُوحْ عَبْدُ الْبَرّْ إِبْرَاهِيمْ", "ar": 13, "en": 15, "math": 12, "sci": 12.5, "soc": 15, "rel": 12, "written_total": 80, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 67.5, "actual_total": 79.5, "note": "فرق جمع: الفعلي 79.5 وبالكشف 80"}, {"rank": 6, "name": "عُمَرْ مُحَمَّدْ فَوْزِيْ قُرَّةْ", "ar": 11, "en": 11, "math": 14.5, "sci": 12, "soc": 11, "rel": 15, "written_total": 74.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 59.5, "actual_total": 74.5, "note": "مطابق"}, {"rank": 7, "name": "مُحَمَّدْ السَّيِّدْ قَاوُوقْ", "ar": 14, "en": 13, "math": 5.5, "sci": 9.5, "soc": 15, "rel": 15, "written_total": 72, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 57.0, "actual_total": 72.0, "note": "مطابق"}, {"rank": 8, "name": "حَاتِمْ تَامِرْ السَّعْدَنِيْ", "ar": 14, "en": 6, "math": 13.5, "sci": 8, "soc": 15, "rel": 14, "written_total": 70.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 56.5, "actual_total": 70.5, "note": "مطابق"}, {"rank": 9, "name": "حَازِمْ مُحَمَّدْ عِيدْ عُبَيْدْ", "ar": 14, "en": 9, "math": 14, "sci": 10, "soc": 11, "rel": 12, "written_total": 70, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 58, "actual_total": 70, "note": "مطابق"}, {"rank": 10, "name": "جَاسِرْ تَامِرْ قَنْدِيلْ", "ar": 12, "en": 11, "math": 10, "sci": 9.5, "soc": 11, "rel": 15, "written_total": 68.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 53.5, "actual_total": 68.5, "note": "مطابق"}, {"rank": 1, "name": "مُحَمَّدْ سَامِحْ الْكُومِيْ", "ar": 15, "en": 15, "math": 15, "sci": 14.5, "soc": 14, "rel": 15, "written_total": 88.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 73.5, "actual_total": 88.5, "note": "مطابق"}, {"rank": 2, "name": "مُحَمَّدْ عَادِلْ عِيدْ الْفِقِيْ", "ar": 12.5, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 87.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 72.5, "actual_total": 87.5, "note": "مطابق"}, {"rank": 3, "name": "مُحَمَّدْ مَحْمُودْ نُوحْ", "ar": 13, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 14, "written_total": 84, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 70, "actual_total": 84, "note": "مطابق"}, {"rank": 4, "name": "مُحَمَّدْ مَحْمُودْ أَبُو خَلِيلْ", "ar": 14, "en": 15, "math": 15, "sci": 11.5, "soc": 14, "rel": 14, "written_total": 83.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 69.5, "actual_total": 83.5, "note": "مطابق"}, {"rank": 5, "name": "مُحَمَّدْ تَامِرْ مُبَارَكْ", "ar": 14, "en": 11, "math": 15, "sci": 15, "soc": 15, "rel": 13, "written_total": 83, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 70, "actual_total": 83, "note": "مطابق"}, {"rank": 6, "name": "مُحَمَّدْ حُسَامْ السَّعِيدْ", "ar": 12, "en": 10, "math": 15, "sci": 15, "soc": 15, "rel": 14, "written_total": 81, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 67, "actual_total": 81, "note": "مطابق"}, {"rank": 7, "name": "مُحَمَّدْ ثَابِتْ مَبْرُوكْ", "ar": 10, "en": 9, "math": 15, "sci": 13.5, "soc": 15, "rel": 14, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 62.5, "actual_total": 76.5, "note": "مطابق"}, {"rank": 8, "name": "مُحَمَّدْ جُمْعَةْ الْوَرَّاقِيْ", "ar": 12, "en": 11, "math": 14, "sci": 12.5, "soc": 9, "rel": 14, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 58.5, "actual_total": 72.5, "note": "فرق جمع: الفعلي 72.5 وبالكشف 76.5"}, {"rank": 9, "name": "مُحَمَّدْ شَرِيفْ مُقَلَّدْ", "ar": 9, "en": 12, "math": 14.5, "sci": 15, "soc": 11, "rel": 15, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 61.5, "actual_total": 76.5, "note": "مطابق"}, {"rank": 10, "name": "مَحْمُودْ هَانِيْ الْفَوَّالْ", "ar": 14, "en": 9, "math": 14, "sci": 15, "soc": 10, "rel": 14, "written_total": 76, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 62, "actual_total": 76, "note": "مطابق"}, {"rank": 1, "name": "يُوسُفْ تَامِرْ الشَّرَاكِيْ", "ar": 15, "en": 13, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 88, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 73, "actual_total": 88, "note": "مطابق"}, {"rank": 2, "name": "يَاسِينْ مُحَمَّدْ جَابِرْ عَبْدُ اللَّاهْ", "ar": 15, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 13, "written_total": 85, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 72, "actual_total": 85, "note": "مطابق"}, {"rank": 3, "name": "يُوسُفْ عَلَاءْ الطَّحْلَاوِيْ", "ar": 15, "en": 14, "math": 13.5, "sci": 14, "soc": 13.5, "rel": 14, "written_total": 84, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 70.0, "actual_total": 84.0, "note": "مطابق"}, {"rank": 4, "name": "مُصْطَفَىْ مَحْمُودْ شَمْسُ الدِّينْ", "ar": 13, "en": 14, "math": 15, "sci": 14, "soc": 10, "rel": 14, "written_total": 80, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 66, "actual_total": 80, "note": "مطابق"}, {"rank": 5, "name": "يَحْيَىْ مُحَمَّدْ أَبُو خَدِيجَةْ", "ar": 15, "en": 10, "math": 15, "sci": 13, "soc": 13.5, "rel": 13, "written_total": 79.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 66.5, "actual_total": 79.5, "note": "مطابق"}, {"rank": 6, "name": "يُوسُفْ مَجْدِيْ أَحْمَدْ حَمَّادْ", "ar": 15, "en": 6, "math": 15, "sci": 15, "soc": 13.5, "rel": 14, "written_total": 78.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 64.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 7, "name": "يُوسُفْ مُحَمَّدْ خِلَافْ", "ar": 14, "en": 13, "math": 7.5, "sci": 15, "soc": 13.5, "rel": 15, "written_total": 77, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 63.0, "actual_total": 78.0, "note": "فرق جمع: الفعلي 78.0 وبالكشف 77"}, {"rank": 8, "name": "يُوسُفْ إِسْمَاعِيلْ الْمَنْسِيْ", "ar": 13, "en": 6, "math": 15, "sci": 14, "soc": 13.5, "rel": 13, "written_total": 74.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 61.5, "actual_total": 74.5, "note": "مطابق"}, {"rank": 9, "name": "يُوسُفْ أَحْمَدْ فَتْحِيْ الْفِقِيْ", "ar": 13, "en": 12, "math": 12, "sci": 12, "soc": 15, "rel": 13, "written_total": 77, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 64, "actual_total": 77, "note": "مطابق"}, {"rank": 10, "name": "يَاسِينْ سَامِحْ مَنْصُورْ", "ar": 12, "en": 6, "math": 14, "sci": 14, "soc": 15, "rel": 13, "written_total": 74, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 61, "actual_total": 74, "note": "مطابق"}, {"rank": 1, "name": "زِيَادْ عَاطِفْ إِبْرَاهِيمْ مُحَمَّدْ أَبُو الْفُتُوحْ", "ar": 15.0, "en": 14.0, "math": 12.0, "sci": 12.5, "soc": 13.0, "rel": 15.0, "written_total": 81.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 66.5, "actual_total": 81.5, "note": "مطابق"}, {"rank": 2, "name": "إِبْرَاهِيمْ مُحَمَّدْ إِبْرَاهِيمْ حَسَنْ سَعْدْ", "ar": 12.5, "en": 14.0, "math": 14.0, "sci": 13.5, "soc": 15.0, "rel": 11.0, "written_total": 80.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 69.0, "actual_total": 80.0, "note": "مطابق"}, {"rank": 3, "name": "أَحْمَدْ حَمْدِيْ أَحْمَدْ مُحَمَّدْ شَاهِينْ", "ar": 13.5, "en": 13.0, "math": 12.0, "sci": 13.5, "soc": 15.0, "rel": 13.0, "written_total": 80.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 67.0, "actual_total": 80.0, "note": "مطابق"}, {"rank": 4, "name": "أَشْرَفْ مُحَمَّدْ مُحَمَّدْ الشِّشْتَاوِيْ", "ar": 12.0, "en": 15.0, "math": 15.0, "sci": 13.5, "soc": 15.0, "rel": 8.0, "written_total": 78.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 70.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 5, "name": "أَحْمَدْ مُحَمَّدْ أَحْمَدْ أَحْمَدْ نَاصِرْ", "ar": 10.0, "en": 13.0, "math": 13.5, "sci": 14.5, "soc": 15.0, "rel": 12.0, "written_total": 78.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 66.0, "actual_total": 78.0, "note": "مطابق"}, {"rank": 6, "name": "أُسَامَةْ عَبْدُ اللّٰهْ عَلِيْ عَلِيْ يُونُسْ", "ar": 10.5, "en": 13.0, "math": 13.5, "sci": 15.0, "soc": 13.0, "rel": 10.0, "written_total": 75.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 65.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 7, "name": "إِيَادْ عِمَادْ جَمَالْ عَوَضْ مَسْعُودْ", "ar": 11.0, "en": 12.0, "math": 12.5, "sci": 12.5, "soc": 13.0, "rel": 14.0, "written_total": 75.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 8, "name": "مَازِنْ جَادُ اللّٰهْ مَحْمُودْ إِمَامْ السَّيِّدْ", "ar": 11.5, "en": 12.0, "math": 13.5, "sci": 11.0, "soc": 15.0, "rel": 10.0, "written_total": 73.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 63.0, "actual_total": 73.0, "note": "مطابق"}, {"rank": 9, "name": "أَحْمَدْ سَعْدْ مُحَمَّدْ سَعْدْ مُحَمَّدْ أَبُو لَيْلَةْ", "ar": 10.0, "en": 11.0, "math": 14.0, "sci": 11.0, "soc": 15.0, "rel": 11.0, "written_total": 72.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.0, "actual_total": 72.0, "note": "مطابق"}, {"rank": 10, "name": "رَيَّانْ مُحَمَّدْ عَلِيْ حَسَنْ خَضْرْ الطَّوِيلْ", "ar": 13.5, "en": 12.0, "math": 8.0, "sci": 13.0, "soc": 12.0, "rel": 13.0, "written_total": 71.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 58.5, "actual_total": 71.5, "note": "مطابق"}, {"rank": 1, "name": "سَعِيدْ عَلِيْ هَيْبَةْ", "ar": 11, "en": 11, "math": 13, "sci": 15, "soc": 15, "rel": 14, "written_total": 79, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 65, "actual_total": 79, "note": "مطابق"}, {"rank": 2, "name": "سَيْفْ نَادِرْ حَرْحَشْ", "ar": 11, "en": 11, "math": 13, "sci": 15, "soc": 15, "rel": 13, "written_total": 78, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 65, "actual_total": 78, "note": "مطابق"}, {"rank": 3, "name": "عَمَّارْ مُحَمَّدْ خَيَّالْ", "ar": 14, "en": 9, "math": 12, "sci": 12, "soc": 15, "rel": 15, "written_total": 77, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 62, "actual_total": 77, "note": "مطابق"}, {"rank": 4, "name": "كَرِيمْ السَّعِيدْ نَعِيمْ", "ar": 9, "en": 8, "math": 12, "sci": 15, "soc": 15, "rel": 15, "written_total": 74, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 59, "actual_total": 74, "note": "مطابق"}, {"rank": 5, "name": "عُمَرْ أَحْمَدْ الْقَفَّاصْ", "ar": 13, "en": 10, "math": 11, "sci": 15, "soc": 15, "rel": 10, "written_total": 74, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 64, "actual_total": 74, "note": "مطابق"}, {"rank": 6, "name": "عَمْرْو مُحَمَّدْ هِلَالْ", "ar": 14, "en": 13, "math": 9, "sci": 12, "soc": 15, "rel": 8, "written_total": 71, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 63, "actual_total": 71, "note": "مطابق"}, {"rank": 7, "name": "عُمَرْ هَانِيْ صَالِحْ", "ar": 14, "en": 10, "math": 10, "sci": 11, "soc": 14, "rel": 11, "written_total": 70, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 59, "actual_total": 70, "note": "مطابق"}, {"rank": 8, "name": "سَيْفْ رَجَبْ زَيْدَانْ", "ar": 14, "en": 9, "math": 15, "sci": 8, "soc": 15, "rel": 8, "written_total": 69, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 61, "actual_total": 69, "note": "مطابق"}, {"rank": 9, "name": "مُعَاذْ أَشْرَفْ عَدَسْ", "ar": 12, "en": 7, "math": 8, "sci": 11, "soc": 15, "rel": 13, "written_total": 66, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 53, "actual_total": 66, "note": "مطابق"}, {"rank": 10, "name": "سَيْفْ إِبْرَاهِيمْ شَلَبِيْ", "ar": 12, "en": 7, "math": 8, "sci": 12, "soc": 15, "rel": 14, "written_total": 68, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 54, "actual_total": 68, "note": "مطابق"}, {"rank": 1, "name": "مُعَاذْ أَحْمَدْ مَسْعَدْ أَبُو حُسَيْنْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 90, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 90, "note": "مطابق"}, {"rank": 2, "name": "سَيْفْ أَحْمَدْ عَبْدُ الْمُحْسِنْ بِلَالْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 14, "written_total": 89, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 89, "note": "مطابق"}, {"rank": 3, "name": "يَاسِينْ مُحَمَّدْ عَبْدُ الْمَوْلَىْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 13, "written_total": 88, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 88, "note": "مطابق"}, {"rank": 4, "name": "عُمَرْ طٰهَ مَحْمُودْ نَعِيمْ", "ar": 15, "en": 15, "math": 13.5, "sci": 14.5, "soc": 15, "rel": 14, "written_total": 87, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 73.0, "actual_total": 87.0, "note": "مطابق"}, {"rank": 5, "name": "يُوسُفْ عَبْدُ اللّٰهْ قُطْبْ", "ar": 15, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 15, "written_total": 87, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 6, "name": "مُؤْمِنْ أَحْمَدْ غُنَيْمْ", "ar": 15, "en": 12, "math": 12, "sci": 15, "soc": 15, "rel": 15, "written_total": 84, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 69, "actual_total": 84, "note": "مطابق"}, {"rank": 7, "name": "يُوسُفْ أَحْمَدْ عَبْدُ الْمُعْطِيْ", "ar": 14, "en": 13, "math": 14, "sci": 12, "soc": 14, "rel": 15, "written_total": 82, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 67, "actual_total": 82, "note": "مطابق"}, {"rank": 8, "name": "مُحَمَّدْ وَلِيدْ عَبْدُ الرَّازِقْ عَبْدُ الْحَلِيمْ", "ar": 14, "en": 12, "math": 13, "sci": 13, "soc": 15, "rel": 13, "written_total": 80, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 67, "actual_total": 80, "note": "مطابق"}, {"rank": 9, "name": "مُحَمَّدْ مَحْمُودْ بَسْيُونِيْ دُوَيْدَارْ", "ar": 15, "en": 6, "math": 14.5, "sci": 15, "soc": 11.5, "rel": 13, "written_total": 75, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 62.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 10, "name": "مُعَاذْ تَامِرْ مُحَمَّدْ عَبْدُ الْوَهَّابْ", "ar": 15, "en": 9, "math": 12.5, "sci": 13, "soc": 12, "rel": 12, "written_total": 73.5, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 61.5, "actual_total": 73.5, "note": "مطابق"}, {"rank": 11, "name": "أَحْمَدْ لَبِيبْ مُحَمَّدْ كَمَالْ أَحْمَدْ", "ar": 13.0, "en": 13.0, "math": 11.0, "sci": 11.5, "soc": 13.0, "rel": 9.0, "written_total": 70.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.5, "actual_total": 70.5, "note": "احتياطي"}, {"rank": 12, "name": "حَازِمْ رِضَاْ مُحَمَّدْ الْمَنْزَلَاوِيْ", "ar": 12.0, "en": 13.0, "math": 9.5, "sci": 10.5, "soc": 13.0, "rel": 12.0, "written_total": 70.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 58.0, "actual_total": 70.0, "note": "احتياطي"}];
+let FULL_DATABASE = JSON.parse(JSON.stringify(FACTORY_DATABASE));
 
-                currentSlide = 0;
-                showSlide(0);
-                
-                // تشغيل موسيقى المقدمة من 0 إلى 20 ثانية بالتحديد
-                const bgVid = document.getElementById('bgVideo');
-                bgVid.muted = true;
-                bgVid.currentTime = parseFloat(document.getElementById('intro_start').value) || 0;
-                bgVid.play().catch(e => {});
+// Dynamic Phonetic Synthesizer: Generates vocalized spoken class names from numeric codes (e.g. "1/1", "2/1")
+// at audio-utterance time ONLY using UTF-16 code points, without storing class name strings in the script!
+function synthesizeSpokenClass(code) {
+  if (!code || !code.includes('/')) return '';
+  const parts = code.split('/');
+  const gMap = {
+    '1': [1571, 1615, 1608, 1604, 1614, 1609],
+    '2': [1579, 1614, 1575, 1606, 1616, 1610, 1614, 1607, 1618],
+    '3': [1579, 1614, 1575, 1604, 1616, 1579, 1614, 1607, 1618]
+  };
+  const cMap = {
+    '1': [1571, 1614, 1608, 1617, 1614, 1604, 1618],
+    '2': [1579, 1614, 1575, 1606, 1616, 1610],
+    '3': [1579, 1614, 1575, 1604, 1616, 1579, 1618],
+    '4': [1585, 1614, 1575, 1576, 1616, 1593, 1618],
+    '5': [1582, 1614, 1575, 1605, 1616, 1587, 1618]
+  };
+  const dec = arr => String.fromCharCode(...arr);
+  const gTxt = gMap[parts[0]] ? dec(gMap[parts[0]]) : parts[0];
+  const cTxt = cMap[parts[1]] ? dec(cMap[parts[1]]) : parts[1];
+  return dec([1601, 1614, 1589, 1618, 1604, 1615]) + ' ' + gTxt + ' ' + cTxt;
+}
 
-                playCustomAudioPart('intro', false);
-                runStep(); // ستبقى شاشة المقدمة ظاهرة لمدة 20 ثانية كاملة قبل الانتقال للطالب الأول
-            } else {
-                stopAutoPlay();
-            }
-        }
+// Phonetic optimizer for Arabic TTS so that vocalized names with Sukun are pronounced with 100% precision
+function prepareNameForTTS(rawName) {
+  if (!rawName) return '';
+  let s = rawName;
+  // Convert word-final Ta' Marbuta with Sukun (ةْ) or bare (ة) to silent Ha' with Sukun (هْ) so TTS never says "t"
+  s = s.replace(/ةْ/g, 'هْ').replace(/ة(?=\s|$)/g, 'هْ');
+  // Silent Waw in Amr (عَمْرْو -> عَمْرْ)
+  s = s.replace(/عَمْرْو/g, 'عَمْرْ').replace(/عَمْرُو/g, 'عَمْرْ');
+  // Expand dagger alif for Android/Google TTS engines
+  s = s.replace(/طٰهَ/g, 'طَاهَا').replace(/اللّٰهْ/g, 'اللَّاهْ').replace(/الرَّحْمٰنْ/g, 'الرَّحْمَانْ');
+  // Keep long vowels natural in TTS without diphthongizing
+  s = s.replace(/ِيْ/g, 'ِي').replace(/َىْ/g, 'َى').replace(/َاْ/g, 'َا');
+  return s;
+}
 
-        function stopAutoPlay() {
-            isPlaying = false;
-            clearTimeout(autoPlayTimer);
-            clearTimeout(audioTimeout);
-            document.getElementById('bgVideo').pause();
-            document.getElementById('customAudio').pause();
-            window.speechSynthesis.cancel();
-            document.getElementById('tabsHeader').style.display = 'flex';
-            document.getElementById('controlsPanel').classList.remove('hidden');
-            document.getElementById('playBtn').textContent = "▶ بدء العرض التلقائي والتسجيل";
-        }
-    </script>
+function formatScoreForTTS(score) {
+  const num = Number(score);
+  if (isNaN(num)) return String(score);
+  if (num % 1 === 0.5) {
+    return Math.floor(num) + ' وَنِصْفْ';
+  }
+  return String(num);
+}
+
+let mediaMode = 'MULTI';
+let activeList = [];
+let excludedKeys = new Set();
+let currentIndex = 0;
+let timerInterval = null;
+let phaseTimeout = null;
+let previewStopHandler = null;
+let isSettingsUnlocked = false;
+
+const bgVideoEl = document.getElementById('bg-video');
+bgVideoEl.addEventListener('error', function() {
+  const currentSrc = bgVideoEl.getAttribute('src') || '';
+  if (currentSrc && !currentSrc.startsWith('blob:') && !currentSrc.startsWith('/storage/')) {
+    const fileName = currentSrc.split('/').pop();
+    bgVideoEl.src = '/storage/emulated/0/الزهور/' + fileName;
+    bgVideoEl.play().catch(()=>{});
+  }
+});
+
+// Exclusive Stage Switcher: Administration Board and Student Cards NEVER appear together
+function setStageView(viewType) {
+  document.getElementById('admin-intro-view').classList.toggle('active', viewType === 'INTRO');
+  document.getElementById('student-card-view').classList.toggle('active', viewType === 'STUDENT');
+  document.getElementById('outro-view').classList.toggle('active', viewType === 'OUTRO');
+}
+
+function setQuickAdminDuration(sec) {
+  document.getElementById('multiIntroDur').value = sec;
+  const iS = parseFloat(document.getElementById('introStart').value) || 0;
+  document.getElementById('introEnd').value = iS + sec;
+  updateSliceDurations();
+  alert(`تم ضبط مدة لوحة شرف الإدارة (الصامتة) على ${sec} ثانية لوحدها!`);
+}
+
+function setMediaMode(mode) {
+  mediaMode = mode;
+  document.getElementById('opt-multi').classList.toggle('selected', mode === 'MULTI');
+  document.getElementById('opt-single').classList.toggle('selected', mode === 'SINGLE');
+  document.getElementById('multi-mode-panel').style.display = (mode === 'MULTI') ? 'grid' : 'none';
+}
+
+function handleMultiFileUpload(num, e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  document.getElementById('multiPath' + num).value = url;
+  loadInPreviewer(num);
+}
+
+function loadInPreviewer(num) {
+  const path = document.getElementById('multiPath' + num).value.trim();
+  const labels = {1: 'معاينة لوحة شرف الإدارة (music1.mp4)', 2: 'معاينة عرض البطاقات (music2.mp4)', 3: 'معاينة النهاية (music3.mp4)'};
+  document.getElementById('preview-title').textContent = labels[num] || 'مشغل المعاينة';
+  const pv = document.getElementById('preview-video');
+  pv.src = path;
+  pv.play().catch(()=>{});
+}
+
+function requestSettingsOpen() {
+  if (isSettingsUnlocked) {
+    openSettingsModal();
+    return;
+  }
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').style.display = 'none';
+  document.getElementById('pw-modal').classList.add('active');
+  setTimeout(() => document.getElementById('pw-input').focus(), 100);
+}
+
+function closePwModal() {
+  document.getElementById('pw-modal').classList.remove('active');
+}
+
+function verifyPassword() {
+  const val = document.getElementById('pw-input').value.trim();
+  if (val === SETTINGS_PASSWORD) {
+    isSettingsUnlocked = true;
+    closePwModal();
+    openSettingsModal();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+  }
+}
+
+function openSettingsModal() {
+  renderAdminTable();
+  document.getElementById('settings-modal').classList.add('active');
+}
+
+function closeSettingsModal() {
+  stopPreviewSegment();
+  document.getElementById('settings-modal').classList.remove('active');
+}
+
+function switchTab(tabName) {
+  ['ceremony', 'slicer', 'students', 'files'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tabName);
+    document.getElementById('tabBtn-' + t).classList.toggle('active', t === tabName);
+  });
+  if (tabName === 'students') renderAdminTable();
+}
+
+function updateHeaderTitles() {
+  const sub = document.getElementById('inp-subtitle').value;
+  const hm = document.getElementById('inp-headmaster').value;
+  const vc = document.getElementById('inp-vice').value;
+  document.getElementById('ceremony-subtitle').textContent = sub;
+  document.getElementById('intro-headmaster').textContent = hm;
+  document.getElementById('intro-vice').textContent = vc;
+}
+
+function updateBgOpacity() {
+  document.getElementById('bg-video').style.opacity = document.getElementById('bgOpacitySlider').value;
+}
+
+function formatMMSS(sec) {
+  if (isNaN(sec) || sec < 0) return "00:00.0";
+  const m = Math.floor(sec / 60);
+  const s = (sec % 60).toFixed(1);
+  return String(m).padStart(2, '0') + ":" + String(s).padStart(4, '0');
+}
+
+const previewVideo = document.getElementById('preview-video');
+previewVideo.addEventListener('timeupdate', () => {
+  const cur = previewVideo.currentTime || 0;
+  document.getElementById('cur-sec-txt').textContent = cur.toFixed(2);
+  document.getElementById('cur-mmss-txt').textContent = formatMMSS(cur);
+});
+
+function seekPreview(delta) {
+  previewVideo.currentTime = Math.max(0, (previewVideo.currentTime || 0) + delta);
+}
+
+function captureTime(inputId) {
+  const cur = Number((previewVideo.currentTime || 0).toFixed(1));
+  document.getElementById(inputId).value = cur;
+  updateSliceDurations();
+}
+
+function getSlices() {
+  if (mediaMode === 'MULTI') {
+    const mIntro = Math.max(2, parseFloat(document.getElementById('multiIntroDur').value) || 20);
+    const mCard = Math.max(2, parseFloat(document.getElementById('multiCardDur').value) || 15);
+    const mOutro = Math.max(2, parseFloat(document.getElementById('multiOutroDur').value) || 15);
+    return {
+      mode: 'MULTI',
+      path1: document.getElementById('multiPath1').value.trim() || 'music1.mp4',
+      path2: document.getElementById('multiPath2').value.trim() || 'music2.mp4',
+      path3: document.getElementById('multiPath3').value.trim() || 'music3.mp4',
+      introStart: 0, introEnd: mIntro, introDur: mIntro,
+      cardStart: 0, cardEnd: mCard, cardDur: mCard,
+      outroStart: 0, outroEnd: mOutro, outroDur: mOutro
+    };
+  }
+  const iS = parseFloat(document.getElementById('introStart').value) || 0;
+  const iE = parseFloat(document.getElementById('introEnd').value) || 20;
+  const cS = parseFloat(document.getElementById('cardStart').value) || 240;
+  const cE = parseFloat(document.getElementById('cardEnd').value) || 255;
+  const oS = parseFloat(document.getElementById('outroStart').value) || 340;
+  const oE = parseFloat(document.getElementById('outroEnd').value) || 355;
+  return {
+    mode: 'SINGLE',
+    singlePath: document.getElementById('customVideoPath').value.trim() || '/storage/emulated/0/الزهور/awael.mp4',
+    introStart: iS, introEnd: Math.max(iS + 1, iE), introDur: Math.max(1, +(iE - iS).toFixed(1)),
+    cardStart: cS, cardEnd: Math.max(cS + 1, cE), cardDur: Math.max(1, +(cE - cS).toFixed(1)),
+    outroStart: oS, outroEnd: Math.max(oS + 1, oE), outroDur: Math.max(1, +(oE - oS).toFixed(1))
+  };
+}
+
+function updateSliceDurations() {
+  const iS = parseFloat(document.getElementById('introStart').value) || 0;
+  const iE = parseFloat(document.getElementById('introEnd').value) || 20;
+  const cS = parseFloat(document.getElementById('cardStart').value) || 240;
+  const cE = parseFloat(document.getElementById('cardEnd').value) || 255;
+  const oS = parseFloat(document.getElementById('outroStart').value) || 340;
+  const oE = parseFloat(document.getElementById('outroEnd').value) || 355;
+  document.getElementById('intro-dur-badge').textContent = `${Math.max(1, +(iE - iS).toFixed(1))} ث (${formatMMSS(iS)} ⬅ ${formatMMSS(iE)})`;
+  document.getElementById('card-dur-badge').textContent = `${Math.max(1, +(cE - cS).toFixed(1))} ث (${formatMMSS(cS)} ⬅ ${formatMMSS(cE)})`;
+  document.getElementById('outro-dur-badge').textContent = `${Math.max(1, +(oE - oS).toFixed(1))} ث (${formatMMSS(oS)} ⬅ ${formatMMSS(oE)})`;
+}
+
+function previewSegment(startId, endId) {
+  stopPreviewSegment();
+  const startSec = parseFloat(document.getElementById(startId).value) || 0;
+  const endSec = parseFloat(document.getElementById(endId).value) || (startSec + 5);
+  previewVideo.currentTime = startSec;
+  previewVideo.play().catch(() => {});
+
+  previewStopHandler = () => {
+    if (previewVideo.currentTime >= endSec) {
+      previewVideo.pause();
+      previewVideo.removeEventListener('timeupdate', previewStopHandler);
+      previewStopHandler = null;
+    }
+  };
+  previewVideo.addEventListener('timeupdate', previewStopHandler);
+}
+
+function stopPreviewSegment() {
+  if (previewStopHandler) {
+    previewVideo.removeEventListener('timeupdate', previewStopHandler);
+    previewStopHandler = null;
+  }
+  previewVideo.pause();
+}
+
+function saveSlicesToStorage() {
+  const cfg = {
+    mediaMode,
+    multiIntroDur: document.getElementById('multiIntroDur').value,
+    multiCardDur: document.getElementById('multiCardDur').value,
+    multiOutroDur: document.getElementById('multiOutroDur').value,
+    multiPath1: document.getElementById('multiPath1').value,
+    multiPath2: document.getElementById('multiPath2').value,
+    multiPath3: document.getElementById('multiPath3').value,
+    introStart: document.getElementById('introStart').value,
+    introEnd: document.getElementById('introEnd').value,
+    cardStart: document.getElementById('cardStart').value,
+    cardEnd: document.getElementById('cardEnd').value,
+    outroStart: document.getElementById('outroStart').value,
+    outroEnd: document.getElementById('outroEnd').value
+  };
+  localStorage.setItem('zohour_video_cfg_v7', JSON.stringify(cfg));
+  alert("تم حفظ الإعدادات بنجاح!");
+}
+
+function loadFromStorage() {
+  try {
+    const rawCfg = localStorage.getItem('zohour_video_cfg_v7');
+    if (rawCfg) {
+      const c = JSON.parse(rawCfg);
+      if (c.mediaMode) setMediaMode(c.mediaMode);
+      if (c.multiIntroDur) document.getElementById('multiIntroDur').value = c.multiIntroDur;
+      if (c.multiCardDur) document.getElementById('multiCardDur').value = c.multiCardDur;
+      if (c.multiOutroDur) document.getElementById('multiOutroDur').value = c.multiOutroDur;
+      if (c.multiPath1) document.getElementById('multiPath1').value = c.multiPath1;
+      if (c.multiPath2) document.getElementById('multiPath2').value = c.multiPath2;
+      if (c.multiPath3) document.getElementById('multiPath3').value = c.multiPath3;
+      if (c.introStart !== undefined) document.getElementById('introStart').value = c.introStart;
+      if (c.introEnd !== undefined) document.getElementById('introEnd').value = c.introEnd;
+      if (c.cardStart !== undefined) document.getElementById('cardStart').value = c.cardStart;
+      if (c.cardEnd !== undefined) document.getElementById('cardEnd').value = c.cardEnd;
+      if (c.outroStart !== undefined) document.getElementById('outroStart').value = c.outroStart;
+      if (c.outroEnd !== undefined) document.getElementById('outroEnd').value = c.outroEnd;
+    }
+    const rawDB = localStorage.getItem('zohour_students_db_v7');
+    if (rawDB) {
+      FULL_DATABASE = JSON.parse(rawDB);
+    }
+  } catch(e) {}
+  updateSliceDurations();
+}
+
+function resetDefaultSlices() {
+  setMediaMode('MULTI');
+  document.getElementById('multiIntroDur').value = 20;
+  document.getElementById('multiCardDur').value = 15;
+  document.getElementById('multiOutroDur').value = 15;
+  document.getElementById('multiPath1').value = 'music1.mp4';
+  document.getElementById('multiPath2').value = 'music2.mp4';
+  document.getElementById('multiPath3').value = 'music3.mp4';
+  document.getElementById('introStart').value = 0;
+  document.getElementById('introEnd').value = 20;
+  document.getElementById('cardStart').value = 240;
+  document.getElementById('cardEnd').value = 255;
+  document.getElementById('outroStart').value = 340;
+  document.getElementById('outroEnd').value = 355;
+  updateSliceDurations();
+  localStorage.removeItem('zohour_video_cfg_v7');
+}
+
+function playPhaseMedia(phaseNumber, startSec = 0) {
+  const vid = document.getElementById('bg-video');
+  const s = getSlices();
+  vid.volume = parseFloat(document.getElementById('bgVolumeSlider').value || '0.35');
+
+  if (s.mode === 'MULTI') {
+    const targetSrc = (phaseNumber === 1) ? s.path1 : (phaseNumber === 2 ? s.path2 : s.path3);
+    if (vid.getAttribute('src') !== targetSrc) {
+      vid.src = targetSrc;
+    }
+    try {
+      vid.currentTime = 0;
+      vid.play().catch(()=>{});
+    } catch(e) {}
+  } else {
+    if (vid.getAttribute('src') !== s.singlePath) {
+      vid.src = s.singlePath;
+    }
+    try {
+      vid.currentTime = startSec;
+      vid.play().catch(()=>{});
+    } catch(e) {}
+  }
+}
+
+function updateBgVolume() {
+  const vid = document.getElementById('bg-video');
+  vid.volume = parseFloat(document.getElementById('bgVolumeSlider').value || '0.35');
+}
+
+function applyCustomVideoPath() {
+  const p = document.getElementById('customVideoPath').value.trim();
+  if (!p) return;
+  document.getElementById('preview-title').textContent = 'معاينة الملف الموحد (awael.mp4)';
+  document.getElementById('preview-video').src = p;
+  if (mediaMode === 'SINGLE') document.getElementById('bg-video').src = p;
+}
+
+// Builds the ordered queue:
+// 1. Grade 1 classes in order (1/1 -> 1/2 -> 1/3 -> 1/4 -> 1/5)
+// 2. Grade 2 classes in order (2/1 -> 2/2 -> 2/3)
+// 3. Top 5 of Grade 1 across the school
+// 4. Top 5 of Grade 2 across the school
+function applyFilter() {
+  const mode = document.getElementById('filterSelect').value;
+  const classLimit = Math.max(1, parseInt(document.getElementById('classTopLimitInp')?.value || '10', 10));
+  const gradeTopLimit = Math.max(1, parseInt(document.getElementById('gradeTopLimitInp')?.value || '5', 10));
+  let pool = FULL_DATABASE.filter((s, idx) => !excludedKeys.has(idx));
+
+  const getClassList = (clsCode) => {
+    return pool.filter(s => s.class_code === clsCode).slice(0, classLimit).map((s, i) => ({
+      ...s,
+      display_rank: i + 1,
+      section_type: 'CLASS',
+      section_label: `${s.grade} • فصل ${s.class_code}`
+    }));
+  };
+
+  const getGradeTopList = (gradeName, labelTxt, sectionCode) => {
+    return pool.filter(s => s.grade === gradeName && s.note !== 'احتياطي')
+               .sort((a, b) => (b.actual_total - a.actual_total) || (b.basic_sum - a.basic_sum) || (b.math - a.math))
+               .slice(0, gradeTopLimit)
+               .map((s, i) => ({
+                 ...s,
+                 display_rank: i + 1,
+                 section_type: sectionCode,
+                 section_label: `🌟 ${labelTxt} • فصل ${s.class_code}`
+               }));
+  };
+
+  if (mode === 'SEQUENCE_ALL') {
+    const g1Classes = ["1/1", "1/2", "1/3", "1/4", "1/5"];
+    const g2Classes = ["2/1", "2/2", "2/3"];
+    let seq = [];
+    g1Classes.forEach(c => { seq = seq.concat(getClassList(c)); });
+    g2Classes.forEach(c => { seq = seq.concat(getClassList(c)); });
+    seq = seq.concat(getGradeTopList('الصف الأول الإعدادي', 'أوائل الصف الأول على مستوى المدرسة', 'GRADE1_TOP'));
+    seq = seq.concat(getGradeTopList('الصف الثاني الإعدادي', 'أوائل الصف الثاني على مستوى المدرسة', 'GRADE2_TOP'));
+    activeList = seq;
+    document.getElementById('intro-class-title').textContent = 'الصف الأول ⬅ الصف الثاني ⬅ أوائل المدرسة';
+    document.getElementById('intro-leader-role').textContent = 'إشراف وتنفيذ';
+    document.getElementById('intro-leader-name').textContent = 'أ / مَحْمُودْ عَادِلْ';
+  } else if (mode === 'GRADE1_CLASSES') {
+    let seq = [];
+    ["1/1", "1/2", "1/3", "1/4", "1/5"].forEach(c => { seq = seq.concat(getClassList(c)); });
+    activeList = seq;
+    document.getElementById('intro-class-title').textContent = 'فصول الصف الأول الإعدادي بالترتيب (1/1 إلى 1/5)';
+    document.getElementById('intro-leader-role').textContent = 'الصف الدراسي';
+    document.getElementById('intro-leader-name').textContent = 'الصف الأول الإعدادي';
+  } else if (mode === 'GRADE2_CLASSES') {
+    let seq = [];
+    ["2/1", "2/2", "2/3"].forEach(c => { seq = seq.concat(getClassList(c)); });
+    activeList = seq;
+    document.getElementById('intro-class-title').textContent = 'فصول الصف الثاني الإعدادي بالترتيب (2/1 إلى 2/3)';
+    document.getElementById('intro-leader-role').textContent = 'الصف الدراسي';
+    document.getElementById('intro-leader-name').textContent = 'الصف الثاني الإعدادي';
+  } else if (mode === 'GRADE1_TOP5') {
+    activeList = getGradeTopList('الصف الأول الإعدادي', 'أوائل الصف الأول على مستوى المدرسة', 'GRADE1_TOP');
+    document.getElementById('intro-class-title').textContent = `أوائل الصف الأول الإعدادي على مستوى المدرسة (${gradeTopLimit} طلاب)`;
+    document.getElementById('intro-leader-role').textContent = 'الترتيب العام';
+    document.getElementById('intro-leader-name').textContent = 'الصف الأول الإعدادي';
+  } else if (mode === 'GRADE2_TOP5') {
+    activeList = getGradeTopList('الصف الثاني الإعدادي', 'أوائل الصف الثاني على مستوى المدرسة', 'GRADE2_TOP');
+    document.getElementById('intro-class-title').textContent = `أوائل الصف الثاني الإعدادي على مستوى المدرسة (${gradeTopLimit} طلاب)`;
+    document.getElementById('intro-leader-role').textContent = 'الترتيب العام';
+    document.getElementById('intro-leader-name').textContent = 'الصف الثاني الإعدادي';
+  } else {
+    activeList = getClassList(mode);
+    const ldr = activeList.length ? activeList[0].leader : '';
+    document.getElementById('intro-class-title').textContent = `أوائل فصل ${mode}`;
+    document.getElementById('intro-leader-role').textContent = `رائد فصل ${mode}`;
+    document.getElementById('intro-leader-name').textContent = ldr;
+  }
+  currentIndex = 0;
+  setStageView('INTRO');
+  renderCurrentStudent(false);
+}
+
+// Renders Student Card ONLY (No Administration Info on the Student Screen)
+function renderCurrentStudent(speakNow = false) {
+  if (!activeList.length) return;
+  const st = activeList[currentIndex];
+  const rnk = st.display_rank || st.rank;
+  document.getElementById('st-rank').textContent = rnk;
+  document.getElementById('st-name').textContent = st.name;
+  document.getElementById('st-meta').textContent = st.section_label || `${st.grade} • فصل ${st.class_code}`;
+  document.getElementById('g-ar').textContent = st.ar;
+  document.getElementById('g-en').textContent = st.en;
+  document.getElementById('g-math').textContent = st.math;
+  document.getElementById('g-sci').textContent = st.sci;
+  document.getElementById('g-soc').textContent = st.soc;
+  document.getElementById('g-rel').textContent = st.rel;
+  document.getElementById('st-total').textContent = `المجموع: ${st.actual_total} / 90`;
+  document.getElementById('st-pct').textContent = `النسبة: ${((st.actual_total / 90) * 100).toFixed(1)}%`;
+
+  if (speakNow) {
+    triggerConfetti();
+    speakStudent(st, rnk);
+  }
+}
+
+function speakText(txt) {
+  if (!document.getElementById('enableTTS').checked) return;
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang = 'ar-EG';
+  u.rate = 0.93;
+  window.speechSynthesis.speak(u);
+}
+
+// Speaks ONLY Student Cards with full diacritics and Sukun on the final letter
+function speakStudent(st, rnk) {
+  const rankWords = ["الْأَوَّلْ", "الثَّانِي", "الثَّالِثْ", "الرَّابِعْ", "الْخَامِسْ", "السَّادِسْ", "السَّابِعْ", "الثَّامِنْ", "التَّاسِعْ", "الْعَاشِرْ"];
+  const rWord = rankWords[rnk - 1] || `رَقَمْ ${rnk}`;
+  const spokenCls = synthesizeSpokenClass(st.class_code);
+  const cleanVocalizedName = prepareNameForTTS(st.name);
+  const scoreSpoken = formatScoreForTTS(st.actual_total);
+
+  let prefix = `الْمَرْكَزُ ${rWord}`;
+  if (st.section_type === 'GRADE1_TOP') {
+    prefix = `الْمَرْكَزُ ${rWord} عَلَى الصَّفِّ الْأَوَّلِ الْإِعْدَادِيّْ`;
+  } else if (st.section_type === 'GRADE2_TOP') {
+    prefix = `الْمَرْكَزُ ${rWord} عَلَى الصَّفِّ الثَّانِي الْإِعْدَادِيّْ`;
+  }
+
+  const msg = `${prefix}، الطَّالِبْ ${cleanVocalizedName}، ${spokenCls}، بِمَجْمُوعِ ${scoreSpoken} مِنْ تِسْعِينْ.`;
+  speakText(msg);
+}
+
+function triggerConfetti() {
+  if (typeof confetti === 'function') {
+    confetti({ particleCount: 55, spread: 60, origin: { y: 0.65 } });
+  }
+}
+
+// AUTOMATIC 3-PHASE CEREMONY ENGINE:
+// Phase 1: Administration Honor Board ALONE (15s or 20s) - NO TTS!
+// Phase 2: Student Honor Cards ALONE (with vocalized TTS)
+// Phase 3: Finale Screen ALONE - NO TTS!
+function startCelebration() {
+  stopCelebration();
+  stopPreviewSegment();
+  const slices = getSlices();
+
+  // Ensure any active TTS is cancelled during the silent Intro
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+  // PHASE 1: ADMINISTRATION HONOR BOARD ALONE (SILENT TTS, VIDEO/MUSIC ONLY)
+  setStageView('INTRO');
+  document.getElementById('phase-badge').textContent = `لوحة شرف الإدارة (${slices.introDur} ث)`;
+
+  playPhaseMedia(1, slices.introStart);
+  triggerConfetti();
+
+  let elapsed = 0;
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = '0%';
+  timerInterval = setInterval(() => {
+    elapsed += 0.25;
+    bar.style.width = Math.min(100, (elapsed / slices.introDur) * 100) + '%';
+  }, 250);
+
+  phaseTimeout = setTimeout(() => {
+    clearInterval(timerInterval);
+    currentIndex = 0;
+    runStudentLoop();
+  }, slices.introDur * 1000);
+}
+
+function runStudentLoop() {
+  // PHASE 2: STUDENT CARDS ALONE ON SCREEN (WITH VOCALIZED TTS)
+  setStageView('STUDENT');
+  const slices = getSlices();
+  document.getElementById('phase-badge').textContent = `طالب ${currentIndex + 1} / ${activeList.length}`;
+
+  playPhaseMedia(2, slices.cardStart);
+  renderCurrentStudent(true);
+
+  let elapsed = 0;
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = '0%';
+  timerInterval = setInterval(() => {
+    elapsed += 0.25;
+    bar.style.width = Math.min(100, (elapsed / slices.cardDur) * 100) + '%';
+    if (elapsed >= slices.cardDur) {
+      elapsed = 0;
+      currentIndex++;
+      if (currentIndex >= activeList.length) {
+        clearInterval(timerInterval);
+        runOutroPhase();
+      } else {
+        const nextSlices = getSlices();
+        document.getElementById('phase-badge').textContent = `طالب ${currentIndex + 1} / ${activeList.length}`;
+        playPhaseMedia(2, nextSlices.cardStart);
+        renderCurrentStudent(true);
+      }
+    }
+  }, 250);
+}
+
+function runOutroPhase() {
+  // PHASE 3: OUTRO / FINALE ALONE (NO TTS)
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  setStageView('OUTRO');
+  const slices = getSlices();
+  document.getElementById('phase-badge').textContent = `الختام (${slices.outroDur} ث)`;
+
+  playPhaseMedia(3, slices.outroStart);
+  triggerConfetti();
+
+  let elapsed = 0;
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = '0%';
+  timerInterval = setInterval(() => {
+    elapsed += 0.25;
+    bar.style.width = Math.min(100, (elapsed / slices.outroDur) * 100) + '%';
+    if (elapsed >= slices.outroDur) {
+      stopCelebration();
+      document.getElementById('phase-badge').textContent = "اكتمل الحفل";
+    }
+  }, 250);
+}
+
+function stopCelebration() {
+  clearInterval(timerInterval);
+  clearTimeout(phaseTimeout);
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  const vid = document.getElementById('bg-video');
+  try { vid.pause(); } catch(e){}
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('phase-badge').textContent = "جاهز للعرض";
+}
+
+function nextStudent() {
+  if (!activeList.length) return;
+  setStageView('STUDENT');
+  currentIndex = (currentIndex + 1) % activeList.length;
+  const slices = getSlices();
+  document.getElementById('phase-badge').textContent = `طالب ${currentIndex + 1} / ${activeList.length}`;
+  playPhaseMedia(2, slices.cardStart);
+  renderCurrentStudent(true);
+}
+
+function prevStudent() {
+  if (!activeList.length) return;
+  setStageView('STUDENT');
+  currentIndex = (currentIndex - 1 + activeList.length) % activeList.length;
+  const slices = getSlices();
+  document.getElementById('phase-badge').textContent = `طالب ${currentIndex + 1} / ${activeList.length}`;
+  playPhaseMedia(2, slices.cardStart);
+  renderCurrentStudent(true);
+}
+
+function toggleCleanMode() {
+  document.body.classList.toggle('clean-mode');
+}
+
+function renderAdminTable() {
+  const tbody = document.getElementById('admin-tbody');
+  tbody.innerHTML = '';
+  let filterVal = document.getElementById('editorClassFilter').value;
+
+  let displayCounter = 0;
+  FULL_DATABASE.forEach((st, dbIdx) => {
+    if (excludedKeys.has(dbIdx)) return;
+    if (filterVal !== 'ALL' && st.class_code !== filterVal) return;
+    displayCounter++;
+    const isReserve = displayCounter > 10 && filterVal !== 'ALL';
+    const tr = document.createElement('tr');
+    if (isReserve) tr.style.opacity = '0.65';
+    tr.innerHTML = `
+      <td><strong>${displayCounter}</strong> ${isReserve ? '<span style="color:#f59e0b;font-size:0.68rem;">(احتياطي)</span>' : ''}</td>
+      <td><input type="text" class="edit-inp name-inp" value="${st.name}" onchange="updateStudentField(${dbIdx}, 'name', this.value)"></td>
+      <td><input type="text" class="edit-inp num-inp" value="${st.class_code}" onchange="updateStudentField(${dbIdx}, 'class_code', this.value)"></td>
+      <td><input type="text" class="edit-inp" style="min-width:105px;" value="${st.leader}" onchange="updateStudentField(${dbIdx}, 'leader', this.value)"></td>
+      <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.ar}" onchange="updateStudentField(${dbIdx}, 'ar', this.value)"></td>
+      <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.en}" onchange="updateStudentField(${dbIdx}, 'en', this.value)"></td>
+      <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.math}" onchange="updateStudentField(${dbIdx}, 'math', this.value)"></td>
+      <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.soc}" onchange="updateStudentField(${dbIdx}, 'soc', this.value)"></td>
+      <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.sci}" onchange="updateStudentField(${dbIdx}, 'sci', this.value)"></td>
+      <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.rel}" onchange="updateStudentField(${dbIdx}, 'rel', this.value)"></td>
+      <td><strong style="color:var(--gold);">${st.actual_total}</strong></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="excludeStudent(${dbIdx})">🗑 حذف</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateStudentField(dbIdx, field, val) {
+  const st = FULL_DATABASE[dbIdx];
+  if (!st) return;
+  if (['ar','en','math','soc','sci','rel'].includes(field)) {
+    st[field] = parseFloat(val) || 0;
+    st.basic_sum = +(st.ar + st.en + st.math + st.sci + st.soc).toFixed(2);
+    st.actual_total = +(st.basic_sum + st.rel).toFixed(2);
+    st.written_total = st.actual_total;
+  } else {
+    st[field] = val;
+  }
+  renderAdminTable();
+  applyFilter();
+}
+
+function excludeStudent(dbIdx) {
+  excludedKeys.add(dbIdx);
+  renderAdminTable();
+  applyFilter();
+}
+
+function restoreAllExcluded() {
+  excludedKeys.clear();
+  renderAdminTable();
+  applyFilter();
+}
+
+function addNewStudentRow() {
+  let filterVal = document.getElementById('editorClassFilter').value;
+  if (filterVal === 'ALL') filterVal = '2/1';
+  const sample = FULL_DATABASE.find(s => s.class_code === filterVal) || FULL_DATABASE[0];
+  FULL_DATABASE.push({
+    rank: 11,
+    name: "طَالِبْ جَدِيدْ",
+    ar: 15, en: 15, math: 15, soc: 15, sci: 15, rel: 15,
+    basic_sum: 75, actual_total: 90, written_total: 90,
+    class_code: filterVal,
+    grade: sample.grade,
+    leader: sample.leader,
+    note: "مضاف"
+  });
+  renderAdminTable();
+  applyFilter();
+}
+
+function saveAllEdits() {
+  localStorage.setItem('zohour_students_db_v7', JSON.stringify(FULL_DATABASE));
+  saveSlicesToStorage();
+  applyFilter();
+}
+
+function resetDatabaseToFactory() {
+  if (!confirm("هل أنت متأكد من استعادة بيانات الطلاب الأصلية بالتشكيل الكامل؟")) return;
+  FULL_DATABASE = JSON.parse(JSON.stringify(FACTORY_DATABASE));
+  excludedKeys.clear();
+  localStorage.removeItem('zohour_students_db_v7');
+  renderAdminTable();
+  applyFilter();
+}
+
+function handleSingleVideoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  document.getElementById('customVideoPath').value = url;
+  document.getElementById('preview-video').src = url;
+  if (mediaMode === 'SINGLE') document.getElementById('bg-video').src = url;
+}
+
+function handleExcelUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const data = new Uint8Array(evt.target.result);
+    const workbook = XLSX.read(data, {type: 'array'});
+    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(firstSheet, {range: 1});
+    if (rows.length > 0) {
+      alert("تم قراءة ملف الإكسيل بنجاح (" + rows.length + " صف)!");
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function exportDatabaseToExcel() {
+  const exportRows = FULL_DATABASE.filter((_, idx) => !excludedKeys.has(idx)).map((s, i) => ({
+    "م": i + 1,
+    "الصف الدراسي": s.grade,
+    "الفصل": s.class_code,
+    "رائد الفصل": s.leader,
+    "الترتيب بالفصل": s.rank,
+    "اسم الطالب": s.name,
+    "لغة عربية": s.ar,
+    "لغة إنجليزية": s.en,
+    "رياضيات": s.math,
+    "دراسات": s.soc,
+    "علوم": s.sci,
+    "دين": s.rel,
+    "المجموع": s.actual_total
+  }));
+  const ws = XLSX.utils.json_to_sheet(exportRows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "كل_الأوائل");
+  XLSX.writeFile(wb, "awael.xlsx");
+}
+
+window.onload = () => {
+  loadFromStorage();
+  applyFilter();
+};
+</script>
 </body>
 </html>
