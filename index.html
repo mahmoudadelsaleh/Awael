@@ -180,6 +180,11 @@
     max-width: 520px;
     margin: 0 auto;
     text-align: center;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .stage.fading-out {
+    opacity: 0.38;
+    transform: scale(0.98);
   }
 
   .card-container {
@@ -411,7 +416,7 @@
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
-    transition: width 0.25s linear;
+    transition: width 0.20s linear;
   }
 
   /* Password Modal */
@@ -540,6 +545,11 @@
   }
   .edit-inp.name-inp { text-align: right; min-width: 175px; font-weight: 700; color: var(--gold); font-family: 'Amiri', serif; font-size: 0.9rem; }
   .edit-inp.num-inp { width: 52px; }
+  .elig-badge {
+    display: inline-block; padding: 2px 6px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;
+  }
+  .elig-pass { background: rgba(34, 197, 94, 0.18); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+  .elig-block { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
 </style>
 </head>
 <body>
@@ -566,11 +576,11 @@
 </div>
 
 <!-- COMPACT EXCLUSIVE STAGE -->
-<div class="stage">
+<div class="stage" id="main-stage">
   <div class="card-container" id="card-view">
     <div class="phase-indicator" id="phase-badge">جاهز للانطلاق</div>
 
-    <!-- SCREEN 1: STANDALONE ADMINISTRATION HONOR BOARD (15s or 20s ALONE, SILENT TTS) -->
+    <!-- SCREEN 1: STANDALONE ADMINISTRATION HONOR BOARD (20s ALONE, SILENT TTS) -->
     <div class="admin-intro-view active" id="admin-intro-view">
       <div class="crown-icon">👑</div>
       <div class="intro-school-heading" id="main-school-title">إدارة المحمودية التعليمية - مدرسة الزهور الإعدادية بنين</div>
@@ -656,13 +666,13 @@
     </div>
 
     <div class="tabs-header">
-      <button class="tab-btn active" id="tabBtn-ceremony" onclick="switchTab('ceremony')">🏆 ترتيب الحفل والفصول</button>
-      <button class="tab-btn" id="tabBtn-slicer" onclick="switchTab('slicer')">🎬 الفيديوهات والتوقيت</button>
+      <button class="tab-btn active" id="tabBtn-ceremony" onclick="switchTab('ceremony')">🏆 ترتيب الحفل وشرط الـ 80 درجة</button>
+      <button class="tab-btn" id="tabBtn-slicer" onclick="switchTab('slicer')">🎬 الفيديوهات وفاصل الـ 3 ثوانٍ</button>
       <button class="tab-btn" id="tabBtn-students" onclick="switchTab('students')">👨‍🎓 تحرير الطلاب (بالتشكيل)</button>
       <button class="tab-btn" id="tabBtn-files" onclick="switchTab('files')">📂 استيراد / تصدير الإكسيل</button>
     </div>
 
-    <!-- TAB 1: CEREMONY SEQUENCE & CLASS SELECTION -->
+    <!-- TAB 1: CEREMONY SEQUENCE & ELIGIBILITY CONDITION -->
     <div class="tab-content active" id="tab-ceremony">
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:10px;">
         <div class="slice-card">
@@ -696,23 +706,40 @@
               <input type="number" id="gradeTopLimitInp" value="5" min="1" max="10" onchange="applyFilter()" style="width:100%;">
             </div>
             <div>
-              <label style="font-size:0.74rem; color:#94a3b8;">عدد طلاب كل فصل:</label>
+              <label style="font-size:0.74rem; color:#94a3b8;">الحد الأقصى لكل فصل:</label>
               <input type="number" id="classTopLimitInp" value="10" min="1" max="15" onchange="applyFilter()" style="width:100%;">
             </div>
           </div>
 
-          <div style="margin-top:10px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-            <label style="font-size:0.78rem; color:var(--gold); font-weight:bold;">مدة لوحة الإدارة (صامتة):</label>
-            <button class="btn btn-secondary btn-sm" onclick="setQuickAdminDuration(15)">15 ثانية</button>
-            <button class="btn btn-secondary btn-sm" onclick="setQuickAdminDuration(20)">20 ثانية</button>
-          </div>
           <div style="margin-top:10px;">
             <button class="btn" style="width:100%;" onclick="closeSettingsModal(); unlockAllMediaAndStart();">▶ بدء الحفل الآلي الآن</button>
           </div>
         </div>
 
+        <!-- Eligibility Filter Box (< 80 total or <= 7.5 in any subject) -->
         <div class="slice-card">
-          <h4>🏫 بيانات لوحة شرف الإدارة (بدون نطق آلي)</h4>
+          <h4>🛡️ شرط حجب الدرجات (أقل من 80 أو نصف الدرجة)</h4>
+          <label style="display:flex; align-items:center; gap:6px; margin-top:4px; cursor:pointer; font-size:0.8rem; color:var(--gold); font-weight:bold;">
+            <input type="checkbox" id="enableEligibilityFilter" checked onchange="applyFilter(); renderAdminTable();">
+            تفعيل حجب الطالب الحاصل على أقل من 80 أو نصف الدرجة
+          </label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+            <div>
+              <label style="font-size:0.72rem; color:#94a3b8;">الحد الأدنى للمجموع (من 90):</label>
+              <input type="number" step="0.5" id="minTotalThreshold" value="80" onchange="applyFilter(); renderAdminTable();" style="width:100%;">
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:#94a3b8;">حجب من حصل في مادة على (أو أقل):</label>
+              <input type="number" step="0.5" id="minSubjThreshold" value="7.5" onchange="applyFilter(); renderAdminTable();" style="width:100%;">
+            </div>
+          </div>
+          <div id="eligibility-summary-box" style="margin-top:8px; padding:6px 8px; border-radius:8px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.35); font-size:0.75rem; color:#4ade80; font-weight:bold;">
+            ✅ إجمالي الطلاب المجتازين للشرط: 34 طالباً (من 80)
+          </div>
+        </div>
+
+        <div class="slice-card">
+          <h4>🏫 بيانات لوحة الإدارة والصوت</h4>
           <div style="margin-bottom:6px;">
             <label style="font-size:0.75rem; color:#94a3b8;">عنوان الحفل الفرعي:</label>
             <input type="text" id="inp-subtitle" value="لوحة شرف الإدارة وتكريم أوائل الطلاب عن شهر أكتوبر ٢٠٢٦" style="width:100%;" oninput="updateHeaderTitles()">
@@ -727,34 +754,42 @@
               <input type="text" id="inp-vice" value="أ / مَرْوَةْ يُونُسْ" style="width:100%;" oninput="updateHeaderTitles()">
             </div>
           </div>
-        </div>
-
-        <div class="slice-card">
-          <h4>🔊 إعدادات نطق الطلاب والصوت</h4>
-          <label style="display:flex; align-items:center; gap:6px; margin-top:4px; cursor:pointer; font-size:0.8rem;">
+          <label style="display:flex; align-items:center; gap:6px; margin-top:8px; cursor:pointer; font-size:0.78rem;">
             <input type="checkbox" id="enableTTS" checked> تفعيل النطق الآلي لبطاقات الطلاب فقط (المقدمة صامتة)
           </label>
-          <label style="display:block; margin-top:8px; font-size:0.76rem; color:#cbd5e1;">مستوى صوت الفيديوهات (music1, 2, 3):</label>
-          <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.65" onchange="updateBgVolume()" style="width:100%; margin-top:2px;">
-          <label style="display:block; margin-top:6px; font-size:0.76rem; color:#cbd5e1;">شفافية فيديو الخلفية:</label>
-          <input type="range" id="bgOpacitySlider" min="0.05" max="0.9" step="0.05" value="0.32" onchange="updateBgOpacity()" style="width:100%; margin-top:2px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px;">
+            <div>
+              <label style="font-size:0.72rem; color:#cbd5e1;">صوت الموسيقى:</label>
+              <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.65" onchange="updateBgVolume()" style="width:100%;">
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:#cbd5e1;">شفافية الفيديو:</label>
+              <input type="range" id="bgOpacitySlider" min="0.05" max="0.9" step="0.05" value="0.32" onchange="updateBgOpacity()" style="width:100%;">
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 2: DUAL-MODE VIDEO & TIMING CONTROLLER -->
+    <!-- TAB 2: DUAL-MODE VIDEO & 3-SECOND FADE-OUT CONTROLLER -->
     <div class="tab-content" id="tab-slicer">
       <div class="mode-switch-bar">
-        <span style="color:var(--gold); font-weight:bold; font-size:0.82rem;">نظام تشغيل الفيديوهات:</span>
-        <div class="mode-radio-group">
-          <label class="mode-option selected" id="opt-multi" onclick="setMediaMode('MULTI')">
-            <input type="radio" name="mediaModeRadio" value="MULTI" checked>
-            🎵 3 فيديوهات (music1.mp4 للإدارة + music2.mp4 للبطاقات + music3.mp4 للنهاية)
-          </label>
-          <label class="mode-option" id="opt-single" onclick="setMediaMode('SINGLE')">
-            <input type="radio" name="mediaModeRadio" value="SINGLE">
-            ✂️ فيديو موحد مقسم زمنياً (awael.mp4)
-          </label>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span style="color:var(--gold); font-weight:bold; font-size:0.82rem;">نظام الفيديوهات:</span>
+          <div class="mode-radio-group">
+            <label class="mode-option selected" id="opt-multi" onclick="setMediaMode('MULTI')">
+              <input type="radio" name="mediaModeRadio" value="MULTI" checked>
+              🎵 3 فيديوهات (music1 للإدارة [20ث] + music2 للبطاقات + music3 للنهاية)
+            </label>
+            <label class="mode-option" id="opt-single" onclick="setMediaMode('SINGLE')">
+              <input type="radio" name="mediaModeRadio" value="SINGLE">
+              ✂️ فيديو موحد مقسم زمنياً (awael.mp4)
+            </label>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <label style="font-size:0.78rem; color:var(--cyan); font-weight:bold;">مدة فاصل خفوت وتلاشي الموسيقى بين المراحل (ث):</label>
+          <input type="number" id="fadeGapDurInp" value="3" min="1" max="10" step="0.5" style="width:65px; text-align:center;">
         </div>
       </div>
 
@@ -762,7 +797,7 @@
       <div id="multi-mode-panel" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px; margin-bottom:12px;">
         <div class="slice-card">
           <h4>1️⃣ فيديو لوحة الإدارة (music1.mp4)</h4>
-          <label style="font-size:0.75rem; color:#94a3b8;">المدة بالثواني (15 أو 20 ثانية):</label>
+          <label style="font-size:0.75rem; color:#94a3b8;">مدة الموسيقى الأولى (20 ثانية + 3 ثوانٍ خفوت وتلاشي):</label>
           <input type="number" id="multiIntroDur" value="20" min="3" style="width:100%; margin:3px 0 6px;">
           <input type="text" id="multiPath1" value="music1.mp4" onchange="syncVideoSources()" style="width:100%; margin-bottom:5px; direction:ltr;">
           <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(1, event)" style="width:100%; font-size:0.72rem;">
@@ -773,7 +808,7 @@
 
         <div class="slice-card">
           <h4>2️⃣ فيديو بطاقات الطلاب (music2.mp4)</h4>
-          <label style="font-size:0.75rem; color:#94a3b8;">مدة بطاقة كل طالب (بالثواني):</label>
+          <label style="font-size:0.75rem; color:#94a3b8;">مدة بطاقة كل طالب (بالثواني) ثم 3 ثوانٍ تلاشي قبل الختام:</label>
           <input type="number" id="multiCardDur" value="15" min="3" style="width:100%; margin:3px 0 6px;">
           <input type="text" id="multiPath2" value="music2.mp4" onchange="syncVideoSources()" style="width:100%; margin-bottom:5px; direction:ltr;">
           <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(2, event)" style="width:100%; font-size:0.72rem;">
@@ -784,7 +819,7 @@
 
         <div class="slice-card">
           <h4>3️⃣ فيديو النهاية (music3.mp4)</h4>
-          <label style="font-size:0.75rem; color:#94a3b8;">مدة شاشة النهاية (بالثواني):</label>
+          <label style="font-size:0.75rem; color:#94a3b8;">مدة شاشة النهاية (بالثواني) ثم 3 ثوانٍ تلاشي ختامي:</label>
           <input type="number" id="multiOutroDur" value="15" min="3" style="width:100%; margin:3px 0 6px;">
           <input type="text" id="multiPath3" value="music3.mp4" onchange="syncVideoSources()" style="width:100%; margin-bottom:5px; direction:ltr;">
           <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(3, event)" style="width:100%; font-size:0.72rem;">
@@ -827,7 +862,7 @@
         <div>
           <div class="slice-card">
             <h4>
-              <span>1️⃣ مقطع لوحة شرف الإدارة (صامت النطق)</span>
+              <span>1️⃣ مقطع لوحة شرف الإدارة (صامت النطق - 20 ثانية)</span>
               <span id="intro-dur-badge" style="color:#38bdf8; font-size:0.76rem;">20 ث</span>
             </h4>
             <div class="slice-inputs">
@@ -921,6 +956,7 @@
               <th>علوم</th>
               <th>دين</th>
               <th>المجموع</th>
+              <th>حالة الشرط</th>
               <th>إجراء</th>
             </tr>
           </thead>
@@ -937,7 +973,7 @@
           <input type="file" id="excelFileInput" accept=".xlsx,.xls" onchange="handleExcelUpload(event)" style="width:100%; margin-top:6px;">
         </div>
         <div class="slice-card">
-          <h4>📤 تصدير البيانات المُشكَّلة إلى إكسيل (awael.xlsx)</h4>
+          <h4>📤 تصدير الطلاب المستوفين للشرط إلى إكسيل (awael.xlsx)</h4>
           <button class="btn" style="margin-top:6px;" onclick="exportDatabaseToExcel()">📊 تحميل ملف awael.xlsx المحدث</button>
         </div>
       </div>
@@ -948,7 +984,7 @@
 
 <script>
 const SETTINGS_PASSWORD = "Mas" + "$2026";
-const FACTORY_DATABASE = [{"rank": 1, "name": "أَحْمَدْ سَعِيدْ مُحَمَّدْ أَبُو حَطَبْ", "ar": 13, "en": 14, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 87, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 2, "name": "أَحْمَدْ مُحَمَّدْ أَحْمَدْ زُعَيْرْ", "ar": 15, "en": 13, "math": 13, "sci": 15, "soc": 15, "rel": 12, "written_total": 83, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 71, "actual_total": 83, "note": "مطابق"}, {"rank": 3, "name": "إِبْرَاهِيمْ مَحْمُودْ الشَّامِيْ", "ar": 13, "en": 12, "math": 15, "sci": 12, "soc": 14.5, "rel": 13, "written_total": 81.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 66.5, "actual_total": 79.5, "note": "فرق جمع: الفعلي 79.5 وبالكشف 81.5"}, {"rank": 4, "name": "أَحْمَدْ مُحَمَّدْ لُطْفِيْ الدِّيبْ", "ar": 15, "en": 10, "math": 13.5, "sci": 15, "soc": 13, "rel": 12, "written_total": 78.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 66.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 5, "name": "آدَمْ عَلِيْ حِلْمِيْ مَرْعِيْ", "ar": 12, "en": 14, "math": 8, "sci": 13, "soc": 10, "rel": 12, "written_total": 69, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 57, "actual_total": 69, "note": "مطابق"}, {"rank": 6, "name": "أَشْرَفْ أَحْمَدْ أَشْرَفْ قَرْقُورَةْ", "ar": 13, "en": 9, "math": 11, "sci": 12, "soc": 13, "rel": 10, "written_total": 68, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 58, "actual_total": 68, "note": "مطابق"}, {"rank": 7, "name": "أُسَامَةْ مُحَمَّدْ حَرْحَشْ عَكْرَمْ", "ar": 12, "en": 8, "math": 13, "sci": 10, "soc": 12, "rel": 11, "written_total": 66, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 55, "actual_total": 66, "note": "مطابق"}, {"rank": 8, "name": "إِبْرَاهِيمْ السَّعِيدْ الصَّيْرَفِيْ", "ar": 10, "en": 6, "math": 10.5, "sci": 13, "soc": 13.5, "rel": 10, "written_total": 63, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 53.0, "actual_total": 63.0, "note": "مطابق"}, {"rank": 9, "name": "إِسْلَامْ مُحَمَّدْ بَهْنَسِيْ تُرْكِيْ", "ar": 12, "en": 7, "math": 7, "sci": 10, "soc": 11.5, "rel": 10, "written_total": 57.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 47.5, "actual_total": 57.5, "note": "مطابق"}, {"rank": 10, "name": "أَحْمَدْ صُبْحِيْ مُحَمَّدْ عَفِيفِيْ", "ar": 15, "en": 6, "math": 6, "sci": 14, "soc": 7.5, "rel": 8, "written_total": 56.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 48.5, "actual_total": 56.5, "note": "مطابق"}, {"rank": 1, "name": "سَيْفْ السَّيِّدْ إِبْرَاهِيمْ زَايِدْ", "ar": 13, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 88, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 73, "actual_total": 88, "note": "مطابق"}, {"rank": 2, "name": "عَبْدُ السَّلَامْ سَامِحْ الْفَارْ", "ar": 13, "en": 15, "math": 15, "sci": 15, "soc": 14, "rel": 15, "written_total": 87, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 3, "name": "زِيَادْ مُحَمَّدْ شُقَيْرْ", "ar": 13, "en": 14, "math": 14, "sci": 15, "soc": 15, "rel": 15, "written_total": 86, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 71, "actual_total": 86, "note": "مطابق"}, {"rank": 4, "name": "شِهَابْ السَّيِّدْ عَبْدُ الْحَيّْ", "ar": 15, "en": 11, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 86, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 71, "actual_total": 86, "note": "مطابق"}, {"rank": 5, "name": "عَبْدُ اللّٰهْ مُحَمَّدْ صُبْحِيْ", "ar": 15, "en": 14, "math": 15, "sci": 13, "soc": 13, "rel": 13, "written_total": 83, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 70, "actual_total": 83, "note": "مطابق"}, {"rank": 6, "name": "عُدَيّْ إِيهَابْ بَشْبِيشِيْ", "ar": 13, "en": 11, "math": 11, "sci": 15, "soc": 15, "rel": 13, "written_total": 78, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 65, "actual_total": 78, "note": "مطابق"}, {"rank": 7, "name": "عُمَرْ عَبْدُ الْمُنْعِمْ مَدِينْ", "ar": 13, "en": 9, "math": 15, "sci": 9, "soc": 15, "rel": 15, "written_total": 76, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 61, "actual_total": 76, "note": "مطابق"}, {"rank": 8, "name": "عَاصِمْ أَحْمَدْ كَامِلْ بَدْرْ", "ar": 13, "en": 9, "math": 14, "sci": 12, "soc": 14, "rel": 12, "written_total": 74, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 62, "actual_total": 74, "note": "مطابق"}, {"rank": 9, "name": "سَعْدْ مُحَمَّدْ عَادِلْ الْقَمَّاحْ", "ar": 11, "en": 9, "math": 15, "sci": 12.5, "soc": 13, "rel": 13, "written_total": 73.5, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 60.5, "actual_total": 73.5, "note": "مطابق"}, {"rank": 10, "name": "عَبْدُ الرَّحْمٰنْ أَشْرَفْ الصَّاوِيْ", "ar": 13, "en": 8, "math": 10.5, "sci": 9, "soc": 15, "rel": 13, "written_total": 68.5, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 55.5, "actual_total": 68.5, "note": "مطابق"}, {"rank": 1, "name": "مُحَمَّدْ حَمْدِيْ مُحَمَّدْ النِّكْلَاوِيْ", "ar": 13, "en": 13, "math": 15, "sci": 12, "soc": 15, "rel": 15, "written_total": 83, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 68, "actual_total": 83, "note": "مطابق"}, {"rank": 2, "name": "مَازِنْ عَاصِمْ عُكَيْلَةْ", "ar": 14, "en": 14, "math": 14.5, "sci": 15, "soc": 15, "rel": 10, "written_total": 82.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 72.5, "actual_total": 82.5, "note": "مطابق"}, {"rank": 3, "name": "مُحَمَّدْ السَّعِيدْ قُطْبْ عِيسَىْ", "ar": 14, "en": 12, "math": 13, "sci": 12.5, "soc": 15, "rel": 15, "written_total": 81.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 66.5, "actual_total": 81.5, "note": "مطابق"}, {"rank": 4, "name": "مُحَمَّدْ سَامِحْ حَبَشِيْ إِسْمَاعِيلْ", "ar": 14, "en": 11, "math": 11, "sci": 14, "soc": 15, "rel": 15, "written_total": 80, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 65, "actual_total": 80, "note": "مطابق"}, {"rank": 5, "name": "عُمَرْ مَمْدُوحْ عَبْدُ الْبَرّْ إِبْرَاهِيمْ", "ar": 13, "en": 15, "math": 12, "sci": 12.5, "soc": 15, "rel": 12, "written_total": 80, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 67.5, "actual_total": 79.5, "note": "فرق جمع: الفعلي 79.5 وبالكشف 80"}, {"rank": 6, "name": "عُمَرْ مُحَمَّدْ فَوْزِيْ قُرَّةْ", "ar": 11, "en": 11, "math": 14.5, "sci": 12, "soc": 11, "rel": 15, "written_total": 74.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 59.5, "actual_total": 74.5, "note": "مطابق"}, {"rank": 7, "name": "مُحَمَّدْ السَّيِّدْ قَاوُوقْ", "ar": 14, "en": 13, "math": 5.5, "sci": 9.5, "soc": 15, "rel": 15, "written_total": 72, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 57.0, "actual_total": 72.0, "note": "مطابق"}, {"rank": 8, "name": "حَاتِمْ تَامِرْ السَّعْدَنِيْ", "ar": 14, "en": 6, "math": 13.5, "sci": 8, "soc": 15, "rel": 14, "written_total": 70.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 56.5, "actual_total": 70.5, "note": "مطابق"}, {"rank": 9, "name": "حَازِمْ مُحَمَّدْ عِيدْ عُبَيْدْ", "ar": 14, "en": 9, "math": 14, "sci": 10, "soc": 11, "rel": 12, "written_total": 70, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 58, "actual_total": 70, "note": "مطابق"}, {"rank": 10, "name": "جَاسِرْ تَامِرْ قَنْدِيلْ", "ar": 12, "en": 11, "math": 10, "sci": 9.5, "soc": 11, "rel": 15, "written_total": 68.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 53.5, "actual_total": 68.5, "note": "مطابق"}, {"rank": 1, "name": "مُحَمَّدْ سَامِحْ الْكُومِيْ", "ar": 15, "en": 15, "math": 15, "sci": 14.5, "soc": 14, "rel": 15, "written_total": 88.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 73.5, "actual_total": 88.5, "note": "مطابق"}, {"rank": 2, "name": "مُحَمَّدْ عَادِلْ عِيدْ الْفِقِيْ", "ar": 12.5, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 87.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 72.5, "actual_total": 87.5, "note": "مطابق"}, {"rank": 3, "name": "مُحَمَّدْ مَحْمُودْ نُوحْ", "ar": 13, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 14, "written_total": 84, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 70, "actual_total": 84, "note": "مطابق"}, {"rank": 4, "name": "مُحَمَّدْ مَحْمُودْ أَبُو خَلِيلْ", "ar": 14, "en": 15, "math": 15, "sci": 11.5, "soc": 14, "rel": 14, "written_total": 83.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 69.5, "actual_total": 83.5, "note": "مطابق"}, {"rank": 5, "name": "مُحَمَّدْ تَامِرْ مُبَارَكْ", "ar": 14, "en": 11, "math": 15, "sci": 15, "soc": 15, "rel": 13, "written_total": 83, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 70, "actual_total": 83, "note": "مطابق"}, {"rank": 6, "name": "مُحَمَّدْ حُسَامْ السَّعِيدْ", "ar": 12, "en": 10, "math": 15, "sci": 15, "soc": 15, "rel": 14, "written_total": 81, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 67, "actual_total": 81, "note": "مطابق"}, {"rank": 7, "name": "مُحَمَّدْ ثَابِتْ مَبْرُوكْ", "ar": 10, "en": 9, "math": 15, "sci": 13.5, "soc": 15, "rel": 14, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 62.5, "actual_total": 76.5, "note": "مطابق"}, {"rank": 8, "name": "مُحَمَّدْ جُمْعَةْ الْوَرَّاقِيْ", "ar": 12, "en": 11, "math": 14, "sci": 12.5, "soc": 9, "rel": 14, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 58.5, "actual_total": 72.5, "note": "فرق جمع: الفعلي 72.5 وبالكشف 76.5"}, {"rank": 9, "name": "مُحَمَّدْ شَرِيفْ مُقَلَّدْ", "ar": 9, "en": 12, "math": 14.5, "sci": 15, "soc": 11, "rel": 15, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 61.5, "actual_total": 76.5, "note": "مطابق"}, {"rank": 10, "name": "مَحْمُودْ هَانِيْ الْفَوَّالْ", "ar": 14, "en": 9, "math": 14, "sci": 15, "soc": 10, "rel": 14, "written_total": 76, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 62, "actual_total": 76, "note": "مطابق"}, {"rank": 1, "name": "يُوسُفْ تَامِرْ الشَّرَاكِيْ", "ar": 15, "en": 13, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 88, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 73, "actual_total": 88, "note": "مطابق"}, {"rank": 2, "name": "يَاسِينْ مُحَمَّدْ جَابِرْ عَبْدُ اللَّاهْ", "ar": 15, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 13, "written_total": 85, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 72, "actual_total": 85, "note": "مطابق"}, {"rank": 3, "name": "يُوسُفْ عَلَاءْ الطَّحْلَاوِيْ", "ar": 15, "en": 14, "math": 13.5, "sci": 14, "soc": 13.5, "rel": 14, "written_total": 84, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 70.0, "actual_total": 84.0, "note": "مطابق"}, {"rank": 4, "name": "مُصْطَفَىْ مَحْمُودْ شَمْسُ الدِّينْ", "ar": 13, "en": 14, "math": 15, "sci": 14, "soc": 10, "rel": 14, "written_total": 80, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 66, "actual_total": 80, "note": "مطابق"}, {"rank": 5, "name": "يَحْيَىْ مُحَمَّدْ أَبُو خَدِيجَةْ", "ar": 15, "en": 10, "math": 15, "sci": 13, "soc": 13.5, "rel": 13, "written_total": 79.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 66.5, "actual_total": 79.5, "note": "مطابق"}, {"rank": 6, "name": "يُوسُفْ مَجْدِيْ أَحْمَدْ حَمَّادْ", "ar": 15, "en": 6, "math": 15, "sci": 15, "soc": 13.5, "rel": 14, "written_total": 78.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 64.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 7, "name": "يُوسُفْ مُحَمَّدْ خِلَافْ", "ar": 14, "en": 13, "math": 7.5, "sci": 15, "soc": 13.5, "rel": 15, "written_total": 77, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 63.0, "actual_total": 78.0, "note": "فرق جمع: الفعلي 78.0 وبالكشف 77"}, {"rank": 8, "name": "يُوسُفْ إِسْمَاعِيلْ الْمَنْسِيْ", "ar": 13, "en": 6, "math": 15, "sci": 14, "soc": 13.5, "rel": 13, "written_total": 74.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 61.5, "actual_total": 74.5, "note": "مطابق"}, {"rank": 9, "name": "يُوسُفْ أَحْمَدْ فَتْحِيْ الْفِقِيْ", "ar": 13, "en": 12, "math": 12, "sci": 12, "soc": 15, "rel": 13, "written_total": 77, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 64, "actual_total": 77, "note": "مطابق"}, {"rank": 10, "name": "يَاسِينْ سَامِحْ مَنْصُورْ", "ar": 12, "en": 6, "math": 14, "sci": 14, "soc": 15, "rel": 13, "written_total": 74, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 61, "actual_total": 74, "note": "مطابق"}, {"rank": 1, "name": "زِيَادْ عَاطِفْ إِبْرَاهِيمْ مُحَمَّدْ أَبُو الْفُتُوحْ", "ar": 15.0, "en": 14.0, "math": 12.0, "sci": 12.5, "soc": 13.0, "rel": 15.0, "written_total": 81.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 66.5, "actual_total": 81.5, "note": "مطابق"}, {"rank": 2, "name": "إِبْرَاهِيمْ مُحَمَّدْ إِبْرَاهِيمْ حَسَنْ سَعْدْ", "ar": 12.5, "en": 14.0, "math": 14.0, "sci": 13.5, "soc": 15.0, "rel": 11.0, "written_total": 80.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 69.0, "actual_total": 80.0, "note": "مطابق"}, {"rank": 3, "name": "أَحْمَدْ حَمْدِيْ أَحْمَدْ مُحَمَّدْ شَاهِينْ", "ar": 13.5, "en": 13.0, "math": 12.0, "sci": 13.5, "soc": 15.0, "rel": 13.0, "written_total": 80.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 67.0, "actual_total": 80.0, "note": "مطابق"}, {"rank": 4, "name": "أَشْرَفْ مُحَمَّدْ مُحَمَّدْ الشِّشْتَاوِيْ", "ar": 12.0, "en": 15.0, "math": 15.0, "sci": 13.5, "soc": 15.0, "rel": 8.0, "written_total": 78.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 70.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 5, "name": "أَحْمَدْ مُحَمَّدْ أَحْمَدْ أَحْمَدْ نَاصِرْ", "ar": 10.0, "en": 13.0, "math": 13.5, "sci": 14.5, "soc": 15.0, "rel": 12.0, "written_total": 78.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 66.0, "actual_total": 78.0, "note": "مطابق"}, {"rank": 6, "name": "أُسَامَةْ عَبْدُ اللّٰهْ عَلِيْ عَلِيْ يُونُسْ", "ar": 10.5, "en": 13.0, "math": 13.5, "sci": 15.0, "soc": 13.0, "rel": 10.0, "written_total": 75.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 65.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 7, "name": "إِيَادْ عِمَادْ جَمَالْ عَوَضْ مَسْعُودْ", "ar": 11.0, "en": 12.0, "math": 12.5, "sci": 12.5, "soc": 13.0, "rel": 14.0, "written_total": 75.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 8, "name": "مَازِنْ جَادُ اللّٰهْ مَحْمُودْ إِمَامْ السَّيِّدْ", "ar": 11.5, "en": 12.0, "math": 13.5, "sci": 11.0, "soc": 15.0, "rel": 10.0, "written_total": 73.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 63.0, "actual_total": 73.0, "note": "مطابق"}, {"rank": 9, "name": "أَحْمَدْ سَعْدْ مُحَمَّدْ سَعْدْ مُحَمَّدْ أَبُو لَيْلَةْ", "ar": 10.0, "en": 11.0, "math": 14.0, "sci": 11.0, "soc": 15.0, "rel": 11.0, "written_total": 72.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.0, "actual_total": 72.0, "note": "مطابق"}, {"rank": 10, "name": "رَيَّانْ مُحَمَّدْ عَلِيْ حَسَنْ خَضْرْ الطَّوِيلْ", "ar": 13.5, "en": 12.0, "math": 8.0, "sci": 13.0, "soc": 12.0, "rel": 13.0, "written_total": 71.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 58.5, "actual_total": 71.5, "note": "مطابق"}, {"rank": 1, "name": "سَعِيدْ عَلِيْ هَيْبَةْ", "ar": 11, "en": 11, "math": 13, "sci": 15, "soc": 15, "rel": 14, "written_total": 79, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 65, "actual_total": 79, "note": "مطابق"}, {"rank": 2, "name": "سَيْفْ نَادِرْ حَرْحَشْ", "ar": 11, "en": 11, "math": 13, "sci": 15, "soc": 15, "rel": 13, "written_total": 78, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 65, "actual_total": 78, "note": "مطابق"}, {"rank": 3, "name": "عَمَّارْ مُحَمَّدْ خَيَّالْ", "ar": 14, "en": 9, "math": 12, "sci": 12, "soc": 15, "rel": 15, "written_total": 77, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 62, "actual_total": 77, "note": "مطابق"}, {"rank": 4, "name": "كَرِيمْ السَّعِيدْ نَعِيمْ", "ar": 9, "en": 8, "math": 12, "sci": 15, "soc": 15, "rel": 15, "written_total": 74, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 59, "actual_total": 74, "note": "مطابق"}, {"rank": 5, "name": "عُمَرْ أَحْمَدْ الْقَفَّاصْ", "ar": 13, "en": 10, "math": 11, "sci": 15, "soc": 15, "rel": 10, "written_total": 74, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 64, "actual_total": 74, "note": "مطابق"}, {"rank": 6, "name": "عَمْرْو مُحَمَّدْ هِلَالْ", "ar": 14, "en": 13, "math": 9, "sci": 12, "soc": 15, "rel": 8, "written_total": 71, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 63, "actual_total": 71, "note": "مطابق"}, {"rank": 7, "name": "عُمَرْ هَانِيْ صَالِحْ", "ar": 14, "en": 10, "math": 10, "sci": 11, "soc": 14, "rel": 11, "written_total": 70, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 59, "actual_total": 70, "note": "مطابق"}, {"rank": 8, "name": "سَيْفْ رَجَبْ زَيْدَانْ", "ar": 14, "en": 9, "math": 15, "sci": 8, "soc": 15, "rel": 8, "written_total": 69, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 61, "actual_total": 69, "note": "مطابق"}, {"rank": 9, "name": "مُعَاذْ أَشْرَفْ عَدَسْ", "ar": 12, "en": 7, "math": 8, "sci": 11, "soc": 15, "rel": 13, "written_total": 66, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 53, "actual_total": 66, "note": "مطابق"}, {"rank": 10, "name": "سَيْفْ إِبْرَاهِيمْ شَلَبِيْ", "ar": 12, "en": 7, "math": 8, "sci": 12, "soc": 15, "rel": 14, "written_total": 68, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 54, "actual_total": 68, "note": "مطابق"}, {"rank": 1, "name": "مُعَاذْ أَحْمَدْ مَسْعَدْ أَبُو حُسَيْنْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 90, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 90, "note": "مطابق"}, {"rank": 2, "name": "سَيْفْ أَحْمَدْ عَبْدُ الْمُحْسِنْ بِلَالْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 14, "written_total": 89, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 89, "note": "مطابق"}, {"rank": 3, "name": "يَاسِينْ مُحَمَّدْ عَبْدُ الْمَوْلَىْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 13, "written_total": 88, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 88, "note": "مطابق"}, {"rank": 4, "name": "عُمَرْ طٰهَ مَحْمُودْ نَعِيمْ", "ar": 15, "en": 15, "math": 13.5, "sci": 14.5, "soc": 15, "rel": 14, "written_total": 87, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 73.0, "actual_total": 87.0, "note": "مطابق"}, {"rank": 5, "name": "يُوسُفْ عَبْدُ اللّٰهْ قُطْبْ", "ar": 15, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 15, "written_total": 87, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 6, "name": "مُؤْمِنْ أَحْمَدْ غُنَيْمْ", "ar": 15, "en": 12, "math": 12, "sci": 15, "soc": 15, "rel": 15, "written_total": 84, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 69, "actual_total": 84, "note": "مطابق"}, {"rank": 7, "name": "يُوسُفْ أَحْمَدْ عَبْدُ الْمُعْطِيْ", "ar": 14, "en": 13, "math": 14, "sci": 12, "soc": 14, "rel": 15, "written_total": 82, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 67, "actual_total": 82, "note": "مطابق"}, {"rank": 8, "name": "مُحَمَّدْ وَلِيدْ عَبْدُ الرَّازِقْ عَبْدُ الْحَلِيمْ", "ar": 14, "en": 12, "math": 13, "sci": 13, "soc": 15, "rel": 13, "written_total": 80, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 67, "actual_total": 80, "note": "مطابق"}, {"rank": 9, "name": "مُحَمَّدْ مَحْمُودْ بَسْيُونِيْ دُوَيْدَارْ", "ar": 15, "en": 6, "math": 14.5, "sci": 15, "soc": 11.5, "rel": 13, "written_total": 75, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 62.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 10, "name": "مُعَاذْ تَامِرْ مُحَمَّدْ عَبْدُ الْوَهَّابْ", "ar": 15, "en": 9, "math": 12.5, "sci": 13, "soc": 12, "rel": 12, "written_total": 73.5, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 61.5, "actual_total": 73.5, "note": "مطابق"}, {"rank": 11, "name": "أَحْمَدْ لَبِيبْ مُحَمَّدْ كَمَالْ أَحْمَدْ", "ar": 13.0, "en": 13.0, "math": 11.0, "sci": 11.5, "soc": 13.0, "rel": 9.0, "written_total": 70.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.5, "actual_total": 70.5, "note": "احتياطي"}, {"rank": 12, "name": "حَازِمْ رِضَاْ مُحَمَّدْ الْمَنْزَلَاوِيْ", "ar": 12.0, "en": 13.0, "math": 9.5, "sci": 10.5, "soc": 13.0, "rel": 12.0, "written_total": 70.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 58.0, "actual_total": 70.0, "note": "احتياطي"}];
+const FACTORY_DATABASE = [{"rank": 1, "name": "أَحْمَدْ سَعِيدْ مُحَمَّدْ أَبُو حَطَبْ", "ar": 13, "en": 14, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 87, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 2, "name": "أَحْمَدْ مُحَمَّدْ أَحْمَدْ زُعَيْرْ", "ar": 15, "en": 13, "math": 13, "sci": 15, "soc": 15, "rel": 12, "written_total": 83, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 71, "actual_total": 83, "note": "مطابق"}, {"rank": 3, "name": "إِبْرَاهِيمْ مَحْمُودْ الشَّامِيْ", "ar": 13, "en": 14, "math": 15, "sci": 12, "soc": 14.5, "rel": 13, "written_total": 81.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 68.5, "actual_total": 81.5, "note": "مطابق"}, {"rank": 4, "name": "أَحْمَدْ مُحَمَّدْ لُطْفِيْ الدِّيبْ", "ar": 15, "en": 10, "math": 13.5, "sci": 15, "soc": 13, "rel": 12, "written_total": 78.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 66.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 5, "name": "آدَمْ عَلِيْ حِلْمِيْ مَرْعِيْ", "ar": 12, "en": 14, "math": 8, "sci": 13, "soc": 10, "rel": 12, "written_total": 69, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 57, "actual_total": 69, "note": "مطابق"}, {"rank": 6, "name": "أَشْرَفْ أَحْمَدْ أَشْرَفْ قَرْقُورَةْ", "ar": 13, "en": 9, "math": 11, "sci": 12, "soc": 13, "rel": 10, "written_total": 68, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 58, "actual_total": 68, "note": "مطابق"}, {"rank": 7, "name": "أُسَامَةْ مُحَمَّدْ حَرْحَشْ عَكْرَمْ", "ar": 12, "en": 8, "math": 13, "sci": 10, "soc": 12, "rel": 11, "written_total": 66, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 55, "actual_total": 66, "note": "مطابق"}, {"rank": 8, "name": "إِبْرَاهِيمْ السَّعِيدْ الصَّيْرَفِيْ", "ar": 10, "en": 6, "math": 10.5, "sci": 13, "soc": 13.5, "rel": 10, "written_total": 63, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 53.0, "actual_total": 63.0, "note": "مطابق"}, {"rank": 9, "name": "إِسْلَامْ مُحَمَّدْ بَهْنَسِيْ تُرْكِيْ", "ar": 12, "en": 7, "math": 7, "sci": 10, "soc": 11.5, "rel": 10, "written_total": 57.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 47.5, "actual_total": 57.5, "note": "مطابق"}, {"rank": 10, "name": "أَحْمَدْ صُبْحِيْ مُحَمَّدْ عَفِيفِيْ", "ar": 15, "en": 6, "math": 6, "sci": 14, "soc": 7.5, "rel": 8, "written_total": 56.5, "class_code": "1/1", "grade": "الصف الأول الإعدادي", "leader": "أ / هَانِيْ سَلَامَةْ", "basic_sum": 48.5, "actual_total": 56.5, "note": "مطابق"}, {"rank": 1, "name": "سَيْفْ السَّيِّدْ إِبْرَاهِيمْ زَايِدْ", "ar": 13, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 88, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 73, "actual_total": 88, "note": "مطابق"}, {"rank": 2, "name": "عَبْدُ السَّلَامْ سَامِحْ الْفَارْ", "ar": 13, "en": 15, "math": 15, "sci": 15, "soc": 14, "rel": 15, "written_total": 87, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 3, "name": "زِيَادْ مُحَمَّدْ شُقَيْرْ", "ar": 13, "en": 14, "math": 14, "sci": 15, "soc": 15, "rel": 15, "written_total": 86, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 71, "actual_total": 86, "note": "مطابق"}, {"rank": 4, "name": "شِهَابْ السَّيِّدْ عَبْدُ الْحَيّْ", "ar": 15, "en": 11, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 86, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 71, "actual_total": 86, "note": "مطابق"}, {"rank": 5, "name": "عَبْدُ اللّٰهْ مُحَمَّدْ صُبْحِيْ", "ar": 15, "en": 14, "math": 15, "sci": 13, "soc": 13, "rel": 13, "written_total": 83, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 70, "actual_total": 83, "note": "مطابق"}, {"rank": 6, "name": "عُدَيّْ إِيهَابْ بَشْبِيشِيْ", "ar": 13, "en": 11, "math": 11, "sci": 15, "soc": 15, "rel": 13, "written_total": 78, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 65, "actual_total": 78, "note": "مطابق"}, {"rank": 7, "name": "عُمَرْ عَبْدُ الْمُنْعِمْ مَدِينْ", "ar": 13, "en": 9, "math": 15, "sci": 9, "soc": 15, "rel": 15, "written_total": 76, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 61, "actual_total": 76, "note": "مطابق"}, {"rank": 8, "name": "عَاصِمْ أَحْمَدْ كَامِلْ بَدْرْ", "ar": 13, "en": 9, "math": 14, "sci": 12, "soc": 14, "rel": 12, "written_total": 74, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 62, "actual_total": 74, "note": "مطابق"}, {"rank": 9, "name": "سَعْدْ مُحَمَّدْ عَادِلْ الْقَمَّاحْ", "ar": 11, "en": 9, "math": 15, "sci": 12.5, "soc": 13, "rel": 13, "written_total": 73.5, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 60.5, "actual_total": 73.5, "note": "مطابق"}, {"rank": 10, "name": "عَبْدُ الرَّحْمٰنْ أَشْرَفْ الصَّاوِيْ", "ar": 13, "en": 8, "math": 10.5, "sci": 9, "soc": 15, "rel": 13, "written_total": 68.5, "class_code": "1/2", "grade": "الصف الأول الإعدادي", "leader": "أ / سَمَرْ خَاطِرْ", "basic_sum": 55.5, "actual_total": 68.5, "note": "مطابق"}, {"rank": 1, "name": "مُحَمَّدْ حَمْدِيْ مُحَمَّدْ النِّكْلَاوِيْ", "ar": 13, "en": 13, "math": 15, "sci": 12, "soc": 15, "rel": 15, "written_total": 83, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 68, "actual_total": 83, "note": "مطابق"}, {"rank": 2, "name": "مَازِنْ عَاصِمْ عُكَيْلَةْ", "ar": 14, "en": 14, "math": 14.5, "sci": 15, "soc": 15, "rel": 10, "written_total": 82.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 72.5, "actual_total": 82.5, "note": "مطابق"}, {"rank": 3, "name": "مُحَمَّدْ السَّعِيدْ قُطْبْ عِيسَىْ", "ar": 14, "en": 12, "math": 13, "sci": 12.5, "soc": 15, "rel": 15, "written_total": 81.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 66.5, "actual_total": 81.5, "note": "مطابق"}, {"rank": 4, "name": "مُحَمَّدْ سَامِحْ حَبَشِيْ إِسْمَاعِيلْ", "ar": 14, "en": 11, "math": 11, "sci": 14, "soc": 15, "rel": 15, "written_total": 80, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 65, "actual_total": 80, "note": "مطابق"}, {"rank": 5, "name": "عُمَرْ مَمْدُوحْ عَبْدُ الْبَرّْ إِبْرَاهِيمْ", "ar": 13, "en": 15, "math": 12.5, "sci": 12.5, "soc": 15, "rel": 12, "written_total": 80.0, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 68.0, "actual_total": 80.0, "note": "مطابق"}, {"rank": 6, "name": "عُمَرْ مُحَمَّدْ فَوْزِيْ قُرَّةْ", "ar": 11, "en": 11, "math": 14.5, "sci": 12, "soc": 11, "rel": 15, "written_total": 74.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 59.5, "actual_total": 74.5, "note": "مطابق"}, {"rank": 7, "name": "مُحَمَّدْ السَّيِّدْ قَاوُوقْ", "ar": 14, "en": 13, "math": 5.5, "sci": 9.5, "soc": 15, "rel": 15, "written_total": 72, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 57.0, "actual_total": 72.0, "note": "مطابق"}, {"rank": 8, "name": "حَاتِمْ تَامِرْ السَّعْدَنِيْ", "ar": 14, "en": 6, "math": 13.5, "sci": 8, "soc": 15, "rel": 14, "written_total": 70.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 56.5, "actual_total": 70.5, "note": "مطابق"}, {"rank": 9, "name": "حَازِمْ مُحَمَّدْ عِيدْ عُبَيْدْ", "ar": 14, "en": 9, "math": 14, "sci": 10, "soc": 11, "rel": 12, "written_total": 70, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 58, "actual_total": 70, "note": "مطابق"}, {"rank": 10, "name": "جَاسِرْ تَامِرْ قَنْدِيلْ", "ar": 12, "en": 11, "math": 10, "sci": 9.5, "soc": 11, "rel": 15, "written_total": 68.5, "class_code": "1/3", "grade": "الصف الأول الإعدادي", "leader": "أ / مُحَمَّدْ صَحْصَحْ", "basic_sum": 53.5, "actual_total": 68.5, "note": "مطابق"}, {"rank": 1, "name": "مُحَمَّدْ سَامِحْ الْكُومِيْ", "ar": 15, "en": 15, "math": 15, "sci": 14.5, "soc": 14, "rel": 15, "written_total": 88.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 73.5, "actual_total": 88.5, "note": "مطابق"}, {"rank": 2, "name": "مُحَمَّدْ عَادِلْ عِيدْ الْفِقِيْ", "ar": 12.5, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 87.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 72.5, "actual_total": 87.5, "note": "مطابق"}, {"rank": 3, "name": "مُحَمَّدْ مَحْمُودْ نُوحْ", "ar": 13, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 14, "written_total": 84, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 70, "actual_total": 84, "note": "مطابق"}, {"rank": 4, "name": "مُحَمَّدْ مَحْمُودْ أَبُو خَلِيلْ", "ar": 14, "en": 15, "math": 15, "sci": 11.5, "soc": 14, "rel": 14, "written_total": 83.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 69.5, "actual_total": 83.5, "note": "مطابق"}, {"rank": 5, "name": "مُحَمَّدْ تَامِرْ مُبَارَكْ", "ar": 14, "en": 11, "math": 15, "sci": 15, "soc": 15, "rel": 13, "written_total": 83, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 70, "actual_total": 83, "note": "مطابق"}, {"rank": 6, "name": "مُحَمَّدْ حُسَامْ السَّعِيدْ", "ar": 12, "en": 10, "math": 15, "sci": 15, "soc": 15, "rel": 14, "written_total": 81, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 67, "actual_total": 81, "note": "مطابق"}, {"rank": 7, "name": "مُحَمَّدْ ثَابِتْ مَبْرُوكْ", "ar": 10, "en": 9, "math": 15, "sci": 13.5, "soc": 15, "rel": 14, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 62.5, "actual_total": 76.5, "note": "مطابق"}, {"rank": 8, "name": "مُحَمَّدْ جُمْعَةْ الْوَرَّاقِيْ", "ar": 12, "en": 11, "math": 14, "sci": 12.5, "soc": 9, "rel": 14, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 58.5, "actual_total": 72.5, "note": "فرق جمع: الفعلي 72.5 وبالكشف 76.5"}, {"rank": 9, "name": "مُحَمَّدْ شَرِيفْ مُقَلَّدْ", "ar": 9, "en": 12, "math": 14.5, "sci": 15, "soc": 11, "rel": 15, "written_total": 76.5, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 61.5, "actual_total": 76.5, "note": "مطابق"}, {"rank": 10, "name": "مَحْمُودْ هَانِيْ الْفَوَّالْ", "ar": 14, "en": 9, "math": 14, "sci": 15, "soc": 10, "rel": 14, "written_total": 76, "class_code": "1/4", "grade": "الصف الأول الإعدادي", "leader": "أ / مَنَالْ الصَّيْرَفِيْ", "basic_sum": 62, "actual_total": 76, "note": "مطابق"}, {"rank": 1, "name": "يُوسُفْ تَامِرْ الشَّرَاكِيْ", "ar": 15, "en": 13, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 88, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 73, "actual_total": 88, "note": "مطابق"}, {"rank": 2, "name": "يَاسِينْ مُحَمَّدْ جَابِرْ عَبْدُ اللَّاهْ", "ar": 15, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 13, "written_total": 85, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 72, "actual_total": 85, "note": "مطابق"}, {"rank": 3, "name": "يُوسُفْ عَلَاءْ الطَّحْلَاوِيْ", "ar": 15, "en": 14, "math": 13.5, "sci": 14, "soc": 13.5, "rel": 14, "written_total": 84, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 70.0, "actual_total": 84.0, "note": "مطابق"}, {"rank": 4, "name": "مُصْطَفَىْ مَحْمُودْ شَمْسُ الدِّينْ", "ar": 13, "en": 14, "math": 15, "sci": 14, "soc": 10, "rel": 14, "written_total": 80, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 66, "actual_total": 80, "note": "مطابق"}, {"rank": 5, "name": "يَحْيَىْ مُحَمَّدْ أَبُو خَدِيجَةْ", "ar": 15, "en": 10, "math": 15, "sci": 13, "soc": 13.5, "rel": 13, "written_total": 79.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 66.5, "actual_total": 79.5, "note": "مطابق"}, {"rank": 6, "name": "يُوسُفْ مَجْدِيْ أَحْمَدْ حَمَّادْ", "ar": 15, "en": 6, "math": 15, "sci": 15, "soc": 13.5, "rel": 14, "written_total": 78.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 64.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 7, "name": "يُوسُفْ مُحَمَّدْ خِلَافْ", "ar": 14, "en": 13, "math": 7.5, "sci": 15, "soc": 13.5, "rel": 15, "written_total": 77, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 63.0, "actual_total": 78.0, "note": "فرق جمع: الفعلي 78.0 وبالكشف 77"}, {"rank": 8, "name": "يُوسُفْ إِسْمَاعِيلْ الْمَنْسِيْ", "ar": 13, "en": 6, "math": 15, "sci": 14, "soc": 13.5, "rel": 13, "written_total": 74.5, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 61.5, "actual_total": 74.5, "note": "مطابق"}, {"rank": 9, "name": "يُوسُفْ أَحْمَدْ فَتْحِيْ الْفِقِيْ", "ar": 13, "en": 12, "math": 12, "sci": 12, "soc": 15, "rel": 13, "written_total": 77, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 64, "actual_total": 77, "note": "مطابق"}, {"rank": 10, "name": "يَاسِينْ سَامِحْ مَنْصُورْ", "ar": 12, "en": 6, "math": 14, "sci": 14, "soc": 15, "rel": 13, "written_total": 74, "class_code": "1/5", "grade": "الصف الأول الإعدادي", "leader": "أ / آيَةْ عَبْدُ الْعَزِيزْ", "basic_sum": 61, "actual_total": 74, "note": "مطابق"}, {"rank": 1, "name": "زِيَادْ عَاطِفْ إِبْرَاهِيمْ مُحَمَّدْ أَبُو الْفُتُوحْ", "ar": 15.0, "en": 14.0, "math": 12.0, "sci": 12.5, "soc": 13.0, "rel": 15.0, "written_total": 81.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 66.5, "actual_total": 81.5, "note": "مطابق"}, {"rank": 2, "name": "إِبْرَاهِيمْ مُحَمَّدْ إِبْرَاهِيمْ حَسَنْ سَعْدْ", "ar": 12.5, "en": 14.0, "math": 14.0, "sci": 13.5, "soc": 15.0, "rel": 11.0, "written_total": 80.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 69.0, "actual_total": 80.0, "note": "مطابق"}, {"rank": 3, "name": "أَحْمَدْ حَمْدِيْ أَحْمَدْ مُحَمَّدْ شَاهِينْ", "ar": 13.5, "en": 13.0, "math": 12.0, "sci": 13.5, "soc": 15.0, "rel": 13.0, "written_total": 80.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 67.0, "actual_total": 80.0, "note": "مطابق"}, {"rank": 4, "name": "أَشْرَفْ مُحَمَّدْ مُحَمَّدْ الشِّشْتَاوِيْ", "ar": 12.0, "en": 15.0, "math": 15.0, "sci": 13.5, "soc": 15.0, "rel": 8.0, "written_total": 78.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 70.5, "actual_total": 78.5, "note": "مطابق"}, {"rank": 5, "name": "أَحْمَدْ مُحَمَّدْ أَحْمَدْ أَحْمَدْ نَاصِرْ", "ar": 10.0, "en": 13.0, "math": 13.5, "sci": 14.5, "soc": 15.0, "rel": 12.0, "written_total": 78.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 66.0, "actual_total": 78.0, "note": "مطابق"}, {"rank": 6, "name": "أُسَامَةْ عَبْدُ اللّٰهْ عَلِيْ عَلِيْ يُونُسْ", "ar": 10.5, "en": 13.0, "math": 13.5, "sci": 15.0, "soc": 13.0, "rel": 10.0, "written_total": 75.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 65.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 7, "name": "إِيَادْ عِمَادْ جَمَالْ عَوَضْ مَسْعُودْ", "ar": 11.0, "en": 12.0, "math": 12.5, "sci": 12.5, "soc": 13.0, "rel": 14.0, "written_total": 75.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 8, "name": "مَازِنْ جَادُ اللّٰهْ مَحْمُودْ إِمَامْ السَّيِّدْ", "ar": 11.5, "en": 12.0, "math": 13.5, "sci": 11.0, "soc": 15.0, "rel": 10.0, "written_total": 73.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 63.0, "actual_total": 73.0, "note": "مطابق"}, {"rank": 9, "name": "أَحْمَدْ سَعْدْ مُحَمَّدْ سَعْدْ مُحَمَّدْ أَبُو لَيْلَةْ", "ar": 10.0, "en": 11.0, "math": 14.0, "sci": 11.0, "soc": 15.0, "rel": 11.0, "written_total": 72.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.0, "actual_total": 72.0, "note": "مطابق"}, {"rank": 10, "name": "رَيَّانْ مُحَمَّدْ عَلِيْ حَسَنْ خَضْرْ الطَّوِيلْ", "ar": 13.5, "en": 12.0, "math": 8.0, "sci": 13.0, "soc": 12.0, "rel": 13.0, "written_total": 71.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 58.5, "actual_total": 71.5, "note": "مطابق"}, {"rank": 1, "name": "سَعِيدْ عَلِيْ هَيْبَةْ", "ar": 11, "en": 11, "math": 13, "sci": 15, "soc": 15, "rel": 14, "written_total": 79, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 65, "actual_total": 79, "note": "مطابق"}, {"rank": 2, "name": "سَيْفْ نَادِرْ حَرْحَشْ", "ar": 11, "en": 11, "math": 13, "sci": 15, "soc": 15, "rel": 13, "written_total": 78, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 65, "actual_total": 78, "note": "مطابق"}, {"rank": 3, "name": "عَمَّارْ مُحَمَّدْ خَيَّالْ", "ar": 14, "en": 9, "math": 12, "sci": 12, "soc": 15, "rel": 15, "written_total": 77, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 62, "actual_total": 77, "note": "مطابق"}, {"rank": 4, "name": "كَرِيمْ السَّعِيدْ نَعِيمْ", "ar": 9, "en": 8, "math": 12, "sci": 15, "soc": 15, "rel": 15, "written_total": 74, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 59, "actual_total": 74, "note": "مطابق"}, {"rank": 5, "name": "عُمَرْ أَحْمَدْ الْقَفَّاصْ", "ar": 13, "en": 10, "math": 11, "sci": 15, "soc": 15, "rel": 10, "written_total": 74, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 64, "actual_total": 74, "note": "مطابق"}, {"rank": 6, "name": "عَمْرْو مُحَمَّدْ هِلَالْ", "ar": 14, "en": 13, "math": 9, "sci": 12, "soc": 15, "rel": 8, "written_total": 71, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 63, "actual_total": 71, "note": "مطابق"}, {"rank": 7, "name": "عُمَرْ هَانِيْ صَالِحْ", "ar": 14, "en": 10, "math": 10, "sci": 11, "soc": 14, "rel": 11, "written_total": 70, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 59, "actual_total": 70, "note": "مطابق"}, {"rank": 8, "name": "سَيْفْ رَجَبْ زَيْدَانْ", "ar": 14, "en": 9, "math": 15, "sci": 8, "soc": 15, "rel": 8, "written_total": 69, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 61, "actual_total": 69, "note": "مطابق"}, {"rank": 9, "name": "مُعَاذْ أَشْرَفْ عَدَسْ", "ar": 12, "en": 7, "math": 8, "sci": 11, "soc": 15, "rel": 13, "written_total": 66, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 53, "actual_total": 66, "note": "مطابق"}, {"rank": 10, "name": "سَيْفْ إِبْرَاهِيمْ شَلَبِيْ", "ar": 12, "en": 7, "math": 8, "sci": 12, "soc": 15, "rel": 14, "written_total": 68, "class_code": "2/2", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَرْوَةْ يُونُسْ", "basic_sum": 54, "actual_total": 68, "note": "مطابق"}, {"rank": 1, "name": "مُعَاذْ أَحْمَدْ مَسْعَدْ أَبُو حُسَيْنْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 15, "written_total": 90, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 90, "note": "مطابق"}, {"rank": 2, "name": "سَيْفْ أَحْمَدْ عَبْدُ الْمُحْسِنْ بِلَالْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 14, "written_total": 89, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 89, "note": "مطابق"}, {"rank": 3, "name": "يَاسِينْ مُحَمَّدْ عَبْدُ الْمَوْلَىْ", "ar": 15, "en": 15, "math": 15, "sci": 15, "soc": 15, "rel": 13, "written_total": 88, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 75, "actual_total": 88, "note": "مطابق"}, {"rank": 4, "name": "عُمَرْ طٰهَ مَحْمُودْ نَعِيمْ", "ar": 15, "en": 15, "math": 13.5, "sci": 14.5, "soc": 15, "rel": 14, "written_total": 87, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 73.0, "actual_total": 87.0, "note": "مطابق"}, {"rank": 5, "name": "يُوسُفْ عَبْدُ اللّٰهْ قُطْبْ", "ar": 15, "en": 13, "math": 15, "sci": 14, "soc": 15, "rel": 15, "written_total": 87, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 72, "actual_total": 87, "note": "مطابق"}, {"rank": 6, "name": "مُؤْمِنْ أَحْمَدْ غُنَيْمْ", "ar": 15, "en": 12, "math": 12, "sci": 15, "soc": 15, "rel": 15, "written_total": 84, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 69, "actual_total": 84, "note": "مطابق"}, {"rank": 7, "name": "يُوسُفْ أَحْمَدْ عَبْدُ الْمُعْطِيْ", "ar": 14, "en": 13, "math": 14, "sci": 12, "soc": 14, "rel": 15, "written_total": 82, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 67, "actual_total": 82, "note": "مطابق"}, {"rank": 8, "name": "مُحَمَّدْ وَلِيدْ عَبْدُ الرَّازِقْ عَبْدُ الْحَلِيمْ", "ar": 14, "en": 12, "math": 13, "sci": 13, "soc": 15, "rel": 13, "written_total": 80, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 67, "actual_total": 80, "note": "مطابق"}, {"rank": 9, "name": "مُحَمَّدْ مَحْمُودْ بَسْيُونِيْ دُوَيْدَارْ", "ar": 15, "en": 6, "math": 14.5, "sci": 15, "soc": 11.5, "rel": 13, "written_total": 75, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 62.0, "actual_total": 75.0, "note": "مطابق"}, {"rank": 10, "name": "مُعَاذْ تَامِرْ مُحَمَّدْ عَبْدُ الْوَهَّابْ", "ar": 15, "en": 9, "math": 12.5, "sci": 13, "soc": 12, "rel": 12, "written_total": 73.5, "class_code": "2/3", "grade": "الصف الثاني الإعدادي", "leader": "أ / إِيمَانْ فَرَجُ اللّٰهْ", "basic_sum": 61.5, "actual_total": 73.5, "note": "مطابق"}, {"rank": 11, "name": "أَحْمَدْ لَبِيبْ مُحَمَّدْ كَمَالْ أَحْمَدْ", "ar": 13.0, "en": 13.0, "math": 11.0, "sci": 11.5, "soc": 13.0, "rel": 9.0, "written_total": 70.5, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 61.5, "actual_total": 70.5, "note": "احتياطي"}, {"rank": 12, "name": "حَازِمْ رِضَاْ مُحَمَّدْ الْمَنْزَلَاوِيْ", "ar": 12.0, "en": 13.0, "math": 9.5, "sci": 10.5, "soc": 13.0, "rel": 12.0, "written_total": 70.0, "class_code": "2/1", "grade": "الصف الثاني الإعدادي", "leader": "أ / مَحْمُودْ عَادِلْ", "basic_sum": 58.0, "actual_total": 70.0, "note": "احتياطي"}];
 let FULL_DATABASE = JSON.parse(JSON.stringify(FACTORY_DATABASE));
 
 // Dynamic Phonetic Synthesizer: Generates vocalized spoken class names from numeric codes (e.g. "1/1", "2/1")
@@ -994,11 +1030,31 @@ function formatScoreForTTS(score) {
   return String(num);
 }
 
+// Eligibility Rule: Block any student with Total < 80 OR any subject <= 7.5 (half of 15)
+function checkStudentEligibility(st) {
+  const filterEnabled = document.getElementById('enableEligibilityFilter')?.checked ?? true;
+  if (!filterEnabled) return { eligible: true, reason: 'مفعل' };
+
+  const minTotal = parseFloat(document.getElementById('minTotalThreshold')?.value ?? '80');
+  const minSubj = parseFloat(document.getElementById('minSubjThreshold')?.value ?? '7.5');
+  const subjects = [st.ar, st.en, st.math, st.sci, st.soc, st.rel].map(v => Number(v) || 0);
+  const lowestSubj = Math.min(...subjects);
+
+  if (st.actual_total < minTotal) {
+    return { eligible: false, reason: `مجموع أقل من ${minTotal}` };
+  }
+  if (lowestSubj <= minSubj) {
+    return { eligible: false, reason: `مادة ≤ ${minSubj}` };
+  }
+  return { eligible: true, reason: 'مستوفٍ' };
+}
+
 let mediaMode = 'MULTI';
 let activeList = [];
 let excludedKeys = new Set();
 let currentIndex = 0;
 let timerInterval = null;
+let fadeInterval = null;
 let phaseTimeout = null;
 let previewStopHandler = null;
 let isSettingsUnlocked = false;
@@ -1027,7 +1083,6 @@ if (window.location.protocol === 'file:') {
   });
 }
 
-// Pre-warm Arabic TTS Voice
 function initArabicVoice() {
   if (!('speechSynthesis' in window)) return;
   const pickVoice = () => {
@@ -1040,7 +1095,6 @@ function initArabicVoice() {
   window.speechSynthesis.onvoiceschanged = pickVoice;
 }
 
-// Direct Background Preloader & RAM Blob Caching for music1.mp4, music2.mp4, music3.mp4
 async function preloadAllAudioVideoDirect() {
   const pill = document.getElementById('preload-pill');
   const files = [
@@ -1049,7 +1103,6 @@ async function preloadAllAudioVideoDirect() {
     { key: 'music3.mp4', el: vid3 }
   ];
 
-  // Trigger native browser preloading immediately
   allBgVids.forEach(v => { try { v.load(); } catch(e){} });
 
   let loadedCount = 0;
@@ -1060,7 +1113,6 @@ async function preloadAllAudioVideoDirect() {
       const blob = await resp.blob();
       const blobUrl = URL.createObjectURL(blob);
       blobCache[item.key] = blobUrl;
-      // Only swap src if the video is currently paused so we never interrupt active playback
       if (item.el.paused) {
         item.el.src = blobUrl;
         item.el.load();
@@ -1068,7 +1120,6 @@ async function preloadAllAudioVideoDirect() {
       loadedCount++;
       if (pill) pill.textContent = `⚡ تم تحميل الصوتيات (${loadedCount}/3)...`;
     } catch (err) {
-      // Fallback: native <video preload="auto"> is already handling streaming
       loadedCount++;
     }
   }));
@@ -1080,7 +1131,6 @@ async function preloadAllAudioVideoDirect() {
   }
 }
 
-// Unlocks all 4 video elements + Web Speech API on the very first user tap (or auto-start)
 function unlockAllMediaAndStart() {
   const startBtn = document.getElementById('instant-start-btn');
   if (startBtn) startBtn.classList.add('hidden');
@@ -1088,7 +1138,6 @@ function unlockAllMediaAndStart() {
   if (!mediaUnlocked) {
     mediaUnlocked = true;
     const vol = parseFloat(document.getElementById('bgVolumeSlider').value || '0.65');
-    // Unlock inactive videos silently inside the user gesture so setTimeout transitions never get blocked
     [vid2, vid3, vidSingle].forEach(v => {
       try {
         v.muted = true;
@@ -1107,7 +1156,6 @@ function unlockAllMediaAndStart() {
       } catch (e) {}
     });
 
-    // Warm up SpeechSynthesis with an empty utterance inside user gesture
     if ('speechSynthesis' in window) {
       try {
         const warm = new SpeechSynthesisUtterance('');
@@ -1129,19 +1177,10 @@ function syncVideoSources() {
   vid3.src = blobCache[p3] || p3;
 }
 
-// Exclusive Stage Switcher: Administration Board and Student Cards NEVER appear together
 function setStageView(viewType) {
   document.getElementById('admin-intro-view').classList.toggle('active', viewType === 'INTRO');
   document.getElementById('student-card-view').classList.toggle('active', viewType === 'STUDENT');
   document.getElementById('outro-view').classList.toggle('active', viewType === 'OUTRO');
-}
-
-function setQuickAdminDuration(sec) {
-  document.getElementById('multiIntroDur').value = sec;
-  const iS = parseFloat(document.getElementById('introStart').value) || 0;
-  document.getElementById('introEnd').value = iS + sec;
-  updateSliceDurations();
-  alert(`تم ضبط مدة لوحة شرف الإدارة (الصامتة) على ${sec} ثانية لوحدها!`);
 }
 
 function setMediaMode(mode) {
@@ -1257,12 +1296,14 @@ function captureTime(inputId) {
 }
 
 function getSlices() {
+  const fadeGap = Math.max(0.5, parseFloat(document.getElementById('fadeGapDurInp')?.value || '3'));
   if (mediaMode === 'MULTI') {
     const mIntro = Math.max(2, parseFloat(document.getElementById('multiIntroDur').value) || 20);
     const mCard = Math.max(2, parseFloat(document.getElementById('multiCardDur').value) || 15);
     const mOutro = Math.max(2, parseFloat(document.getElementById('multiOutroDur').value) || 15);
     return {
       mode: 'MULTI',
+      fadeGap,
       path1: document.getElementById('multiPath1').value.trim() || 'music1.mp4',
       path2: document.getElementById('multiPath2').value.trim() || 'music2.mp4',
       path3: document.getElementById('multiPath3').value.trim() || 'music3.mp4',
@@ -1279,6 +1320,7 @@ function getSlices() {
   const oE = parseFloat(document.getElementById('outroEnd').value) || 355;
   return {
     mode: 'SINGLE',
+    fadeGap,
     singlePath: document.getElementById('customVideoPath').value.trim() || 'awael.mp4',
     introStart: iS, introEnd: Math.max(iS + 1, iE), introDur: Math.max(1, +(iE - iS).toFixed(1)),
     cardStart: cS, cardEnd: Math.max(cS + 1, cE), cardDur: Math.max(1, +(cE - cS).toFixed(1)),
@@ -1326,6 +1368,7 @@ function stopPreviewSegment() {
 function saveSlicesToStorage() {
   const cfg = {
     mediaMode,
+    fadeGapDur: document.getElementById('fadeGapDurInp').value,
     multiIntroDur: document.getElementById('multiIntroDur').value,
     multiCardDur: document.getElementById('multiCardDur').value,
     multiOutroDur: document.getElementById('multiOutroDur').value,
@@ -1339,17 +1382,18 @@ function saveSlicesToStorage() {
     outroStart: document.getElementById('outroStart').value,
     outroEnd: document.getElementById('outroEnd').value
   };
-  localStorage.setItem('zohour_video_cfg_v8', JSON.stringify(cfg));
+  localStorage.setItem('zohour_video_cfg_v9', JSON.stringify(cfg));
   syncVideoSources();
   alert("تم حفظ الإعدادات بنجاح!");
 }
 
 function loadFromStorage() {
   try {
-    const rawCfg = localStorage.getItem('zohour_video_cfg_v8');
+    const rawCfg = localStorage.getItem('zohour_video_cfg_v9');
     if (rawCfg) {
       const c = JSON.parse(rawCfg);
       if (c.mediaMode) setMediaMode(c.mediaMode);
+      if (c.fadeGapDur) document.getElementById('fadeGapDurInp').value = c.fadeGapDur;
       if (c.multiIntroDur) document.getElementById('multiIntroDur').value = c.multiIntroDur;
       if (c.multiCardDur) document.getElementById('multiCardDur').value = c.multiCardDur;
       if (c.multiOutroDur) document.getElementById('multiOutroDur').value = c.multiOutroDur;
@@ -1363,7 +1407,7 @@ function loadFromStorage() {
       if (c.outroStart !== undefined) document.getElementById('outroStart').value = c.outroStart;
       if (c.outroEnd !== undefined) document.getElementById('outroEnd').value = c.outroEnd;
     }
-    const rawDB = localStorage.getItem('zohour_students_db_v7');
+    const rawDB = localStorage.getItem('zohour_students_db_v9');
     if (rawDB) {
       FULL_DATABASE = JSON.parse(rawDB);
     }
@@ -1373,6 +1417,7 @@ function loadFromStorage() {
 
 function resetDefaultSlices() {
   setMediaMode('MULTI');
+  document.getElementById('fadeGapDurInp').value = 3;
   document.getElementById('multiIntroDur').value = 20;
   document.getElementById('multiCardDur').value = 15;
   document.getElementById('multiOutroDur').value = 15;
@@ -1386,8 +1431,12 @@ function resetDefaultSlices() {
   document.getElementById('outroStart').value = 340;
   document.getElementById('outroEnd').value = 355;
   updateSliceDurations();
-  localStorage.removeItem('zohour_video_cfg_v8');
+  localStorage.removeItem('zohour_video_cfg_v9');
   syncVideoSources();
+}
+
+function getActiveVideoElement() {
+  return allBgVids.find(v => v.classList.contains('active-vid')) || vid1;
 }
 
 // Instant Zero-Latency Media Switcher using the 4 preloaded <video> elements
@@ -1403,7 +1452,6 @@ function playPhaseMedia(phaseNumber, startSec = 0) {
     activeVid = vidSingle;
   }
 
-  // Pause other background videos and highlight the active one
   allBgVids.forEach(v => {
     if (v !== activeVid) {
       v.classList.remove('active-vid');
@@ -1422,12 +1470,57 @@ function playPhaseMedia(phaseNumber, startSec = 0) {
     const playPromise = activeVid.play();
     if (playPromise && typeof playPromise.catch === 'function') {
       playPromise.catch(() => {
-        // Show one-tap button if browser blocked unmuted autoplay
         const btn = document.getElementById('instant-start-btn');
         if (btn) btn.classList.remove('hidden');
       });
     }
   } catch(e) {}
+}
+
+// 3-Second Audio & Visual Fade-Out Transition Between Phases ("بخفوت الموسيقى وتلاشيها")
+function runPhaseFadeOutTransition(durationSec, transitionLabel, onComplete) {
+  clearInterval(timerInterval);
+  clearInterval(fadeInterval);
+  clearTimeout(phaseTimeout);
+
+  const activeVid = getActiveVideoElement();
+  const startVol = activeVid ? activeVid.volume : parseFloat(document.getElementById('bgVolumeSlider').value || '0.65');
+  const startOp = parseFloat(document.getElementById('bgOpacitySlider').value || '0.32');
+  const stageEl = document.getElementById('main-stage');
+  const bar = document.getElementById('progress-bar');
+  const badge = document.getElementById('phase-badge');
+
+  if (stageEl) stageEl.classList.add('fading-out');
+  if (badge) badge.textContent = transitionLabel || `⏳ فاصل وتلاشي الموسيقى (${durationSec} ث)...`;
+  if (bar) bar.style.width = '100%';
+
+  const stepMs = 50;
+  const totalSteps = Math.max(1, Math.round((durationSec * 1000) / stepMs));
+  let currentStep = 0;
+
+  fadeInterval = setInterval(() => {
+    currentStep++;
+    const ratio = Math.max(0, 1 - (currentStep / totalSteps));
+    // Smooth perceptual volume fade-out to 0.00
+    if (activeVid) {
+      activeVid.volume = Math.max(0, +(startVol * Math.pow(ratio, 1.3)).toFixed(3));
+      activeVid.style.opacity = Math.max(0.05, +(startOp * ratio).toFixed(3));
+    }
+    if (bar) {
+      bar.style.width = Math.max(0, (ratio * 100)).toFixed(1) + '%';
+    }
+
+    if (currentStep >= totalSteps) {
+      clearInterval(fadeInterval);
+      fadeInterval = null;
+      if (activeVid) {
+        try { activeVid.pause(); } catch(e) {}
+        activeVid.volume = parseFloat(document.getElementById('bgVolumeSlider').value || '0.65');
+      }
+      if (stageEl) stageEl.classList.remove('fading-out');
+      if (typeof onComplete === 'function') onComplete();
+    }
+  }, stepMs);
 }
 
 function updateBgVolume() {
@@ -1444,19 +1537,25 @@ function applyCustomVideoPath() {
   vidSingle.load();
 }
 
-// Builds the ordered queue:
-// 1. Grade 1 classes in order (1/1 -> 1/2 -> 1/3 -> 1/4 -> 1/5)
-// 2. Grade 2 classes in order (2/1 -> 2/2 -> 2/3)
-// 3. Top 5 of Grade 1 across the school
-// 4. Top 5 of Grade 2 across the school
+// Builds the ordered queue after applying the Eligibility Rule (Total >= 80 & every subject > 7.5)
 function applyFilter() {
   const mode = document.getElementById('filterSelect').value;
   const classLimit = Math.max(1, parseInt(document.getElementById('classTopLimitInp')?.value || '10', 10));
   const gradeTopLimit = Math.max(1, parseInt(document.getElementById('gradeTopLimitInp')?.value || '5', 10));
-  let pool = FULL_DATABASE.filter((s, idx) => !excludedKeys.has(idx));
+
+  // Filter out manually deleted rows AND students blocked by the <80 total or <=7.5 subject rule
+  let pool = FULL_DATABASE.filter((s, idx) => !excludedKeys.has(idx) && checkStudentEligibility(s).eligible);
+
+  // Update summary counter in settings
+  const totalNonReserve = FULL_DATABASE.filter((s, idx) => !excludedKeys.has(idx) && s.note !== 'احتياطي');
+  const totalEligible = totalNonReserve.filter(s => checkStudentEligibility(s).eligible);
+  const sumBox = document.getElementById('eligibility-summary-box');
+  if (sumBox) {
+    sumBox.textContent = `✅ الطلاب المجتازون للشرط حالياً: ${totalEligible.length} طالباً من أصل ${totalNonReserve.length} (تم حجب ${totalNonReserve.length - totalEligible.length} طالب)`;
+  }
 
   const getClassList = (clsCode) => {
-    return pool.filter(s => s.class_code === clsCode).slice(0, classLimit).map((s, i) => ({
+    return pool.filter(s => s.class_code === clsCode && s.note !== 'احتياطي').slice(0, classLimit).map((s, i) => ({
       ...s,
       display_rank: i + 1,
       section_type: 'CLASS',
@@ -1514,7 +1613,8 @@ function applyFilter() {
     document.getElementById('intro-leader-name').textContent = 'الصف الثاني الإعدادي';
   } else {
     activeList = getClassList(mode);
-    const ldr = activeList.length ? activeList[0].leader : '';
+    const anyFromClass = FULL_DATABASE.find(s => s.class_code === mode);
+    const ldr = anyFromClass ? anyFromClass.leader : '';
     document.getElementById('intro-class-title').textContent = `أوائل فصل ${mode}`;
     document.getElementById('intro-leader-role').textContent = `رائد فصل ${mode}`;
     document.getElementById('intro-leader-name').textContent = ldr;
@@ -1526,7 +1626,15 @@ function applyFilter() {
 
 // Renders Student Card ONLY (No Administration Info on the Student Screen)
 function renderCurrentStudent(speakNow = false) {
-  if (!activeList.length) return;
+  if (!activeList.length) {
+    document.getElementById('st-rank').textContent = '!';
+    document.getElementById('st-name').textContent = 'لا يوجد طلاب مستوفون لشرط الـ 80 درجة في هذا الاختيار';
+    document.getElementById('st-meta').textContent = 'تم حجب الحاصلين على أقل من 80 أو نصف الدرجة';
+    ['g-ar','g-en','g-math','g-sci','g-soc','g-rel'].forEach(id => document.getElementById(id).textContent = '-');
+    document.getElementById('st-total').textContent = 'المجموع: -- / 90';
+    document.getElementById('st-pct').textContent = 'النسبة: --%';
+    return;
+  }
   const st = activeList[currentIndex];
   const rnk = st.display_rank || st.rank;
   document.getElementById('st-rank').textContent = rnk;
@@ -1583,10 +1691,10 @@ function triggerConfetti() {
   }
 }
 
-// AUTOMATIC 3-PHASE CEREMONY ENGINE:
-// Phase 1: Administration Honor Board ALONE (15s or 20s) - NO TTS!
-// Phase 2: Student Honor Cards ALONE (with vocalized TTS)
-// Phase 3: Finale Screen ALONE - NO TTS!
+// AUTOMATIC 3-PHASE CEREMONY ENGINE WITH 3-SECOND AUDIO FADE-OUT BETWEEN PHASES:
+// Phase 1: Administration Honor Board ALONE (20s) - NO TTS -> 3s Music Fade-Out
+// Phase 2: Student Honor Cards ALONE (with vocalized TTS) -> 3s Music Fade-Out
+// Phase 3: Finale Screen ALONE (15s) - NO TTS -> 3s Music Fade-Out
 function startCelebration() {
   stopCelebration();
   stopPreviewSegment();
@@ -1596,7 +1704,7 @@ function startCelebration() {
 
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
-  // PHASE 1: ADMINISTRATION HONOR BOARD ALONE (SILENT TTS, VIDEO/MUSIC ONLY)
+  // PHASE 1: ADMINISTRATION HONOR BOARD ALONE (20 SECONDS, SILENT TTS)
   setStageView('INTRO');
   document.getElementById('phase-badge').textContent = `لوحة شرف الإدارة (${slices.introDur} ث)`;
 
@@ -1613,12 +1721,23 @@ function startCelebration() {
 
   phaseTimeout = setTimeout(() => {
     clearInterval(timerInterval);
-    currentIndex = 0;
-    runStudentLoop();
+    // 3-SECOND FADE-OUT TRANSITION BETWEEN PHASE 1 AND PHASE 2
+    runPhaseFadeOutTransition(
+      slices.fadeGap,
+      `⏳ تلاشي الموسيقى والانتقال للطلاب (${slices.fadeGap} ث)...`,
+      () => {
+        currentIndex = 0;
+        runStudentLoop();
+      }
+    );
   }, slices.introDur * 1000);
 }
 
 function runStudentLoop() {
+  if (!activeList.length) {
+    runOutroPhase();
+    return;
+  }
   // PHASE 2: STUDENT CARDS ALONE ON SCREEN (WITH VOCALIZED TTS)
   setStageView('STUDENT');
   const slices = getSlices();
@@ -1638,7 +1757,16 @@ function runStudentLoop() {
       currentIndex++;
       if (currentIndex >= activeList.length) {
         clearInterval(timerInterval);
-        runOutroPhase();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        // 3-SECOND FADE-OUT TRANSITION BETWEEN PHASE 2 AND PHASE 3
+        const curSlices = getSlices();
+        runPhaseFadeOutTransition(
+          curSlices.fadeGap,
+          `⏳ تلاشي الموسيقى والانتقال للختام (${curSlices.fadeGap} ث)...`,
+          () => {
+            runOutroPhase();
+          }
+        );
       } else {
         const nextSlices = getSlices();
         document.getElementById('phase-badge').textContent = `طالب ${currentIndex + 1} / ${activeList.length}`;
@@ -1666,17 +1794,31 @@ function runOutroPhase() {
     elapsed += 0.25;
     bar.style.width = Math.min(100, (elapsed / slices.outroDur) * 100) + '%';
     if (elapsed >= slices.outroDur) {
-      stopCelebration();
-      document.getElementById('phase-badge').textContent = "اكتمل الحفل";
+      clearInterval(timerInterval);
+      // 3-SECOND FINAL FADE-OUT AT THE END OF PHASE 3
+      runPhaseFadeOutTransition(
+        slices.fadeGap,
+        `⏳ تلاشي موسيقى الختام (${slices.fadeGap} ث)...`,
+        () => {
+          stopCelebration();
+          document.getElementById('phase-badge').textContent = "اكتمل الحفل بنجاح";
+        }
+      );
     }
   }, 250);
 }
 
 function stopCelebration() {
   clearInterval(timerInterval);
+  clearInterval(fadeInterval);
   clearTimeout(phaseTimeout);
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  allBgVids.forEach(v => { try { v.pause(); } catch(e){} });
+  const stageEl = document.getElementById('main-stage');
+  if (stageEl) stageEl.classList.remove('fading-out');
+  const vol = parseFloat(document.getElementById('bgVolumeSlider').value || '0.65');
+  allBgVids.forEach(v => {
+    try { v.pause(); v.volume = vol; } catch(e){}
+  });
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('phase-badge').textContent = "متوقف";
   const startBtn = document.getElementById('instant-start-btn');
@@ -1685,6 +1827,9 @@ function stopCelebration() {
 
 function nextStudent() {
   if (!activeList.length) return;
+  clearInterval(fadeInterval);
+  const stageEl = document.getElementById('main-stage');
+  if (stageEl) stageEl.classList.remove('fading-out');
   if (!mediaUnlocked) {
     mediaUnlocked = true;
     [vid1, vid2, vid3, vidSingle].forEach(v => { v.muted = false; });
@@ -1699,6 +1844,9 @@ function nextStudent() {
 
 function prevStudent() {
   if (!activeList.length) return;
+  clearInterval(fadeInterval);
+  const stageEl = document.getElementById('main-stage');
+  if (stageEl) stageEl.classList.remove('fading-out');
   if (!mediaUnlocked) {
     mediaUnlocked = true;
     [vid1, vid2, vid3, vidSingle].forEach(v => { v.muted = false; });
@@ -1725,9 +1873,10 @@ function renderAdminTable() {
     if (excludedKeys.has(dbIdx)) return;
     if (filterVal !== 'ALL' && st.class_code !== filterVal) return;
     displayCounter++;
-    const isReserve = displayCounter > 10 && filterVal !== 'ALL';
+    const isReserve = st.note === 'احتياطي';
+    const elig = checkStudentEligibility(st);
     const tr = document.createElement('tr');
-    if (isReserve) tr.style.opacity = '0.65';
+    if (isReserve || !elig.eligible) tr.style.opacity = '0.68';
     tr.innerHTML = `
       <td><strong>${displayCounter}</strong> ${isReserve ? '<span style="color:#f59e0b;font-size:0.68rem;">(احتياطي)</span>' : ''}</td>
       <td><input type="text" class="edit-inp name-inp" value="${st.name}" onchange="updateStudentField(${dbIdx}, 'name', this.value)"></td>
@@ -1740,6 +1889,11 @@ function renderAdminTable() {
       <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.sci}" onchange="updateStudentField(${dbIdx}, 'sci', this.value)"></td>
       <td><input type="number" step="0.5" class="edit-inp num-inp" value="${st.rel}" onchange="updateStudentField(${dbIdx}, 'rel', this.value)"></td>
       <td><strong style="color:var(--gold);">${st.actual_total}</strong></td>
+      <td>
+        <span class="elig-badge ${elig.eligible ? 'elig-pass' : 'elig-block'}">
+          ${elig.eligible ? '✅ مستوفٍ' : '🚫 محجوب (' + elig.reason + ')'}
+        </span>
+      </td>
       <td>
         <button class="btn btn-danger btn-sm" onclick="excludeStudent(${dbIdx})">🗑 حذف</button>
       </td>
@@ -1794,7 +1948,7 @@ function addNewStudentRow() {
 }
 
 function saveAllEdits() {
-  localStorage.setItem('zohour_students_db_v7', JSON.stringify(FULL_DATABASE));
+  localStorage.setItem('zohour_students_db_v9', JSON.stringify(FULL_DATABASE));
   saveSlicesToStorage();
   applyFilter();
 }
@@ -1803,7 +1957,7 @@ function resetDatabaseToFactory() {
   if (!confirm("هل أنت متأكد من استعادة بيانات الطلاب الأصلية بالتشكيل الكامل؟")) return;
   FULL_DATABASE = JSON.parse(JSON.stringify(FACTORY_DATABASE));
   excludedKeys.clear();
-  localStorage.removeItem('zohour_students_db_v7');
+  localStorage.removeItem('zohour_students_db_v9');
   renderAdminTable();
   applyFilter();
 }
@@ -1835,7 +1989,7 @@ function handleExcelUpload(e) {
 }
 
 function exportDatabaseToExcel() {
-  const exportRows = FULL_DATABASE.filter((_, idx) => !excludedKeys.has(idx)).map((s, i) => ({
+  const exportRows = FULL_DATABASE.filter((s, idx) => !excludedKeys.has(idx) && checkStudentEligibility(s).eligible && s.note !== 'احتياطي').map((s, i) => ({
     "م": i + 1,
     "الصف الدراسي": s.grade,
     "الفصل": s.class_code,
@@ -1852,7 +2006,7 @@ function exportDatabaseToExcel() {
   }));
   const ws = XLSX.utils.json_to_sheet(exportRows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "كل_الأوائل");
+  XLSX.utils.book_append_sheet(wb, ws, "المجتازون_فوق_80");
   XLSX.writeFile(wb, "awael.xlsx");
 }
 
