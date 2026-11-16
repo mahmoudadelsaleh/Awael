@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>احتفالية أوائل مدرسة الزهور الإعدادية بنين - شهر أكتوبر</title>
+<!-- Direct Preload Hints for Instant Media Loading on GitHub Pages -->
+<link rel="preload" href="music1.mp4" as="video" type="video/mp4">
+<link rel="preload" href="music2.mp4" as="video" type="video/mp4">
+<link rel="preload" href="music3.mp4" as="video" type="video/mp4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -38,16 +42,45 @@
     justify-content: center;
     position: relative;
   }
-  #bg-video {
+
+  /* Dedicated Preloaded Background Video Layers (Zero-Latency Switching) */
+  .bg-vid {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
     object-fit: cover;
-    opacity: 0.30;
+    opacity: 0;
     z-index: -1;
     pointer-events: none;
+    transition: opacity 0.35s ease;
   }
+  .bg-vid.active-vid {
+    opacity: 0.32;
+  }
+
+  /* Preload Status Pill (Top-Right) */
+  .preload-pill {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 500;
+    background: rgba(11, 18, 34, 0.82);
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    color: var(--cyan);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    transition: opacity 0.4s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+  .preload-pill.ready {
+    border-color: rgba(34, 197, 94, 0.6);
+    color: #4ade80;
+  }
+  .clean-mode .preload-pill { opacity: 0 !important; }
 
   /* Micro Floating Settings Gear (Top-Left) */
   .floating-gear {
@@ -86,13 +119,13 @@
     display: flex;
     gap: 4px;
     align-items: center;
-    background: rgba(7, 11, 20, 0.65);
-    border: 1px solid rgba(255, 215, 0, 0.30);
+    background: rgba(7, 11, 20, 0.72);
+    border: 1px solid rgba(255, 215, 0, 0.35);
     padding: 4px 8px;
     border-radius: 999px;
     backdrop-filter: blur(6px);
     transition: opacity 0.25s;
-    opacity: 0.42;
+    opacity: 0.65;
   }
   .ceremony-QuickBar:hover { opacity: 1; }
   .clean-mode .ceremony-QuickBar,
@@ -118,6 +151,29 @@
   }
   .q-btn:hover { transform: scale(1.04); }
 
+  /* One-Tap Instant Audio Launch Banner inside Admin Intro if Paused */
+  .instant-start-btn {
+    margin-top: 10px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: #000;
+    font-weight: 900;
+    font-size: 0.88rem;
+    border: 2px solid #fff;
+    padding: 7px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    animation: pulseGlow 1.5s infinite ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .instant-start-btn.hidden { display: none !important; }
+  @keyframes pulseGlow {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(255, 215, 0, 0.55); }
+    50% { transform: scale(1.05); box-shadow: 0 0 26px rgba(255, 215, 0, 0.9); }
+  }
+
   /* Compact Jewel-Like Stage */
   .stage {
     width: 94%;
@@ -140,7 +196,6 @@
     overflow: hidden;
     backdrop-filter: blur(10px);
   }
-  /* Subtle Corner Accents */
   .card-container::before {
     content: "";
     position: absolute;
@@ -489,14 +544,21 @@
 </head>
 <body>
 
-<video id="bg-video" src="music1.mp4" playsinline></video>
+<!-- 4 Dedicated Preloaded Video Layers for Zero-Delay Switching ("شغال طلقة") -->
+<video id="bg-vid-1" class="bg-vid active-vid" src="music1.mp4" preload="auto" playsinline webkit-playsinline></video>
+<video id="bg-vid-2" class="bg-vid" src="music2.mp4" preload="auto" loop playsinline webkit-playsinline></video>
+<video id="bg-vid-3" class="bg-vid" src="music3.mp4" preload="auto" playsinline webkit-playsinline></video>
+<video id="bg-vid-single" class="bg-vid" src="awael.mp4" preload="auto" playsinline webkit-playsinline></video>
+
+<!-- Preload Status Indicator -->
+<div class="preload-pill" id="preload-pill">⚡ جاري تحميل الصوتيات مباشرة...</div>
 
 <!-- Small Settings Gear Icon in Top-Left Corner -->
 <button class="floating-gear" onclick="requestSettingsOpen()" title="الإعدادات وتحرير البيانات (Mas$2026)">⚙️</button>
 
 <!-- Subtle Mini Ceremony Control Pill in Bottom-Right -->
 <div class="ceremony-QuickBar">
-  <button class="q-btn primary" onclick="startCelebration()">▶ بدء الحفل</button>
+  <button class="q-btn primary" onclick="unlockAllMediaAndStart()">▶ بدء الحفل</button>
   <button class="q-btn" onclick="stopCelebration()">⏹</button>
   <button class="q-btn" onclick="prevStudent()">⏮</button>
   <button class="q-btn" onclick="nextStudent()">⏭</button>
@@ -506,7 +568,7 @@
 <!-- COMPACT EXCLUSIVE STAGE -->
 <div class="stage">
   <div class="card-container" id="card-view">
-    <div class="phase-indicator" id="phase-badge">جاهز للعرض</div>
+    <div class="phase-indicator" id="phase-badge">جاهز للانطلاق</div>
 
     <!-- SCREEN 1: STANDALONE ADMINISTRATION HONOR BOARD (15s or 20s ALONE, SILENT TTS) -->
     <div class="admin-intro-view active" id="admin-intro-view">
@@ -528,6 +590,10 @@
           <div class="pillar-name" id="intro-leader-name">أ / مَحْمُودْ عَادِلْ</div>
         </div>
       </div>
+      <!-- Instant One-Tap Launch Button (Auto-hides once ceremony starts) -->
+      <button class="instant-start-btn" id="instant-start-btn" onclick="unlockAllMediaAndStart()">
+        🔊 اضغط هنا لتشغيل الصوت وبدء الحفل فوراً
+      </button>
     </div>
 
     <!-- SCREEN 2: STANDALONE STUDENT HONOR CARD (NO ADMINISTRATION HEADER/NAMES, VOCALIZED TTS) -->
@@ -641,7 +707,7 @@
             <button class="btn btn-secondary btn-sm" onclick="setQuickAdminDuration(20)">20 ثانية</button>
           </div>
           <div style="margin-top:10px;">
-            <button class="btn" style="width:100%;" onclick="closeSettingsModal(); startCelebration();">▶ بدء الحفل الآلي الآن</button>
+            <button class="btn" style="width:100%;" onclick="closeSettingsModal(); unlockAllMediaAndStart();">▶ بدء الحفل الآلي الآن</button>
           </div>
         </div>
 
@@ -668,10 +734,10 @@
           <label style="display:flex; align-items:center; gap:6px; margin-top:4px; cursor:pointer; font-size:0.8rem;">
             <input type="checkbox" id="enableTTS" checked> تفعيل النطق الآلي لبطاقات الطلاب فقط (المقدمة صامتة)
           </label>
-          <label style="display:block; margin-top:8px; font-size:0.76rem; color:#cbd5e1;">مستوى صوت فيديو الخلفية:</label>
-          <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.35" onchange="updateBgVolume()" style="width:100%; margin-top:2px;">
+          <label style="display:block; margin-top:8px; font-size:0.76rem; color:#cbd5e1;">مستوى صوت الفيديوهات (music1, 2, 3):</label>
+          <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.05" value="0.65" onchange="updateBgVolume()" style="width:100%; margin-top:2px;">
           <label style="display:block; margin-top:6px; font-size:0.76rem; color:#cbd5e1;">شفافية فيديو الخلفية:</label>
-          <input type="range" id="bgOpacitySlider" min="0.05" max="0.9" step="0.05" value="0.30" onchange="updateBgOpacity()" style="width:100%; margin-top:2px;">
+          <input type="range" id="bgOpacitySlider" min="0.05" max="0.9" step="0.05" value="0.32" onchange="updateBgOpacity()" style="width:100%; margin-top:2px;">
         </div>
       </div>
     </div>
@@ -683,7 +749,7 @@
         <div class="mode-radio-group">
           <label class="mode-option selected" id="opt-multi" onclick="setMediaMode('MULTI')">
             <input type="radio" name="mediaModeRadio" value="MULTI" checked>
-            🎵 3 فيديوهات (music1 للإدارة + music2 للبطاقات + music3 للنهاية)
+            🎵 3 فيديوهات (music1.mp4 للإدارة + music2.mp4 للبطاقات + music3.mp4 للنهاية)
           </label>
           <label class="mode-option" id="opt-single" onclick="setMediaMode('SINGLE')">
             <input type="radio" name="mediaModeRadio" value="SINGLE">
@@ -698,7 +764,7 @@
           <h4>1️⃣ فيديو لوحة الإدارة (music1.mp4)</h4>
           <label style="font-size:0.75rem; color:#94a3b8;">المدة بالثواني (15 أو 20 ثانية):</label>
           <input type="number" id="multiIntroDur" value="20" min="3" style="width:100%; margin:3px 0 6px;">
-          <input type="text" id="multiPath1" value="music1.mp4" style="width:100%; margin-bottom:5px; direction:ltr;">
+          <input type="text" id="multiPath1" value="music1.mp4" onchange="syncVideoSources()" style="width:100%; margin-bottom:5px; direction:ltr;">
           <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(1, event)" style="width:100%; font-size:0.72rem;">
           <div style="margin-top:6px;">
             <button class="btn btn-secondary btn-sm" onclick="loadInPreviewer(1)">👁 معاينة</button>
@@ -709,7 +775,7 @@
           <h4>2️⃣ فيديو بطاقات الطلاب (music2.mp4)</h4>
           <label style="font-size:0.75rem; color:#94a3b8;">مدة بطاقة كل طالب (بالثواني):</label>
           <input type="number" id="multiCardDur" value="15" min="3" style="width:100%; margin:3px 0 6px;">
-          <input type="text" id="multiPath2" value="music2.mp4" style="width:100%; margin-bottom:5px; direction:ltr;">
+          <input type="text" id="multiPath2" value="music2.mp4" onchange="syncVideoSources()" style="width:100%; margin-bottom:5px; direction:ltr;">
           <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(2, event)" style="width:100%; font-size:0.72rem;">
           <div style="margin-top:6px;">
             <button class="btn btn-secondary btn-sm" onclick="loadInPreviewer(2)">👁 معاينة</button>
@@ -720,7 +786,7 @@
           <h4>3️⃣ فيديو النهاية (music3.mp4)</h4>
           <label style="font-size:0.75rem; color:#94a3b8;">مدة شاشة النهاية (بالثواني):</label>
           <input type="number" id="multiOutroDur" value="15" min="3" style="width:100%; margin:3px 0 6px;">
-          <input type="text" id="multiPath3" value="music3.mp4" style="width:100%; margin-bottom:5px; direction:ltr;">
+          <input type="text" id="multiPath3" value="music3.mp4" onchange="syncVideoSources()" style="width:100%; margin-bottom:5px; direction:ltr;">
           <input type="file" accept="video/*,audio/*" onchange="handleMultiFileUpload(3, event)" style="width:100%; font-size:0.72rem;">
           <div style="margin-top:6px;">
             <button class="btn btn-secondary btn-sm" onclick="loadInPreviewer(3)">👁 معاينة</button>
@@ -732,7 +798,7 @@
       <div class="slicer-layout">
         <div class="preview-box">
           <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;" id="preview-title">مشغل المعاينة وضبط التوقيت</h4>
-          <video id="preview-video" src="music1.mp4" controls playsinline></video>
+          <video id="preview-video" src="awael.mp4" preload="metadata" controls playsinline></video>
 
           <div class="time-readout">
             <span>الثانية: <strong id="cur-sec-txt">0.00</strong> ث</span>
@@ -752,7 +818,7 @@
             <label style="font-size:0.76rem; color:var(--gold); font-weight:bold;">ملف الفيديو الموحد (awael.mp4):</label>
             <input type="file" accept="video/*,audio/*" onchange="handleSingleVideoUpload(event)" style="width:100%; margin-top:4px; font-size:0.72rem;">
             <div style="margin-top:6px; display:flex; gap:5px; align-items:center;">
-              <input type="text" id="customVideoPath" value="/storage/emulated/0/الزهور/awael.mp4" style="flex:1; font-size:0.75rem; direction:ltr;">
+              <input type="text" id="customVideoPath" value="awael.mp4" style="flex:1; font-size:0.75rem; direction:ltr;">
               <button class="btn btn-secondary btn-sm" onclick="applyCustomVideoPath()">تطبيق</button>
             </div>
           </div>
@@ -912,13 +978,9 @@ function synthesizeSpokenClass(code) {
 function prepareNameForTTS(rawName) {
   if (!rawName) return '';
   let s = rawName;
-  // Convert word-final Ta' Marbuta with Sukun (ةْ) or bare (ة) to silent Ha' with Sukun (هْ) so TTS never says "t"
   s = s.replace(/ةْ/g, 'هْ').replace(/ة(?=\s|$)/g, 'هْ');
-  // Silent Waw in Amr (عَمْرْو -> عَمْرْ)
   s = s.replace(/عَمْرْو/g, 'عَمْرْ').replace(/عَمْرُو/g, 'عَمْرْ');
-  // Expand dagger alif for Android/Google TTS engines
   s = s.replace(/طٰهَ/g, 'طَاهَا').replace(/اللّٰهْ/g, 'اللَّاهْ').replace(/الرَّحْمٰنْ/g, 'الرَّحْمَانْ');
-  // Keep long vowels natural in TTS without diphthongizing
   s = s.replace(/ِيْ/g, 'ِي').replace(/َىْ/g, 'َى').replace(/َاْ/g, 'َا');
   return s;
 }
@@ -940,16 +1002,132 @@ let timerInterval = null;
 let phaseTimeout = null;
 let previewStopHandler = null;
 let isSettingsUnlocked = false;
+let mediaUnlocked = false;
+let selectedArabicVoice = null;
+const blobCache = {};
 
-const bgVideoEl = document.getElementById('bg-video');
-bgVideoEl.addEventListener('error', function() {
-  const currentSrc = bgVideoEl.getAttribute('src') || '';
-  if (currentSrc && !currentSrc.startsWith('blob:') && !currentSrc.startsWith('/storage/')) {
-    const fileName = currentSrc.split('/').pop();
-    bgVideoEl.src = '/storage/emulated/0/الزهور/' + fileName;
-    bgVideoEl.play().catch(()=>{});
+// 4 Dedicated Video Elements
+const vid1 = document.getElementById('bg-vid-1');
+const vid2 = document.getElementById('bg-vid-2');
+const vid3 = document.getElementById('bg-vid-3');
+const vidSingle = document.getElementById('bg-vid-single');
+const allBgVids = [vid1, vid2, vid3, vidSingle];
+
+// Local Android fallback ONLY when running via file:// protocol
+if (window.location.protocol === 'file:') {
+  allBgVids.forEach(v => {
+    v.addEventListener('error', function() {
+      const currentSrc = v.getAttribute('src') || '';
+      if (currentSrc && !currentSrc.startsWith('blob:') && !currentSrc.startsWith('/storage/')) {
+        const fileName = currentSrc.split('/').pop();
+        v.src = '/storage/emulated/0/الزهور/' + fileName;
+        v.load();
+      }
+    }, { once: true });
+  });
+}
+
+// Pre-warm Arabic TTS Voice
+function initArabicVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const pickVoice = () => {
+    const voices = window.speechSynthesis.getVoices() || [];
+    selectedArabicVoice = voices.find(v => v.lang === 'ar-EG')
+                       || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ar'))
+                       || null;
+  };
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
+
+// Direct Background Preloader & RAM Blob Caching for music1.mp4, music2.mp4, music3.mp4
+async function preloadAllAudioVideoDirect() {
+  const pill = document.getElementById('preload-pill');
+  const files = [
+    { key: 'music1.mp4', el: vid1 },
+    { key: 'music2.mp4', el: vid2 },
+    { key: 'music3.mp4', el: vid3 }
+  ];
+
+  // Trigger native browser preloading immediately
+  allBgVids.forEach(v => { try { v.load(); } catch(e){} });
+
+  let loadedCount = 0;
+  await Promise.all(files.map(async (item) => {
+    try {
+      const resp = await fetch(item.key, { cache: 'force-cache' });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      blobCache[item.key] = blobUrl;
+      // Only swap src if the video is currently paused so we never interrupt active playback
+      if (item.el.paused) {
+        item.el.src = blobUrl;
+        item.el.load();
+      }
+      loadedCount++;
+      if (pill) pill.textContent = `⚡ تم تحميل الصوتيات (${loadedCount}/3)...`;
+    } catch (err) {
+      // Fallback: native <video preload="auto"> is already handling streaming
+      loadedCount++;
+    }
+  }));
+
+  if (pill) {
+    pill.textContent = '✅ الصوتيات محملة وجاهزة 100%';
+    pill.classList.add('ready');
+    setTimeout(() => { pill.style.opacity = '0'; }, 3500);
   }
-});
+}
+
+// Unlocks all 4 video elements + Web Speech API on the very first user tap (or auto-start)
+function unlockAllMediaAndStart() {
+  const startBtn = document.getElementById('instant-start-btn');
+  if (startBtn) startBtn.classList.add('hidden');
+
+  if (!mediaUnlocked) {
+    mediaUnlocked = true;
+    const vol = parseFloat(document.getElementById('bgVolumeSlider').value || '0.65');
+    // Unlock inactive videos silently inside the user gesture so setTimeout transitions never get blocked
+    [vid2, vid3, vidSingle].forEach(v => {
+      try {
+        v.muted = true;
+        const p = v.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            v.pause();
+            v.currentTime = 0;
+            v.muted = false;
+            v.volume = vol;
+          }).catch(() => {
+            v.muted = false;
+            v.volume = vol;
+          });
+        }
+      } catch (e) {}
+    });
+
+    // Warm up SpeechSynthesis with an empty utterance inside user gesture
+    if ('speechSynthesis' in window) {
+      try {
+        const warm = new SpeechSynthesisUtterance('');
+        warm.volume = 0;
+        window.speechSynthesis.speak(warm);
+      } catch (e) {}
+    }
+  }
+
+  startCelebration();
+}
+
+function syncVideoSources() {
+  const p1 = document.getElementById('multiPath1').value.trim() || 'music1.mp4';
+  const p2 = document.getElementById('multiPath2').value.trim() || 'music2.mp4';
+  const p3 = document.getElementById('multiPath3').value.trim() || 'music3.mp4';
+  vid1.src = blobCache[p1] || p1;
+  vid2.src = blobCache[p2] || p2;
+  vid3.src = blobCache[p3] || p3;
+}
 
 // Exclusive Stage Switcher: Administration Board and Student Cards NEVER appear together
 function setStageView(viewType) {
@@ -978,6 +1156,9 @@ function handleMultiFileUpload(num, e) {
   if (!file) return;
   const url = URL.createObjectURL(file);
   document.getElementById('multiPath' + num).value = url;
+  if (num === 1) { vid1.src = url; vid1.load(); }
+  if (num === 2) { vid2.src = url; vid2.load(); }
+  if (num === 3) { vid3.src = url; vid3.load(); }
   loadInPreviewer(num);
 }
 
@@ -986,7 +1167,7 @@ function loadInPreviewer(num) {
   const labels = {1: 'معاينة لوحة شرف الإدارة (music1.mp4)', 2: 'معاينة عرض البطاقات (music2.mp4)', 3: 'معاينة النهاية (music3.mp4)'};
   document.getElementById('preview-title').textContent = labels[num] || 'مشغل المعاينة';
   const pv = document.getElementById('preview-video');
-  pv.src = path;
+  pv.src = blobCache[path] || path;
   pv.play().catch(()=>{});
 }
 
@@ -1044,7 +1225,11 @@ function updateHeaderTitles() {
 }
 
 function updateBgOpacity() {
-  document.getElementById('bg-video').style.opacity = document.getElementById('bgOpacitySlider').value;
+  const op = document.getElementById('bgOpacitySlider').value;
+  allBgVids.forEach(v => {
+    if (v.classList.contains('active-vid')) v.style.opacity = op;
+    else v.style.opacity = 0;
+  });
 }
 
 function formatMMSS(sec) {
@@ -1094,7 +1279,7 @@ function getSlices() {
   const oE = parseFloat(document.getElementById('outroEnd').value) || 355;
   return {
     mode: 'SINGLE',
-    singlePath: document.getElementById('customVideoPath').value.trim() || '/storage/emulated/0/الزهور/awael.mp4',
+    singlePath: document.getElementById('customVideoPath').value.trim() || 'awael.mp4',
     introStart: iS, introEnd: Math.max(iS + 1, iE), introDur: Math.max(1, +(iE - iS).toFixed(1)),
     cardStart: cS, cardEnd: Math.max(cS + 1, cE), cardDur: Math.max(1, +(cE - cS).toFixed(1)),
     outroStart: oS, outroEnd: Math.max(oS + 1, oE), outroDur: Math.max(1, +(oE - oS).toFixed(1))
@@ -1154,13 +1339,14 @@ function saveSlicesToStorage() {
     outroStart: document.getElementById('outroStart').value,
     outroEnd: document.getElementById('outroEnd').value
   };
-  localStorage.setItem('zohour_video_cfg_v7', JSON.stringify(cfg));
+  localStorage.setItem('zohour_video_cfg_v8', JSON.stringify(cfg));
+  syncVideoSources();
   alert("تم حفظ الإعدادات بنجاح!");
 }
 
 function loadFromStorage() {
   try {
-    const rawCfg = localStorage.getItem('zohour_video_cfg_v7');
+    const rawCfg = localStorage.getItem('zohour_video_cfg_v8');
     if (rawCfg) {
       const c = JSON.parse(rawCfg);
       if (c.mediaMode) setMediaMode(c.mediaMode);
@@ -1200,37 +1386,53 @@ function resetDefaultSlices() {
   document.getElementById('outroStart').value = 340;
   document.getElementById('outroEnd').value = 355;
   updateSliceDurations();
-  localStorage.removeItem('zohour_video_cfg_v7');
+  localStorage.removeItem('zohour_video_cfg_v8');
+  syncVideoSources();
 }
 
+// Instant Zero-Latency Media Switcher using the 4 preloaded <video> elements
 function playPhaseMedia(phaseNumber, startSec = 0) {
-  const vid = document.getElementById('bg-video');
   const s = getSlices();
-  vid.volume = parseFloat(document.getElementById('bgVolumeSlider').value || '0.35');
+  const vol = parseFloat(document.getElementById('bgVolumeSlider').value || '0.65');
+  const op = document.getElementById('bgOpacitySlider').value || '0.32';
 
+  let activeVid = vid1;
   if (s.mode === 'MULTI') {
-    const targetSrc = (phaseNumber === 1) ? s.path1 : (phaseNumber === 2 ? s.path2 : s.path3);
-    if (vid.getAttribute('src') !== targetSrc) {
-      vid.src = targetSrc;
-    }
-    try {
-      vid.currentTime = 0;
-      vid.play().catch(()=>{});
-    } catch(e) {}
+    activeVid = (phaseNumber === 1) ? vid1 : (phaseNumber === 2 ? vid2 : vid3);
   } else {
-    if (vid.getAttribute('src') !== s.singlePath) {
-      vid.src = s.singlePath;
-    }
-    try {
-      vid.currentTime = startSec;
-      vid.play().catch(()=>{});
-    } catch(e) {}
+    activeVid = vidSingle;
   }
+
+  // Pause other background videos and highlight the active one
+  allBgVids.forEach(v => {
+    if (v !== activeVid) {
+      v.classList.remove('active-vid');
+      v.style.opacity = 0;
+      try { v.pause(); } catch(e) {}
+    }
+  });
+
+  activeVid.classList.add('active-vid');
+  activeVid.style.opacity = op;
+  activeVid.muted = false;
+  activeVid.volume = vol;
+
+  try {
+    activeVid.currentTime = (s.mode === 'MULTI') ? 0 : startSec;
+    const playPromise = activeVid.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {
+        // Show one-tap button if browser blocked unmuted autoplay
+        const btn = document.getElementById('instant-start-btn');
+        if (btn) btn.classList.remove('hidden');
+      });
+    }
+  } catch(e) {}
 }
 
 function updateBgVolume() {
-  const vid = document.getElementById('bg-video');
-  vid.volume = parseFloat(document.getElementById('bgVolumeSlider').value || '0.35');
+  const vol = parseFloat(document.getElementById('bgVolumeSlider').value || '0.65');
+  allBgVids.forEach(v => { v.volume = vol; });
 }
 
 function applyCustomVideoPath() {
@@ -1238,7 +1440,8 @@ function applyCustomVideoPath() {
   if (!p) return;
   document.getElementById('preview-title').textContent = 'معاينة الملف الموحد (awael.mp4)';
   document.getElementById('preview-video').src = p;
-  if (mediaMode === 'SINGLE') document.getElementById('bg-video').src = p;
+  vidSingle.src = p;
+  vidSingle.load();
 }
 
 // Builds the ordered queue:
@@ -1350,6 +1553,7 @@ function speakText(txt) {
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(txt);
   u.lang = 'ar-EG';
+  if (selectedArabicVoice) u.voice = selectedArabicVoice;
   u.rate = 0.93;
   window.speechSynthesis.speak(u);
 }
@@ -1387,8 +1591,9 @@ function startCelebration() {
   stopCelebration();
   stopPreviewSegment();
   const slices = getSlices();
+  const startBtn = document.getElementById('instant-start-btn');
+  if (startBtn) startBtn.classList.add('hidden');
 
-  // Ensure any active TTS is cancelled during the silent Intro
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
   // PHASE 1: ADMINISTRATION HONOR BOARD ALONE (SILENT TTS, VIDEO/MUSIC ONLY)
@@ -1471,14 +1676,19 @@ function stopCelebration() {
   clearInterval(timerInterval);
   clearTimeout(phaseTimeout);
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  const vid = document.getElementById('bg-video');
-  try { vid.pause(); } catch(e){}
+  allBgVids.forEach(v => { try { v.pause(); } catch(e){} });
   document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('phase-badge').textContent = "جاهز للعرض";
+  document.getElementById('phase-badge').textContent = "متوقف";
+  const startBtn = document.getElementById('instant-start-btn');
+  if (startBtn) startBtn.classList.remove('hidden');
 }
 
 function nextStudent() {
   if (!activeList.length) return;
+  if (!mediaUnlocked) {
+    mediaUnlocked = true;
+    [vid1, vid2, vid3, vidSingle].forEach(v => { v.muted = false; });
+  }
   setStageView('STUDENT');
   currentIndex = (currentIndex + 1) % activeList.length;
   const slices = getSlices();
@@ -1489,6 +1699,10 @@ function nextStudent() {
 
 function prevStudent() {
   if (!activeList.length) return;
+  if (!mediaUnlocked) {
+    mediaUnlocked = true;
+    [vid1, vid2, vid3, vidSingle].forEach(v => { v.muted = false; });
+  }
   setStageView('STUDENT');
   currentIndex = (currentIndex - 1 + activeList.length) % activeList.length;
   const slices = getSlices();
@@ -1600,7 +1814,8 @@ function handleSingleVideoUpload(e) {
   const url = URL.createObjectURL(file);
   document.getElementById('customVideoPath').value = url;
   document.getElementById('preview-video').src = url;
-  if (mediaMode === 'SINGLE') document.getElementById('bg-video').src = url;
+  vidSingle.src = url;
+  vidSingle.load();
 }
 
 function handleExcelUpload(e) {
@@ -1641,10 +1856,12 @@ function exportDatabaseToExcel() {
   XLSX.writeFile(wb, "awael.xlsx");
 }
 
-window.onload = () => {
+window.addEventListener('DOMContentLoaded', () => {
+  initArabicVoice();
   loadFromStorage();
   applyFilter();
-};
+  preloadAllAudioVideoDirect();
+});
 </script>
 </body>
 </html>
